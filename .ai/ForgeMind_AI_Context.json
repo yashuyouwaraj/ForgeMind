@@ -1,0 +1,4380 @@
+[
+  {
+    "metadata": {
+      "project": "ForgeMind",
+      "specification": "apis",
+      "status": "approved"
+    },
+    "api": {
+      "name": "ForgeMind Platform API",
+      "version": "v1",
+      "basePath": "/api/v1",
+      "protocol": "HTTPS",
+      "authentication": "JWT",
+      "authorization": "RBAC",
+      "contentType": "application/json"
+    },
+    "standards": {
+      "pagination": {
+        "page": "page",
+        "limit": "limit",
+        "sort": "sort",
+        "order": "asc | desc"
+      },
+      "filtering": true,
+      "search": true,
+      "versioning": "URL",
+      "idFormat": "UUID"
+    },
+    "responseFormat": {
+      "success": {
+        "success": true,
+        "data": {},
+        "meta": {},
+        "message": "Success"
+      },
+      "error": {
+        "success": false,
+        "error": {
+          "code": "ERROR_CODE",
+          "message": "Human readable message",
+          "details": []
+        },
+        "traceId": "trace-id"
+      }
+    },
+    "modules": [
+      {
+        "id": "authentication",
+        "basePath": "/auth",
+        "endpoints": [
+          {
+            "method": "POST",
+            "path": "/login",
+            "authentication": false
+          },
+          {
+            "method": "POST",
+            "path": "/refresh",
+            "authentication": false
+          },
+          {
+            "method": "POST",
+            "path": "/logout",
+            "authentication": true
+          },
+          {
+            "method": "GET",
+            "path": "/me",
+            "authentication": true
+          }
+        ]
+      },
+      {
+        "id": "repositories",
+        "basePath": "/repositories",
+        "endpoints": [
+          {
+            "method": "GET",
+            "path": "/",
+            "authentication": true
+          },
+          {
+            "method": "POST",
+            "path": "/",
+            "authentication": true
+          },
+          {
+            "method": "GET",
+            "path": "/{repositoryId}",
+            "authentication": true
+          },
+          {
+            "method": "PUT",
+            "path": "/{repositoryId}",
+            "authentication": true
+          },
+          {
+            "method": "DELETE",
+            "path": "/{repositoryId}",
+            "authentication": true
+          },
+          {
+            "method": "POST",
+            "path": "/{repositoryId}/sync",
+            "authentication": true
+          }
+        ]
+      },
+      {
+        "id": "analysis",
+        "basePath": "/analysis",
+        "endpoints": [
+          {
+            "method": "POST",
+            "path": "/start",
+            "authentication": true
+          },
+          {
+            "method": "GET",
+            "path": "/{jobId}",
+            "authentication": true
+          },
+          {
+            "method": "GET",
+            "path": "/history",
+            "authentication": true
+          }
+        ]
+      },
+      {
+        "id": "architecture",
+        "basePath": "/architecture",
+        "endpoints": [
+          {
+            "method": "GET",
+            "path": "/{repositoryId}",
+            "authentication": true
+          }
+        ]
+      },
+      {
+        "id": "knowledge-graph",
+        "basePath": "/graph",
+        "endpoints": [
+          {
+            "method": "GET",
+            "path": "/{repositoryId}",
+            "authentication": true
+          },
+          {
+            "method": "GET",
+            "path": "/search",
+            "authentication": true
+          }
+        ]
+      },
+      {
+        "id": "digital-twin",
+        "basePath": "/digital-twin",
+        "endpoints": [
+          {
+            "method": "GET",
+            "path": "/{projectId}",
+            "authentication": true
+          },
+          {
+            "method": "GET",
+            "path": "/timeline/{projectId}",
+            "authentication": true
+          }
+        ]
+      },
+      {
+        "id": "runtime",
+        "basePath": "/runtime",
+        "endpoints": [
+          {
+            "method": "GET",
+            "path": "/health",
+            "authentication": true
+          },
+          {
+            "method": "GET",
+            "path": "/metrics",
+            "authentication": true
+          },
+          {
+            "method": "GET",
+            "path": "/logs",
+            "authentication": true
+          },
+          {
+            "method": "GET",
+            "path": "/traces",
+            "authentication": true
+          }
+        ]
+      },
+      {
+        "id": "impact-analysis",
+        "basePath": "/impact",
+        "endpoints": [
+          {
+            "method": "POST",
+            "path": "/analyse",
+            "authentication": true
+          },
+          {
+            "method": "GET",
+            "path": "/{analysisId}",
+            "authentication": true
+          }
+        ]
+      },
+      {
+        "id": "reasoning",
+        "basePath": "/reasoning",
+        "endpoints": [
+          {
+            "method": "POST",
+            "path": "/query",
+            "authentication": true
+          },
+          {
+            "method": "POST",
+            "path": "/explain",
+            "authentication": true
+          }
+        ]
+      },
+      {
+        "id": "policy",
+        "basePath": "/policies",
+        "endpoints": [
+          {
+            "method": "GET",
+            "path": "/",
+            "authentication": true
+          },
+          {
+            "method": "POST",
+            "path": "/",
+            "authentication": true
+          },
+          {
+            "method": "PUT",
+            "path": "/{policyId}",
+            "authentication": true
+          },
+          {
+            "method": "DELETE",
+            "path": "/{policyId}",
+            "authentication": true
+          }
+        ]
+      },
+      {
+        "id": "export",
+        "basePath": "/exports",
+        "endpoints": [
+          {
+            "method": "POST",
+            "path": "/context",
+            "authentication": true
+          },
+          {
+            "method": "GET",
+            "path": "/{exportId}",
+            "authentication": true
+          }
+        ]
+      },
+      {
+        "id": "plugins",
+        "basePath": "/plugins",
+        "endpoints": [
+          {
+            "method": "GET",
+            "path": "/",
+            "authentication": true
+          },
+          {
+            "method": "POST",
+            "path": "/install",
+            "authentication": true
+          },
+          {
+            "method": "DELETE",
+            "path": "/{pluginId}",
+            "authentication": true
+          }
+        ]
+      },
+      {
+        "id": "settings",
+        "basePath": "/settings",
+        "endpoints": [
+          {
+            "method": "GET",
+            "path": "/",
+            "authentication": true
+          },
+          {
+            "method": "PUT",
+            "path": "/",
+            "authentication": true
+          }
+        ]
+      }
+    ],
+    "httpStatusCodes": {
+      "200": "Success",
+      "201": "Created",
+      "202": "Accepted",
+      "204": "No Content",
+      "400": "Bad Request",
+      "401": "Unauthorized",
+      "403": "Forbidden",
+      "404": "Not Found",
+      "409": "Conflict",
+      "422": "Validation Failed",
+      "429": "Too Many Requests",
+      "500": "Internal Server Error"
+    },
+    "rules": [
+      "Every endpoint returns the standard response format.",
+      "Every endpoint returns a traceId.",
+      "Every endpoint is versioned.",
+      "No endpoint exposes database entities directly.",
+      "DTOs are mandatory.",
+      "Input validation is required.",
+      "JWT is required unless explicitly marked as public.",
+      "RBAC is enforced after authentication."
+    ]
+  },
+  {
+    "architecture": {
+      "name": "ForgeMind Architecture",
+      "style": "Event-Driven Microservices",
+      "deployment": "Cloud Native",
+      "repository": "Monorepo",
+      "processing": "Incremental",
+      "communication": {
+        "synchronous": [
+          "REST API",
+          "WebSocket"
+        ],
+        "asynchronous": [
+          "Apache Kafka"
+        ]
+      },
+      "principles": [
+        "Single Responsibility",
+        "Loose Coupling",
+        "High Cohesion",
+        "Independent Deployment",
+        "Independent Scaling",
+        "Incremental Processing",
+        "Language Agnostic",
+        "Evidence Driven",
+        "Production Ready"
+      ]
+    },
+    "layers": [
+      {
+        "name": "Presentation Layer",
+        "responsibility": "User interface and user interaction.",
+        "technology": [
+          "Next.js",
+          "React",
+          "TypeScript"
+        ]
+      },
+      {
+        "name": "API Layer",
+        "responsibility": "Authentication, routing, validation and request orchestration.",
+        "technology": [
+          "Express.js"
+        ]
+      },
+      {
+        "name": "Application Layer",
+        "responsibility": "Business logic implemented as independent microservices."
+      },
+      {
+        "name": "Intelligence Layer",
+        "responsibility": "Repository analysis, semantic understanding, graph reasoning and software intelligence.",
+        "technology": [
+          "Python",
+          "FastAPI"
+        ]
+      },
+      {
+        "name": "Data Layer",
+        "responsibility": "Persistent storage for business data, graph data, caching and exports."
+      },
+      {
+        "name": "Infrastructure Layer",
+        "responsibility": "Deployment, monitoring, scaling and networking."
+      }
+    ],
+    "coreComponents": [
+      "Frontend",
+      "API Gateway",
+      "Authentication",
+      "Repository Service",
+      "Git Service",
+      "Parser Service",
+      "Semantic Analysis Service",
+      "Universal Intermediate Representation Service",
+      "Knowledge Graph Service",
+      "Digital Twin Service",
+      "Runtime Intelligence Service",
+      "Change Impact Service",
+      "Search Service",
+      "Export Service",
+      "Notification Service",
+      "Analytics Service"
+    ],
+    "processingPipeline": [
+      "Repository Import",
+      "Repository Synchronisation",
+      "Language Detection",
+      "Framework Detection",
+      "Repository Parsing",
+      "Semantic Analysis",
+      "Universal Intermediate Representation Generation",
+      "Knowledge Graph Generation",
+      "Software Digital Twin Synchronisation",
+      "Repository Indexing",
+      "Runtime Correlation",
+      "Change Impact Analysis",
+      "AI Context Export"
+    ],
+    "softwareModel": {
+      "representation": "Software Digital Twin",
+      "graphEngine": "Neo4j",
+      "languageModel": "Universal Intermediate Representation",
+      "searchModel": "Semantic Search",
+      "runtimeModel": "Continuous Synchronisation"
+    },
+    "communication": {
+      "rest": {
+        "purpose": [
+          "Frontend Requests",
+          "Authentication",
+          "Search",
+          "Project Management",
+          "Repository Management"
+        ]
+      },
+      "websocket": {
+        "purpose": [
+          "Live Analysis Progress",
+          "Notifications",
+          "Runtime Updates",
+          "Graph Updates",
+          "Repository Synchronisation"
+        ]
+      },
+      "kafka": {
+        "purpose": [
+          "Repository Analysis",
+          "Graph Updates",
+          "Digital Twin Synchronisation",
+          "Runtime Processing",
+          "Notifications",
+          "Background Jobs"
+        ]
+      }
+    },
+    "storage": {
+      "postgresql": {
+        "purpose": "Transactional business data"
+      },
+      "neo4j": {
+        "purpose": "Software Knowledge Graph and Software Digital Twin"
+      },
+      "redis": {
+        "purpose": "Caching, sessions and temporary processing"
+      },
+      "objectStorage": {
+        "purpose": "Reports, exports, diagrams and generated artifacts"
+      }
+    },
+    "scalability": {
+      "strategy": "Horizontal Scaling",
+      "servicesScaleIndependently": true,
+      "statelessServices": true,
+      "eventDriven": true
+    },
+    "security": {
+      "authentication": "JWT",
+      "authorization": "RBAC",
+      "transport": "HTTPS",
+      "auditLogging": true,
+      "tenantIsolation": true
+    },
+    "supportedRepositoryProviders": [
+      "GitHub",
+      "GitLab",
+      "Bitbucket",
+      "Azure DevOps",
+      "Local Repository",
+      "ZIP Archive"
+    ],
+    "supportedOutputs": [
+      "Software Digital Twin",
+      "Knowledge Graph",
+      "Architecture Model",
+      "Dependency Graph",
+      "Runtime Model",
+      "AI Context Package",
+      "Engineering Reports"
+    ],
+    "nonFunctionalRequirements": {
+      "availability": "High Availability",
+      "performance": "Incremental Processing",
+      "reliability": "Fault Tolerant",
+      "security": "Enterprise Grade",
+      "maintainability": "Modular",
+      "observability": "Full Stack Monitoring",
+      "extensibility": "Plugin Architecture"
+    },
+    "futureExpansion": [
+      "Additional Programming Languages",
+      "Additional Git Providers",
+      "Cloud Platform Integrations",
+      "Security Analysis",
+      "Architecture Recommendations",
+      "Custom Plugins",
+      "Enterprise Integrations"
+    ]
+  },
+  {
+    "metadata": {
+      "project": "ForgeMind",
+      "specification": "configuration",
+      "status": "approved"
+    },
+    "configuration": {
+      "strategy": "Hierarchical",
+      "sourceOfTruth": true,
+      "hotReloadSupported": true
+    },
+    "hierarchy": [
+      "Default Configuration",
+      "Environment Configuration",
+      "Workspace Configuration",
+      "Project Configuration",
+      "Service Configuration",
+      "Runtime Overrides"
+    ],
+    "environments": [
+      "development",
+      "testing",
+      "staging",
+      "production"
+    ],
+    "globalConfiguration": {
+      "applicationName": "ForgeMind",
+      "defaultTimezone": "UTC",
+      "defaultLanguage": "en",
+      "logLevel": "INFO"
+    },
+    "serviceConfiguration": [
+      {
+        "service": "api-gateway",
+        "configuration": [
+          "Port",
+          "Rate Limits",
+          "JWT Settings",
+          "CORS",
+          "HTTPS"
+        ]
+      },
+      {
+        "service": "repository-service",
+        "configuration": [
+          "Repository Storage",
+          "Clone Timeout",
+          "Maximum Repository Size"
+        ]
+      },
+      {
+        "service": "workflow-orchestrator",
+        "configuration": [
+          "Retry Count",
+          "Retry Delay",
+          "Parallel Jobs",
+          "Job Timeout"
+        ]
+      },
+      {
+        "service": "parser-service",
+        "configuration": [
+          "Supported Languages",
+          "Parser Timeout",
+          "Maximum File Size"
+        ]
+      },
+      {
+        "service": "runtime-service",
+        "configuration": [
+          "Metrics Interval",
+          "Trace Sampling",
+          "Log Retention"
+        ]
+      }
+    ],
+    "databaseConfiguration": {
+      "postgres": [
+        "Host",
+        "Port",
+        "Database",
+        "Connection Pool"
+      ],
+      "neo4j": [
+        "URI",
+        "Authentication",
+        "Pool Size"
+      ],
+      "redis": [
+        "Host",
+        "Port",
+        "TTL"
+      ]
+    },
+    "kafkaConfiguration": {
+      "Bootstrap Servers": true,
+      "Consumer Groups": true,
+      "Retry Policy": true,
+      "Dead Letter Queue": true
+    },
+    "featureFlags": [
+      "Runtime Intelligence",
+      "AI Context Export",
+      "Plugin System",
+      "Policy Engine",
+      "Reasoning Engine"
+    ],
+    "pluginConfiguration": {
+      "Auto Discovery": true,
+      "Plugin Directory": "/plugins",
+      "Sandbox Enabled": true
+    },
+    "securityConfiguration": {
+      "JWT Expiration": true,
+      "Refresh Tokens": true,
+      "HTTPS Required": true,
+      "Rate Limiting": true
+    },
+    "configurationRules": [
+      "Environment variables override default values.",
+      "Secrets are never stored in configuration files.",
+      "Every service validates its configuration at startup.",
+      "Invalid configuration prevents service startup.",
+      "Configuration changes are audited.",
+      "Configuration is version controlled."
+    ],
+    "futureCapabilities": [
+      "Remote Configuration",
+      "Configuration Dashboard",
+      "Live Configuration Updates",
+      "Configuration Versioning"
+    ]
+  },
+  {
+    "metadata": {
+      "project": "ForgeMind",
+      "specification": "database",
+      "status": "approved"
+    },
+    "strategy": {
+      "name": "Polyglot Persistence",
+      "description": "Each storage technology is responsible for the data type it manages best.",
+      "principles": [
+        "Single ownership",
+        "No duplicated source of truth",
+        "High cohesion",
+        "Loose coupling",
+        "Scalable by responsibility"
+      ]
+    },
+    "databases": [
+      {
+        "id": "postgres",
+        "name": "PostgreSQL",
+        "type": "Relational Database",
+        "purpose": "Transactional business data",
+        "ownerServices": [
+          "auth-service",
+          "repository-service",
+          "notification-service",
+          "analytics-service"
+        ]
+      },
+      {
+        "id": "neo4j",
+        "name": "Neo4j",
+        "type": "Graph Database",
+        "purpose": "Software Knowledge Graph and Software Digital Twin",
+        "ownerServices": [
+          "graph-service",
+          "digital-twin-service",
+          "runtime-service",
+          "impact-service",
+          "search-service",
+          "reasoning-engine"
+        ]
+      },
+      {
+        "id": "redis",
+        "name": "Redis",
+        "type": "In-Memory Cache",
+        "purpose": "Caching, distributed locks and temporary state",
+        "ownerServices": [
+          "api-gateway",
+          "workflow-orchestrator",
+          "repository-service"
+        ]
+      },
+      {
+        "id": "object-storage",
+        "name": "Object Storage",
+        "type": "Blob Storage",
+        "purpose": "Reports, AI exports, repository snapshots and generated artifacts",
+        "ownerServices": [
+          "export-service"
+        ]
+      }
+    ],
+    "postgresql": {
+      "schemas": [
+        {
+          "name": "identity",
+          "tables": [
+            "users",
+            "roles",
+            "permissions",
+            "user_roles",
+            "refresh_tokens"
+          ]
+        },
+        {
+          "name": "repositories",
+          "tables": [
+            "repositories",
+            "repository_branches",
+            "repository_settings",
+            "repository_sync_history"
+          ]
+        },
+        {
+          "name": "workspace",
+          "tables": [
+            "organizations",
+            "workspaces",
+            "workspace_members"
+          ]
+        },
+        {
+          "name": "jobs",
+          "tables": [
+            "workflow_jobs",
+            "workflow_steps",
+            "job_failures"
+          ]
+        },
+        {
+          "name": "notifications",
+          "tables": [
+            "notifications",
+            "notification_templates"
+          ]
+        },
+        {
+          "name": "analytics",
+          "tables": [
+            "usage_metrics",
+            "platform_statistics",
+            "audit_logs"
+          ]
+        }
+      ]
+    },
+    "neo4j": {
+      "nodeTypes": [
+        "Repository",
+        "Module",
+        "Package",
+        "Namespace",
+        "Class",
+        "Interface",
+        "Function",
+        "Method",
+        "Variable",
+        "Database",
+        "DatabaseTable",
+        "API",
+        "Service",
+        "Deployment",
+        "Container",
+        "Queue",
+        "Topic",
+        "Event",
+        "Configuration",
+        "EnvironmentVariable",
+        "CloudResource",
+        "Pipeline"
+      ],
+      "relationshipTypes": [
+        "CALLS",
+        "USES",
+        "DEPENDS_ON",
+        "IMPLEMENTS",
+        "EXTENDS",
+        "READS",
+        "WRITES",
+        "PUBLISHES",
+        "SUBSCRIBES",
+        "OWNS",
+        "DEPLOYS",
+        "CONFIGURES",
+        "CONNECTS_TO",
+        "HOSTS",
+        "GENERATES",
+        "TRIGGERS"
+      ]
+    },
+    "redis": {
+      "stores": [
+        "authentication-cache",
+        "repository-cache",
+        "graph-cache",
+        "search-cache",
+        "workflow-locks",
+        "rate-limit-cache",
+        "session-cache"
+      ]
+    },
+    "objectStorage": {
+      "buckets": [
+        "repository-snapshots",
+        "analysis-results",
+        "reports",
+        "architecture-diagrams",
+        "graph-exports",
+        "ai-context-packages",
+        "temporary-artifacts"
+      ]
+    },
+    "ownershipRules": [
+      "Each dataset has exactly one owner service.",
+      "No service writes directly to another service's database.",
+      "Cross-service communication occurs through APIs or Kafka events.",
+      "Neo4j is the only source of truth for graph relationships.",
+      "PostgreSQL is the only source of truth for business entities.",
+      "Redis never stores permanent business data.",
+      "Object Storage only stores generated artifacts and exported files."
+    ],
+    "backupStrategy": {
+      "postgresql": "Daily full backup with point-in-time recovery",
+      "neo4j": "Daily backup and graph consistency verification",
+      "redis": "Periodic snapshots",
+      "objectStorage": "Versioned object storage"
+    },
+    "futureExpansion": [
+      "Read replicas",
+      "Database sharding",
+      "Multi-region replication",
+      "Tenant isolation",
+      "Cold archive storage"
+    ]
+  },
+  {
+    "metadata": {
+      "project": "ForgeMind",
+      "specification": "design-system",
+      "status": "approved"
+    },
+    "designSystem": {
+      "name": "ForgeMind Design System",
+      "philosophy": "Premium enterprise software with a modern glassmorphism aesthetic focused on clarity, speed and engineering productivity."
+    },
+    "designPrinciples": [
+      "Professional over flashy.",
+      "Information first.",
+      "Consistency over creativity.",
+      "Minimal visual noise.",
+      "Fast interactions.",
+      "Accessibility by default.",
+      "Every element has a purpose."
+    ],
+    "theme": {
+      "mode": "Dark First",
+      "supportsLightTheme": true,
+      "glassmorphism": true,
+      "blurEffects": true,
+      "softGradients": true
+    },
+    "layout": {
+      "type": "Desktop First",
+      "maxContentWidth": "1600px",
+      "sidebar": "Collapsible",
+      "topNavigation": "Sticky",
+      "contentPadding": "24px",
+      "borderRadius": "Large"
+    },
+    "spacing": {
+      "system": "8 Point Grid",
+      "baseUnit": 8,
+      "scale": [
+        4,
+        8,
+        12,
+        16,
+        24,
+        32,
+        40,
+        48,
+        64,
+        80
+      ]
+    },
+    "typography": {
+      "primaryFont": "Inter",
+      "monospaceFont": "JetBrains Mono",
+      "headingStyle": "Bold",
+      "bodyStyle": "Regular",
+      "lineHeight": "Comfortable"
+    },
+    "iconography": {
+      "library": "Lucide",
+      "style": "Outline",
+      "cornerStyle": "Rounded"
+    },
+    "componentStyle": {
+      "cards": {
+        "glass": true,
+        "shadow": "Soft",
+        "border": "Subtle"
+      },
+      "buttons": {
+        "style": "Minimal",
+        "rounded": true,
+        "hoverAnimation": true
+      },
+      "inputs": {
+        "filled": false,
+        "glass": true,
+        "validationIndicators": true
+      },
+      "tables": {
+        "stickyHeader": true,
+        "virtualScrolling": true,
+        "rowHover": true
+      },
+      "dialogs": {
+        "blurBackground": true,
+        "rounded": true
+      }
+    },
+    "visualization": {
+      "graphs": {
+        "interactive": true,
+        "zoom": true,
+        "pan": true,
+        "fullscreen": true,
+        "miniMap": true
+      },
+      "charts": {
+        "animated": true,
+        "interactive": true
+      },
+      "architectureView": {
+        "dragDrop": true,
+        "smartLayout": true,
+        "edgeHighlighting": true
+      }
+    },
+    "animations": {
+      "enabled": true,
+      "duration": "150-250ms",
+      "principles": [
+        "Subtle",
+        "Fast",
+        "Meaningful",
+        "Never distracting"
+      ]
+    },
+    "loadingExperience": {
+      "skeletonLoaders": true,
+      "progressIndicators": true,
+      "optimisticUpdates": true
+    },
+    "responsive": {
+      "desktop": true,
+      "tablet": true,
+      "mobile": true
+    },
+    "accessibility": {
+      "keyboardNavigation": true,
+      "screenReaderSupport": true,
+      "highContrastMode": true,
+      "focusIndicators": true
+    },
+    "dashboardWidgets": [
+      "Repository Health",
+      "Analysis Progress",
+      "Runtime Overview",
+      "Knowledge Graph Preview",
+      "Recent Activity",
+      "Policy Violations",
+      "AI Context Export",
+      "Quick Actions"
+    ],
+    "supportedViews": [
+      "Table",
+      "Card",
+      "Graph",
+      "Timeline",
+      "Tree",
+      "Kanban",
+      "Split View",
+      "Fullscreen"
+    ],
+    "designRules": [
+      "Every page has one primary action.",
+      "Never overload a screen with information.",
+      "Maximum three visual hierarchy levels.",
+      "Use icons only when they improve recognition.",
+      "Every loading state has a skeleton.",
+      "Every destructive action requires confirmation.",
+      "Navigation remains consistent throughout the application.",
+      "Dark mode is the primary design experience."
+    ],
+    "inspiration": [
+      "Linear",
+      "Raycast",
+      "GitHub",
+      "Vercel",
+      "Grafana",
+      "Azure Portal"
+    ]
+  },
+  {
+    "metadata": {
+      "project": "ForgeMind",
+      "specification": "digital-twin",
+      "status": "approved"
+    },
+    "digitalTwin": {
+      "name": "ForgeMind Software Digital Twin",
+      "description": "A continuously synchronized, language-independent digital representation of an entire software system.",
+      "sourceOfTruth": true,
+      "realTime": true,
+      "incremental": true
+    },
+    "purpose": {
+      "mission": "Maintain a continuously evolving understanding of a software system by combining source code, runtime behaviour, infrastructure and software relationships into a single unified model."
+    },
+    "inputs": [
+      {
+        "source": "Repository Analysis",
+        "service": "repository-analysis"
+      },
+      {
+        "source": "Universal Intermediate Representation",
+        "service": "uir-service"
+      },
+      {
+        "source": "Knowledge Graph",
+        "service": "graph-service"
+      },
+      {
+        "source": "Runtime Intelligence",
+        "service": "runtime-service"
+      },
+      {
+        "source": "Policy Engine",
+        "service": "policy-engine"
+      },
+      {
+        "source": "Metadata Registry",
+        "service": "metadata-registry"
+      }
+    ],
+    "represents": [
+      "Repositories",
+      "Projects",
+      "Services",
+      "Packages",
+      "Classes",
+      "Interfaces",
+      "Functions",
+      "REST APIs",
+      "GraphQL APIs",
+      "Databases",
+      "Tables",
+      "Kafka Topics",
+      "Queues",
+      "Deployments",
+      "Containers",
+      "Infrastructure",
+      "Runtime State",
+      "Dependencies",
+      "Configuration"
+    ],
+    "state": {
+      "repository": true,
+      "architecture": true,
+      "runtime": true,
+      "deployment": true,
+      "configuration": true,
+      "dependencies": true
+    },
+    "synchronization": {
+      "strategy": "Incremental",
+      "fullRebuildSupported": true,
+      "eventDriven": true,
+      "realTimeUpdates": true
+    },
+    "updateTriggers": [
+      "RepositoryImported",
+      "RepositorySynchronized",
+      "RepositoryParsed",
+      "SemanticAnalysisCompleted",
+      "UIRGenerated",
+      "KnowledgeGraphUpdated",
+      "RuntimeUpdated",
+      "DeploymentDetected",
+      "PolicyEvaluated"
+    ],
+    "consumers": [
+      "reasoning-engine",
+      "impact-service",
+      "search-service",
+      "analytics-service",
+      "export-service",
+      "ui"
+    ],
+    "supportedOperations": [
+      "Architecture Exploration",
+      "Dependency Traversal",
+      "Runtime Correlation",
+      "Component Search",
+      "Risk Evaluation",
+      "Impact Prediction",
+      "Health Monitoring",
+      "Engineering Reasoning",
+      "AI Context Generation"
+    ],
+    "healthModel": {
+      "levels": [
+        "Healthy",
+        "Warning",
+        "Critical"
+      ],
+      "signals": [
+        "Build Failures",
+        "Runtime Errors",
+        "Latency",
+        "Policy Violations",
+        "Security Findings",
+        "Dependency Risk"
+      ]
+    },
+    "qualityRules": [
+      "Every Digital Twin entity references a canonical Entity ID.",
+      "Every update must be traceable.",
+      "The Digital Twin is synchronized incrementally whenever possible.",
+      "Deleted software components are removed while preserving historical references.",
+      "No runtime data may overwrite repository metadata.",
+      "The Digital Twin must always remain internally consistent."
+    ],
+    "observability": {
+      "trackChanges": true,
+      "trackFailures": true,
+      "trackLatency": true,
+      "trackSynchronizationTime": true,
+      "trackProcessingDuration": true
+    },
+    "performanceTargets": {
+      "incrementalUpdate": "< 5 seconds",
+      "repositorySynchronization": "< 60 seconds",
+      "searchLatency": "< 200 ms",
+      "graphTraversal": "< 500 ms"
+    },
+    "futureCapabilities": [
+      "Distributed Digital Twins",
+      "Multi-Tenant Digital Twins",
+      "Cloud Resource Correlation",
+      "Infrastructure Digital Twin",
+      "Business Process Correlation"
+    ]
+  },
+  {
+    "metadata": {
+      "project": "ForgeMind",
+      "specification": "domain-model",
+      "status": "approved"
+    },
+    "domain": {
+      "name": "ForgeMind Domain Model",
+      "description": "Canonical business entities used across the ForgeMind platform."
+    },
+    "entities": [
+      {
+        "id": "organization",
+        "name": "Organization",
+        "description": "Top-level owner of workspaces and users.",
+        "attributes": [
+          "id",
+          "name",
+          "slug",
+          "status",
+          "createdAt",
+          "updatedAt"
+        ],
+        "relationships": [
+          {
+            "type": "HAS_MANY",
+            "target": "workspace"
+          },
+          {
+            "type": "HAS_MANY",
+            "target": "user"
+          }
+        ]
+      },
+      {
+        "id": "workspace",
+        "name": "Workspace",
+        "description": "Logical environment containing repositories and projects.",
+        "attributes": [
+          "id",
+          "name",
+          "description",
+          "visibility",
+          "createdAt"
+        ],
+        "relationships": [
+          {
+            "type": "BELONGS_TO",
+            "target": "organization"
+          },
+          {
+            "type": "HAS_MANY",
+            "target": "repository"
+          },
+          {
+            "type": "HAS_MANY",
+            "target": "project"
+          }
+        ]
+      },
+      {
+        "id": "project",
+        "name": "Project",
+        "description": "Logical collection of one or more repositories representing a software system.",
+        "attributes": [
+          "id",
+          "name",
+          "description",
+          "status",
+          "createdAt"
+        ],
+        "relationships": [
+          {
+            "type": "HAS_MANY",
+            "target": "repository"
+          },
+          {
+            "type": "HAS_ONE",
+            "target": "software-digital-twin"
+          }
+        ]
+      },
+      {
+        "id": "repository",
+        "name": "Repository",
+        "description": "Source code repository imported into ForgeMind.",
+        "attributes": [
+          "id",
+          "name",
+          "provider",
+          "defaultBranch",
+          "url",
+          "status"
+        ],
+        "relationships": [
+          {
+            "type": "BELONGS_TO",
+            "target": "project"
+          },
+          {
+            "type": "HAS_MANY",
+            "target": "commit"
+          },
+          {
+            "type": "HAS_MANY",
+            "target": "software-component"
+          }
+        ]
+      },
+      {
+        "id": "commit",
+        "name": "Commit",
+        "description": "Version control commit imported from the repository.",
+        "attributes": [
+          "hash",
+          "author",
+          "message",
+          "timestamp"
+        ],
+        "relationships": [
+          {
+            "type": "BELONGS_TO",
+            "target": "repository"
+          }
+        ]
+      },
+      {
+        "id": "software-component",
+        "name": "Software Component",
+        "description": "Generic representation of a software entity.",
+        "attributes": [
+          "id",
+          "type",
+          "name",
+          "language",
+          "framework",
+          "version"
+        ],
+        "relationships": [
+          {
+            "type": "BELONGS_TO",
+            "target": "repository"
+          },
+          {
+            "type": "CONNECTED_TO",
+            "target": "software-component"
+          }
+        ]
+      },
+      {
+        "id": "api-endpoint",
+        "name": "API Endpoint",
+        "description": "HTTP endpoint exposed by a service.",
+        "attributes": [
+          "method",
+          "path",
+          "authentication",
+          "responseType"
+        ],
+        "relationships": [
+          {
+            "type": "BELONGS_TO",
+            "target": "service"
+          }
+        ]
+      },
+      {
+        "id": "service",
+        "name": "Service",
+        "description": "Deployable backend service.",
+        "attributes": [
+          "id",
+          "name",
+          "technology",
+          "version",
+          "status"
+        ],
+        "relationships": [
+          {
+            "type": "HAS_MANY",
+            "target": "api-endpoint"
+          },
+          {
+            "type": "DEPENDS_ON",
+            "target": "service"
+          },
+          {
+            "type": "USES",
+            "target": "database"
+          }
+        ]
+      },
+      {
+        "id": "database",
+        "name": "Database",
+        "description": "Persistent storage used by a service.",
+        "attributes": [
+          "id",
+          "name",
+          "type"
+        ],
+        "relationships": [
+          {
+            "type": "OWNED_BY",
+            "target": "service"
+          }
+        ]
+      },
+      {
+        "id": "workflow-job",
+        "name": "Workflow Job",
+        "description": "Execution of a long-running workflow.",
+        "attributes": [
+          "id",
+          "status",
+          "progress",
+          "startedAt",
+          "completedAt"
+        ],
+        "relationships": [
+          {
+            "type": "EXECUTED_BY",
+            "target": "workflow-orchestrator"
+          }
+        ]
+      },
+      {
+        "id": "knowledge-graph",
+        "name": "Knowledge Graph",
+        "description": "Graph representation of software entities and relationships.",
+        "attributes": [
+          "id",
+          "version",
+          "lastUpdated"
+        ],
+        "relationships": [
+          {
+            "type": "GENERATED_FROM",
+            "target": "repository"
+          }
+        ]
+      },
+      {
+        "id": "software-digital-twin",
+        "name": "Software Digital Twin",
+        "description": "Unified representation of the software system.",
+        "attributes": [
+          "id",
+          "version",
+          "health",
+          "lastSynced"
+        ],
+        "relationships": [
+          {
+            "type": "GENERATED_FROM",
+            "target": "knowledge-graph"
+          },
+          {
+            "type": "POWERED_BY",
+            "target": "runtime-model"
+          }
+        ]
+      },
+      {
+        "id": "runtime-model",
+        "name": "Runtime Model",
+        "description": "Live operational state of the software system.",
+        "attributes": [
+          "latency",
+          "cpu",
+          "memory",
+          "health"
+        ],
+        "relationships": [
+          {
+            "type": "OBSERVES",
+            "target": "service"
+          }
+        ]
+      },
+      {
+        "id": "analysis-report",
+        "name": "Analysis Report",
+        "description": "Generated report describing repository intelligence.",
+        "attributes": [
+          "id",
+          "type",
+          "format",
+          "generatedAt"
+        ],
+        "relationships": [
+          {
+            "type": "GENERATED_FROM",
+            "target": "project"
+          }
+        ]
+      },
+      {
+        "id": "ai-context-package",
+        "name": "AI Context Package",
+        "description": "Portable export that allows AI systems to understand a project without rescanning the repository.",
+        "attributes": [
+          "id",
+          "format",
+          "version",
+          "generatedAt"
+        ],
+        "relationships": [
+          {
+            "type": "GENERATED_FROM",
+            "target": "software-digital-twin"
+          }
+        ]
+      }
+    ],
+    "rules": [
+      "Every entity must have a globally unique ID.",
+      "Relationships must reference entity IDs.",
+      "Entities are technology independent.",
+      "Entities represent business concepts rather than implementation details.",
+      "Every entity must be traceable back to its repository origin where applicable."
+    ]
+  },
+  {
+    "metadata": {
+      "project": "ForgeMind",
+      "specification": "engineering-principles",
+      "status": "approved"
+    },
+    "vision": {
+      "mission": "Build the world's most advanced Software Intelligence Platform that understands software systems independently of programming language or framework.",
+      "corePhilosophy": "Understand software, don't just search source code."
+    },
+    "architecturePrinciples": [
+      "Microservice-first architecture.",
+      "Event-driven communication using Kafka.",
+      "Every service owns its own data.",
+      "No shared databases between services.",
+      "Asynchronous communication wherever practical.",
+      "Stateless services by default.",
+      "Every service is independently deployable.",
+      "Every service exposes health endpoints."
+    ],
+    "softwarePrinciples": [
+      "Software understanding is language independent.",
+      "UIR is the canonical software representation.",
+      "Knowledge Graph represents relationships.",
+      "Digital Twin represents the current software state.",
+      "Reasoning Engine explains software using evidence.",
+      "Repository analysis is deterministic."
+    ],
+    "codingPrinciples": [
+      "Readable code over clever code.",
+      "Composition over inheritance.",
+      "SOLID principles.",
+      "Clean Architecture.",
+      "Domain-driven design where appropriate.",
+      "Feature-first package structure.",
+      "Strict TypeScript configuration.",
+      "No business logic inside controllers."
+    ],
+    "backendStandards": {
+      "runtime": "Node.js",
+      "language": "TypeScript",
+      "framework": "Express.js",
+      "orm": "Prisma",
+      "validation": "Zod",
+      "authentication": "JWT",
+      "messageBroker": "Kafka"
+    },
+    "frontendStandards": {
+      "framework": "React",
+      "language": "TypeScript",
+      "routing": "React Router",
+      "styling": "Tailwind CSS",
+      "components": "shadcn/ui",
+      "stateManagement": "Zustand",
+      "dataFetching": "TanStack Query"
+    },
+    "databaseStandards": {
+      "transactional": "PostgreSQL",
+      "graph": "Neo4j",
+      "cache": "Redis",
+      "objectStorage": "S3 Compatible Storage"
+    },
+    "securityPrinciples": [
+      "Least privilege.",
+      "Secure by default.",
+      "JWT authentication.",
+      "RBAC authorization.",
+      "No secrets inside repositories.",
+      "Encrypt data in transit and at rest.",
+      "Audit every sensitive action."
+    ],
+    "uiPrinciples": [
+      "Dark-first interface.",
+      "Glassmorphism styling.",
+      "Minimal visual noise.",
+      "Fast interactions.",
+      "Keyboard-first productivity.",
+      "Responsive on all screen sizes.",
+      "Consistent spacing and typography.",
+      "Animations support usability rather than decoration."
+    ],
+    "aiPrinciples": [
+      "No dependency on commercial LLM APIs.",
+      "Platform intelligence comes from software analysis.",
+      "Reasoning must be explainable.",
+      "Never invent software relationships.",
+      "Every conclusion requires evidence.",
+      "LLMs are optional interfaces, not platform dependencies."
+    ],
+    "pluginPrinciples": [
+      "Everything extensible through plugins.",
+      "Plugins never modify core platform.",
+      "Plugins use published extension points only.",
+      "Plugin failures never affect core services."
+    ],
+    "qualityPrinciples": [
+      "Every feature has automated tests.",
+      "CI/CD required.",
+      "Code reviews required.",
+      "Static analysis required.",
+      "Zero critical security findings before release."
+    ],
+    "nonGoals": [
+      "Not a source code editor.",
+      "Not a Git hosting platform.",
+      "Not a CI/CD replacement.",
+      "Not an IDE.",
+      "Not an LLM wrapper.",
+      "Not another chatbot."
+    ],
+    "engineeringDecisions": [
+      {
+        "decision": "Use Universal Intermediate Representation.",
+        "reason": "Language-independent software understanding."
+      },
+      {
+        "decision": "Use Neo4j.",
+        "reason": "Native graph traversal for software relationships."
+      },
+      {
+        "decision": "Use Kafka.",
+        "reason": "Loose coupling between services."
+      },
+      {
+        "decision": "Use Event-Driven Architecture.",
+        "reason": "Scalable asynchronous workflows."
+      },
+      {
+        "decision": "Use Express.js.",
+        "reason": "Simple, mature and flexible backend framework."
+      },
+      {
+        "decision": "Use React.",
+        "reason": "Rich interactive enterprise UI."
+      },
+      {
+        "decision": "Use Tree-sitter.",
+        "reason": "Consistent multi-language parsing."
+      },
+      {
+        "decision": "No commercial AI dependency.",
+        "reason": "Platform intelligence remains independent and portable."
+      }
+    ],
+    "projectRules": [
+      "Keep architecture simple before making it clever.",
+      "Avoid premature optimisation.",
+      "Prefer explicitness over magic.",
+      "Every feature must have a clear business purpose.",
+      "Every service must have a single responsibility.",
+      "Documentation evolves with implementation.",
+      "Never duplicate the source of truth."
+    ]
+  },
+  {
+    "metadata": {
+      "project": "ForgeMind",
+      "specification": "entity-registry",
+      "status": "approved"
+    },
+    "registry": {
+      "name": "ForgeMind Global Entity Registry",
+      "description": "Canonical identity system for every entity managed by ForgeMind.",
+      "sourceOfTruth": true
+    },
+    "identity": {
+      "strategy": "Globally Unique Entity ID",
+      "format": "UUID v7",
+      "immutable": true,
+      "versioned": true
+    },
+    "entityTypes": [
+      {
+        "type": "Repository",
+        "prefix": "repo"
+      },
+      {
+        "type": "Workspace",
+        "prefix": "ws"
+      },
+      {
+        "type": "Project",
+        "prefix": "proj"
+      },
+      {
+        "type": "Module",
+        "prefix": "mod"
+      },
+      {
+        "type": "Package",
+        "prefix": "pkg"
+      },
+      {
+        "type": "Namespace",
+        "prefix": "ns"
+      },
+      {
+        "type": "Service",
+        "prefix": "svc"
+      },
+      {
+        "type": "Class",
+        "prefix": "cls"
+      },
+      {
+        "type": "Interface",
+        "prefix": "int"
+      },
+      {
+        "type": "Function",
+        "prefix": "fn"
+      },
+      {
+        "type": "Method",
+        "prefix": "mth"
+      },
+      {
+        "type": "API",
+        "prefix": "api"
+      },
+      {
+        "type": "Database",
+        "prefix": "db"
+      },
+      {
+        "type": "Table",
+        "prefix": "tbl"
+      },
+      {
+        "type": "Topic",
+        "prefix": "topic"
+      },
+      {
+        "type": "Queue",
+        "prefix": "queue"
+      },
+      {
+        "type": "Deployment",
+        "prefix": "deploy"
+      },
+      {
+        "type": "Runtime Event",
+        "prefix": "event"
+      }
+    ],
+    "canonicalFields": [
+      "entityId",
+      "entityType",
+      "name",
+      "qualifiedName",
+      "repositoryId",
+      "language",
+      "framework",
+      "version",
+      "sourceFile",
+      "sourceLine",
+      "createdAt",
+      "updatedAt"
+    ],
+    "identityRules": [
+      "Entity IDs never change.",
+      "Names may change without changing identity.",
+      "Relationships always reference entity IDs.",
+      "Entities may exist across multiple repositories.",
+      "Aliases never replace canonical IDs."
+    ],
+    "aliases": {
+      "enabled": true,
+      "examples": [
+        {
+          "entity": "PaymentService",
+          "aliases": [
+            "PaymentSvc",
+            "Payments"
+          ]
+        }
+      ]
+    },
+    "versioning": {
+      "trackHistory": true,
+      "retainPreviousVersions": true,
+      "compareVersions": true
+    },
+    "mergeStrategy": {
+      "duplicateDetection": true,
+      "semanticSimilarity": true,
+      "manualApprovalThreshold": 0.8
+    },
+    "lifecycle": [
+      "Discovered",
+      "Analysed",
+      "Registered",
+      "Referenced",
+      "Updated",
+      "Deprecated",
+      "Archived"
+    ],
+    "references": {
+      "usedBy": [
+        "repository-analysis",
+        "knowledge-graph",
+        "digital-twin",
+        "runtime-service",
+        "impact-service",
+        "reasoning-engine",
+        "search-service",
+        "export-service"
+      ]
+    },
+    "validationRules": [
+      "Every entity must have exactly one canonical ID.",
+      "Duplicate IDs are not permitted.",
+      "Deleted entities remain traceable through history.",
+      "All references must resolve to existing entity IDs.",
+      "Entity identity is independent of source language."
+    ],
+    "futureExtensions": [
+      "Cross Repository Identity",
+      "Cross Organization Identity",
+      "Plugin Entity Types",
+      "Federated Identity Registry"
+    ]
+  },
+  {
+    "metadata": {
+      "project": "ForgeMind",
+      "specification": "events",
+      "status": "approved"
+    },
+    "eventBus": {
+      "technology": "Apache Kafka",
+      "delivery": "At Least Once",
+      "ordering": "Per Partition",
+      "serialization": "JSON",
+      "versioning": "Semantic",
+      "retryPolicy": {
+        "maxRetries": 5,
+        "backoff": "Exponential",
+        "deadLetterQueue": true
+      }
+    },
+    "eventEnvelope": {
+      "requiredFields": [
+        "eventId",
+        "eventName",
+        "eventVersion",
+        "timestamp",
+        "correlationId",
+        "traceId",
+        "producer",
+        "payload"
+      ]
+    },
+    "topics": [
+      {
+        "id": "repository-events",
+        "name": "repository.events",
+        "owner": "repository-service"
+      },
+      {
+        "id": "analysis-events",
+        "name": "analysis.events",
+        "owner": "workflow-orchestrator"
+      },
+      {
+        "id": "graph-events",
+        "name": "graph.events",
+        "owner": "graph-service"
+      },
+      {
+        "id": "digital-twin-events",
+        "name": "digital-twin.events",
+        "owner": "digital-twin-service"
+      },
+      {
+        "id": "runtime-events",
+        "name": "runtime.events",
+        "owner": "runtime-service"
+      },
+      {
+        "id": "impact-events",
+        "name": "impact.events",
+        "owner": "impact-service"
+      },
+      {
+        "id": "notification-events",
+        "name": "notification.events",
+        "owner": "notification-service"
+      },
+      {
+        "id": "export-events",
+        "name": "export.events",
+        "owner": "export-service"
+      }
+    ],
+    "events": [
+      {
+        "id": "repository-imported",
+        "name": "RepositoryImported",
+        "topic": "repository.events",
+        "version": "1.0.0",
+        "producer": "repository-service",
+        "consumers": [
+          "workflow-orchestrator"
+        ],
+        "payload": [
+          "repositoryId",
+          "workspaceId",
+          "provider",
+          "branch"
+        ]
+      },
+      {
+        "id": "repository-synchronized",
+        "name": "RepositorySynchronized",
+        "topic": "repository.events",
+        "version": "1.0.0",
+        "producer": "git-service",
+        "consumers": [
+          "workflow-orchestrator"
+        ]
+      },
+      {
+        "id": "repository-parsed",
+        "name": "RepositoryParsed",
+        "topic": "analysis.events",
+        "version": "1.0.0",
+        "producer": "parser-service",
+        "consumers": [
+          "workflow-orchestrator"
+        ]
+      },
+      {
+        "id": "semantic-analysis-completed",
+        "name": "SemanticAnalysisCompleted",
+        "topic": "analysis.events",
+        "version": "1.0.0",
+        "producer": "semantic-service",
+        "consumers": [
+          "workflow-orchestrator"
+        ]
+      },
+      {
+        "id": "uir-generated",
+        "name": "UIRGenerated",
+        "topic": "analysis.events",
+        "version": "1.0.0",
+        "producer": "uir-service",
+        "consumers": [
+          "workflow-orchestrator"
+        ]
+      },
+      {
+        "id": "knowledge-graph-updated",
+        "name": "KnowledgeGraphUpdated",
+        "topic": "graph.events",
+        "version": "1.0.0",
+        "producer": "graph-service",
+        "consumers": [
+          "workflow-orchestrator",
+          "search-service",
+          "analytics-service"
+        ]
+      },
+      {
+        "id": "digital-twin-updated",
+        "name": "DigitalTwinUpdated",
+        "topic": "digital-twin.events",
+        "version": "1.0.0",
+        "producer": "digital-twin-service",
+        "consumers": [
+          "impact-service",
+          "runtime-service",
+          "reasoning-engine",
+          "export-service"
+        ]
+      },
+      {
+        "id": "runtime-updated",
+        "name": "RuntimeUpdated",
+        "topic": "runtime.events",
+        "version": "1.0.0",
+        "producer": "runtime-service",
+        "consumers": [
+          "reasoning-engine",
+          "analytics-service"
+        ]
+      },
+      {
+        "id": "impact-analysis-completed",
+        "name": "ImpactAnalysisCompleted",
+        "topic": "impact.events",
+        "version": "1.0.0",
+        "producer": "impact-service",
+        "consumers": [
+          "notification-service",
+          "analytics-service"
+        ]
+      },
+      {
+        "id": "export-generated",
+        "name": "ExportGenerated",
+        "topic": "export.events",
+        "version": "1.0.0",
+        "producer": "export-service",
+        "consumers": [
+          "notification-service"
+        ]
+      },
+      {
+        "id": "plugin-installed",
+        "name": "PluginInstalled",
+        "topic": "platform.events",
+        "version": "1.0.0",
+        "producer": "metadata-registry",
+        "consumers": [
+          "workflow-orchestrator"
+        ]
+      }
+    ],
+    "workflowSequence": [
+      "RepositoryImported",
+      "RepositorySynchronized",
+      "RepositoryParsed",
+      "SemanticAnalysisCompleted",
+      "UIRGenerated",
+      "KnowledgeGraphUpdated",
+      "DigitalTwinUpdated",
+      "ImpactAnalysisCompleted"
+    ],
+    "eventRules": [
+      "Events are immutable.",
+      "Events cannot be modified after publication.",
+      "Every event must have a unique eventId.",
+      "Every event must include a correlationId.",
+      "Every event must include a traceId.",
+      "Events must be idempotent.",
+      "Consumers must handle duplicate delivery.",
+      "Events should never expose sensitive data.",
+      "Breaking payload changes require a new event version."
+    ],
+    "deadLetterQueue": {
+      "enabled": true,
+      "topic": "platform.dlq",
+      "retention": "14d"
+    }
+  },
+  {
+    "metadata": {
+      "project": "ForgeMind",
+      "specification": "features",
+      "status": "approved"
+    },
+    "features": [
+      {
+        "id": "repository-import",
+        "name": "Repository Import",
+        "category": "Repository Management",
+        "description": "Import a source code repository into ForgeMind for analysis.",
+        "ui": [
+          "Dashboard",
+          "Repository Explorer"
+        ],
+        "apis": [
+          "POST /repositories"
+        ],
+        "services": [
+          "repository-service",
+          "git-service",
+          "workflow-orchestrator"
+        ],
+        "events": [
+          "RepositoryImported",
+          "RepositorySynchronized"
+        ],
+        "databases": [
+          "postgres"
+        ],
+        "outputs": [
+          "Registered Repository",
+          "Workflow Started"
+        ]
+      },
+      {
+        "id": "repository-analysis",
+        "name": "Repository Analysis",
+        "category": "Software Intelligence",
+        "description": "Analyse repository structure and source code.",
+        "ui": [
+          "Repository Details"
+        ],
+        "apis": [
+          "POST /analysis/start"
+        ],
+        "services": [
+          "parser-service",
+          "semantic-service",
+          "uir-service"
+        ],
+        "events": [
+          "RepositoryParsed",
+          "SemanticAnalysisCompleted",
+          "UIRGenerated"
+        ],
+        "databases": [
+          "neo4j"
+        ],
+        "outputs": [
+          "Universal Intermediate Representation"
+        ]
+      },
+      {
+        "id": "knowledge-graph",
+        "name": "Knowledge Graph",
+        "category": "Software Intelligence",
+        "description": "Build and maintain software relationships.",
+        "ui": [
+          "Knowledge Graph"
+        ],
+        "apis": [
+          "GET /graph/{repositoryId}"
+        ],
+        "services": [
+          "graph-service"
+        ],
+        "events": [
+          "KnowledgeGraphUpdated"
+        ],
+        "databases": [
+          "neo4j"
+        ],
+        "outputs": [
+          "Software Knowledge Graph"
+        ]
+      },
+      {
+        "id": "digital-twin",
+        "name": "Software Digital Twin",
+        "category": "Software Intelligence",
+        "description": "Maintain a live digital representation of the software system.",
+        "ui": [
+          "Software Digital Twin"
+        ],
+        "apis": [
+          "GET /digital-twin/{projectId}"
+        ],
+        "services": [
+          "digital-twin-service"
+        ],
+        "events": [
+          "DigitalTwinUpdated"
+        ],
+        "databases": [
+          "neo4j"
+        ],
+        "outputs": [
+          "Software Digital Twin"
+        ]
+      },
+      {
+        "id": "runtime-intelligence",
+        "name": "Runtime Intelligence",
+        "category": "Observability",
+        "description": "Correlate runtime telemetry with software architecture.",
+        "ui": [
+          "Runtime Dashboard"
+        ],
+        "apis": [
+          "GET /runtime/health",
+          "GET /runtime/metrics",
+          "GET /runtime/logs"
+        ],
+        "services": [
+          "runtime-service"
+        ],
+        "events": [
+          "RuntimeUpdated"
+        ],
+        "databases": [
+          "neo4j"
+        ],
+        "outputs": [
+          "Runtime Model"
+        ]
+      },
+      {
+        "id": "impact-analysis",
+        "name": "Change Impact Analysis",
+        "category": "Engineering Intelligence",
+        "description": "Predict the impact of software changes before deployment.",
+        "ui": [
+          "Impact Analysis"
+        ],
+        "apis": [
+          "POST /impact/analyse"
+        ],
+        "services": [
+          "impact-service"
+        ],
+        "events": [
+          "ImpactAnalysisCompleted"
+        ],
+        "databases": [
+          "neo4j"
+        ],
+        "outputs": [
+          "Blast Radius",
+          "Risk Score",
+          "Recommendations"
+        ]
+      },
+      {
+        "id": "reasoning-engine",
+        "name": "Software Reasoning",
+        "category": "Engineering Intelligence",
+        "description": "Provide explainable engineering reasoning using graph traversal and runtime evidence.",
+        "ui": [
+          "Reasoning Panel"
+        ],
+        "apis": [
+          "POST /reasoning/query",
+          "POST /reasoning/explain"
+        ],
+        "services": [
+          "reasoning-engine"
+        ],
+        "events": [],
+        "databases": [
+          "neo4j"
+        ],
+        "outputs": [
+          "Engineering Explanation",
+          "Evidence",
+          "Confidence Score"
+        ]
+      },
+      {
+        "id": "policy-evaluation",
+        "name": "Policy Evaluation",
+        "category": "Governance",
+        "description": "Evaluate repositories and architecture against engineering policies.",
+        "ui": [
+          "Policies"
+        ],
+        "apis": [
+          "GET /policies",
+          "POST /policies"
+        ],
+        "services": [
+          "policy-engine"
+        ],
+        "events": [],
+        "databases": [
+          "postgres"
+        ],
+        "outputs": [
+          "Compliance Report",
+          "Violations",
+          "Recommendations"
+        ]
+      },
+      {
+        "id": "repository-search",
+        "name": "Repository Search",
+        "category": "Discovery",
+        "description": "Search repositories, software components and relationships.",
+        "ui": [
+          "Global Search"
+        ],
+        "apis": [
+          "GET /graph/search"
+        ],
+        "services": [
+          "search-service"
+        ],
+        "events": [],
+        "databases": [
+          "neo4j"
+        ],
+        "outputs": [
+          "Search Results"
+        ]
+      },
+      {
+        "id": "ai-context-export",
+        "name": "AI Context Export",
+        "category": "Developer Productivity",
+        "description": "Generate portable project intelligence for AI systems.",
+        "ui": [
+          "AI Context Export"
+        ],
+        "apis": [
+          "POST /exports/context"
+        ],
+        "services": [
+          "export-service"
+        ],
+        "events": [
+          "ExportGenerated"
+        ],
+        "databases": [
+          "object-storage"
+        ],
+        "outputs": [
+          "Markdown",
+          "JSON",
+          "PDF",
+          "GraphML",
+          "AI Context Package"
+        ]
+      },
+      {
+        "id": "plugin-management",
+        "name": "Plugin Management",
+        "category": "Platform",
+        "description": "Install, enable, disable and manage ForgeMind plugins.",
+        "ui": [
+          "Plugin Manager"
+        ],
+        "apis": [
+          "GET /plugins",
+          "POST /plugins/install"
+        ],
+        "services": [
+          "metadata-registry"
+        ],
+        "events": [
+          "PluginInstalled"
+        ],
+        "databases": [
+          "postgres"
+        ],
+        "outputs": [
+          "Installed Plugins",
+          "Plugin Status"
+        ]
+      }
+    ],
+    "featureRules": [
+      "Every feature must have at least one owning service.",
+      "Every feature must expose an API or UI entry point.",
+      "Every feature must have clear inputs and outputs.",
+      "Business capabilities are independent of implementation details.",
+      "Features may span multiple services."
+    ]
+  },
+  {
+    "metadata": {
+      "project": "ForgeMind",
+      "specification": "knowledge-graph",
+      "status": "approved"
+    },
+    "graph": {
+      "name": "ForgeMind Software Knowledge Graph",
+      "database": "Neo4j",
+      "description": "A graph representation of software systems that captures entities and their relationships across source code, runtime, infrastructure and repositories.",
+      "sourceOfTruth": true
+    },
+    "nodeCategories": [
+      {
+        "category": "Repository",
+        "nodes": [
+          "Repository",
+          "Branch",
+          "Commit",
+          "Tag"
+        ]
+      },
+      {
+        "category": "Source Code",
+        "nodes": [
+          "Package",
+          "Namespace",
+          "Module",
+          "Class",
+          "Interface",
+          "Enum",
+          "Method",
+          "Function",
+          "Variable",
+          "Constant"
+        ]
+      },
+      {
+        "category": "Architecture",
+        "nodes": [
+          "Service",
+          "API",
+          "Gateway",
+          "Database",
+          "Table",
+          "Queue",
+          "Topic",
+          "Configuration"
+        ]
+      },
+      {
+        "category": "Infrastructure",
+        "nodes": [
+          "Container",
+          "Pod",
+          "Deployment",
+          "Cluster",
+          "CloudResource",
+          "LoadBalancer"
+        ]
+      },
+      {
+        "category": "Runtime",
+        "nodes": [
+          "RuntimeEvent",
+          "Trace",
+          "Metric",
+          "Log",
+          "Alert"
+        ]
+      }
+    ],
+    "relationshipTypes": [
+      "CALLS",
+      "USES",
+      "DEPENDS_ON",
+      "IMPLEMENTS",
+      "EXTENDS",
+      "IMPORTS",
+      "OWNS",
+      "READS",
+      "WRITES",
+      "PUBLISHES",
+      "SUBSCRIBES",
+      "CONFIGURES",
+      "DEPLOYS",
+      "CONNECTS_TO",
+      "GENERATES",
+      "HOSTS",
+      "CONTAINS",
+      "BELONGS_TO",
+      "EXECUTES",
+      "TRIGGERS"
+    ],
+    "relationshipProperties": [
+      "createdAt",
+      "updatedAt",
+      "repositoryId",
+      "commitHash",
+      "confidence",
+      "source",
+      "version"
+    ],
+    "graphGenerationPipeline": [
+      "Universal Intermediate Representation",
+      "Entity Extraction",
+      "Relationship Discovery",
+      "Relationship Validation",
+      "Duplicate Removal",
+      "Graph Persistence",
+      "Graph Indexing"
+    ],
+    "supportedQueries": [
+      "Dependency Traversal",
+      "Shortest Path",
+      "Circular Dependency Detection",
+      "Reverse Dependency",
+      "Blast Radius",
+      "Ownership",
+      "Impact Analysis",
+      "Architecture Discovery",
+      "Dead Code Detection",
+      "Orphan Component Detection"
+    ],
+    "graphIndexes": [
+      "Repository",
+      "Service",
+      "Class",
+      "Method",
+      "API",
+      "Database",
+      "Topic",
+      "Commit"
+    ],
+    "qualityRules": [
+      "Every node must have a globally unique ID.",
+      "Relationships must never duplicate existing relationships.",
+      "Every node must contain source metadata.",
+      "Every relationship must have a valid source.",
+      "Graph updates are incremental.",
+      "Deleted source code removes obsolete graph nodes.",
+      "Graph consistency is validated after every update."
+    ],
+    "integration": {
+      "producedBy": [
+        "graph-service"
+      ],
+      "consumedBy": [
+        "digital-twin-service",
+        "reasoning-engine",
+        "impact-service",
+        "search-service",
+        "analytics-service",
+        "export-service"
+      ]
+    },
+    "graphCapabilities": [
+      "Architecture Discovery",
+      "Dependency Analysis",
+      "Repository Navigation",
+      "Cross Repository Analysis",
+      "Runtime Correlation",
+      "Impact Prediction",
+      "Software Search",
+      "Engineering Reasoning"
+    ],
+    "futureCapabilities": [
+      "Cross Organization Graphs",
+      "Plugin-defined Node Types",
+      "Graph Versioning",
+      "Custom Relationship Types"
+    ]
+  },
+  {
+    "metadata": {
+      "project": "ForgeMind",
+      "specification": "plugin-system",
+      "status": "approved"
+    },
+    "pluginSystem": {
+      "name": "ForgeMind Plugin System",
+      "description": "Extensible plugin architecture that allows ForgeMind to support new languages, frameworks, integrations and export formats without modifying the core platform.",
+      "version": "1.0"
+    },
+    "goals": [
+      "Keep the core platform small.",
+      "Allow third-party extensions.",
+      "Enable language-independent growth.",
+      "Support enterprise integrations.",
+      "Support internal and community plugins."
+    ],
+    "pluginCategories": [
+      {
+        "id": "language-plugin",
+        "name": "Language Plugin",
+        "purpose": "Add support for new programming languages."
+      },
+      {
+        "id": "framework-plugin",
+        "name": "Framework Plugin",
+        "purpose": "Detect frameworks and extract framework metadata."
+      },
+      {
+        "id": "parser-plugin",
+        "name": "Parser Plugin",
+        "purpose": "Provide parsing implementation."
+      },
+      {
+        "id": "semantic-plugin",
+        "name": "Semantic Analysis Plugin",
+        "purpose": "Language-specific semantic analysis."
+      },
+      {
+        "id": "integration-plugin",
+        "name": "Integration Plugin",
+        "purpose": "Git providers, cloud providers and external systems."
+      },
+      {
+        "id": "export-plugin",
+        "name": "Export Plugin",
+        "purpose": "Additional export formats."
+      },
+      {
+        "id": "visualization-plugin",
+        "name": "Visualization Plugin",
+        "purpose": "Additional graph visualizations and reports."
+      }
+    ],
+    "pluginLifecycle": [
+      "Discovered",
+      "Installed",
+      "Validated",
+      "Enabled",
+      "Running",
+      "Disabled",
+      "Removed"
+    ],
+    "pluginManifest": {
+      "requiredFields": [
+        "pluginId",
+        "name",
+        "version",
+        "author",
+        "description",
+        "category",
+        "entryPoint",
+        "permissions",
+        "compatibility"
+      ]
+    },
+    "permissions": [
+      "Read Repository",
+      "Read Metadata",
+      "Read Knowledge Graph",
+      "Read Digital Twin",
+      "Generate UIR",
+      "Export Data",
+      "Register Language",
+      "Register Framework"
+    ],
+    "extensionPoints": [
+      "Repository Scanner",
+      "Language Detector",
+      "Framework Detector",
+      "Parser",
+      "Semantic Analyzer",
+      "UIR Mapper",
+      "Knowledge Graph Enrichment",
+      "Digital Twin Enrichment",
+      "Reasoning Rules",
+      "Export Generator",
+      "Dashboard Widgets"
+    ],
+    "compatibility": {
+      "semanticVersioning": true,
+      "minimumPlatformVersion": true,
+      "maximumPlatformVersion": true
+    },
+    "sandbox": {
+      "enabled": true,
+      "isolatedExecution": true,
+      "resourceLimits": true,
+      "permissionChecks": true
+    },
+    "validation": [
+      "Manifest Validation",
+      "Permission Validation",
+      "Signature Verification",
+      "Compatibility Validation",
+      "Dependency Validation"
+    ],
+    "events": [
+      "PluginInstalled",
+      "PluginEnabled",
+      "PluginDisabled",
+      "PluginUpdated",
+      "PluginRemoved"
+    ],
+    "security": {
+      "signedPlugins": true,
+      "checksumValidation": true,
+      "permissionBasedAccess": true,
+      "restrictedFilesystemAccess": true,
+      "restrictedNetworkAccess": true
+    },
+    "qualityRules": [
+      "Plugins must never modify core platform code.",
+      "Plugins communicate only through extension points.",
+      "Plugins cannot bypass security.",
+      "Plugins must declare all permissions.",
+      "Plugin failures must never crash the platform.",
+      "Plugins are independently versioned."
+    ],
+    "futureCapabilities": [
+      "Marketplace",
+      "Automatic Updates",
+      "Enterprise Plugin Store",
+      "Remote Plugin Registry",
+      "Plugin Analytics"
+    ]
+  },
+  {
+    "project": {
+      "name": "ForgeMind",
+      "tagline": "Understand Software. Not Just Code.",
+      "type": "Universal Software Intelligence Platform",
+      "category": "Developer Platform",
+      "status": "In Development",
+      "license": "MIT"
+    },
+    "vision": {
+      "statement": "ForgeMind transforms software repositories into a continuously evolving Software Digital Twin that enables engineering teams to understand architecture, dependencies, runtime behaviour and software evolution through a unified intelligence platform.",
+      "goal": "Build the world's most comprehensive Software Intelligence Platform capable of understanding software systems regardless of programming language, framework or infrastructure."
+    },
+    "problemStatement": {
+      "summary": "Modern software systems are difficult to understand because architecture, source code, runtime behaviour, infrastructure and documentation exist across disconnected tools.",
+      "problems": [
+        "Large repositories are difficult to understand.",
+        "Dependencies are hidden across multiple services.",
+        "Impact analysis is mostly manual.",
+        "Architecture documentation becomes outdated.",
+        "Runtime behaviour is disconnected from source code.",
+        "Developers spend significant time exploring code instead of solving problems.",
+        "AI assistants repeatedly need project context before becoming useful."
+      ]
+    },
+    "solution": {
+      "summary": "ForgeMind creates a Software Digital Twin that continuously represents the current state of a software system by combining repository analysis, architecture discovery, runtime intelligence and graph-based software modelling.",
+      "capabilities": [
+        "Repository Intelligence",
+        "Architecture Discovery",
+        "Software Knowledge Graph",
+        "Software Digital Twin",
+        "Runtime Intelligence",
+        "Change Impact Analysis",
+        "Dependency Analysis",
+        "AI Context Export",
+        "Repository Search",
+        "Engineering Reports"
+      ]
+    },
+    "productPrinciples": [
+      "Understand software instead of source code.",
+      "Everything should be explainable.",
+      "Software should remain language agnostic.",
+      "Documentation should evolve automatically whenever possible.",
+      "Incremental processing is preferred over complete rebuilding.",
+      "Architecture should be driven by evidence instead of assumptions.",
+      "Every engineering decision should improve maintainability and scalability.",
+      "Enterprise quality takes priority over rapid shortcuts."
+    ],
+    "supportedRepositoryProviders": [
+      "GitHub",
+      "GitLab",
+      "Bitbucket",
+      "Azure DevOps",
+      "Local Repository",
+      "ZIP Archive"
+    ],
+    "supportedLanguages": [
+      "Java",
+      "Kotlin",
+      "JavaScript",
+      "TypeScript",
+      "Python",
+      "Go",
+      "Rust",
+      "C#",
+      "C++",
+      "PHP",
+      "Ruby",
+      "Swift"
+    ],
+    "supportedFrameworks": [
+      "Spring Boot",
+      "Express.js",
+      "Next.js",
+      "NestJS",
+      "FastAPI",
+      "Django",
+      "Flask",
+      "ASP.NET Core",
+      "React",
+      "Angular",
+      "Vue"
+    ],
+    "coreConcepts": [
+      "Software Digital Twin",
+      "Universal Intermediate Representation",
+      "Software Knowledge Graph",
+      "Semantic Analysis",
+      "Repository Intelligence",
+      "Runtime Intelligence",
+      "Change Impact Analysis",
+      "AI Context Export"
+    ],
+    "architecture": {
+      "style": "Microservices",
+      "communication": [
+        "REST",
+        "WebSocket",
+        "Apache Kafka"
+      ],
+      "deployment": "Cloud Native",
+      "repositoryModel": "Monorepo",
+      "processingModel": "Incremental",
+      "designPattern": "Event Driven"
+    },
+    "technologyStack": {
+      "frontend": [
+        "Next.js",
+        "React",
+        "TypeScript",
+        "Tailwind CSS",
+        "shadcn/ui",
+        "Framer Motion",
+        "Zustand"
+      ],
+      "backend": [
+        "Express.js",
+        "TypeScript"
+      ],
+      "intelligence": [
+        "Python",
+        "FastAPI"
+      ],
+      "databases": [
+        "PostgreSQL",
+        "Neo4j",
+        "Redis",
+        "Object Storage"
+      ],
+      "infrastructure": [
+        "Docker",
+        "Kubernetes",
+        "NGINX",
+        "Apache Kafka"
+      ]
+    },
+    "nonGoals": [
+      "Not a chatbot.",
+      "Not a code editor.",
+      "Not a Git hosting platform.",
+      "Not a replacement for GitHub.",
+      "Not a replacement for Kubernetes.",
+      "Not dependent on commercial LLM APIs."
+    ],
+    "engineeringStandards": {
+      "codeQuality": "Production Ready",
+      "language": "TypeScript Strict",
+      "testing": [
+        "Unit",
+        "Integration",
+        "End-to-End"
+      ],
+      "documentation": "Documentation First",
+      "architecture": "Microservices",
+      "security": "Enterprise First"
+    },
+    "uiPrinciples": {
+      "style": "Premium Enterprise SaaS",
+      "theme": "Dark First",
+      "designLanguage": [
+        "Minimal",
+        "Modern",
+        "Soft Glassmorphism"
+      ],
+      "inspiration": [
+        "Vercel",
+        "Linear",
+        "Stripe Dashboard",
+        "Raycast",
+        "Notion Calendar"
+      ]
+    },
+    "futureVision": {
+      "objective": "ForgeMind becomes the intelligence layer between developers and software systems, allowing engineering teams to understand software through knowledge rather than manual exploration."
+    }
+  },
+  {
+    "metadata": {
+      "project": "ForgeMind",
+      "specification": "reasoning-engine",
+      "status": "approved"
+    },
+    "reasoningEngine": {
+      "name": "Software Reasoning Engine",
+      "description": "An explainable engineering intelligence engine that answers software questions using graph traversal, deterministic reasoning, runtime evidence and engineering rules.",
+      "deterministic": true,
+      "llmRequired": false,
+      "languageIndependent": true
+    },
+    "purpose": {
+      "mission": "Help engineers understand software behaviour by reasoning over evidence rather than generating probable text."
+    },
+    "inputs": [
+      {
+        "source": "Software Digital Twin",
+        "service": "digital-twin-service"
+      },
+      {
+        "source": "Knowledge Graph",
+        "service": "graph-service"
+      },
+      {
+        "source": "Runtime Intelligence",
+        "service": "runtime-service"
+      },
+      {
+        "source": "Policy Engine",
+        "service": "policy-engine"
+      },
+      {
+        "source": "Metadata Registry",
+        "service": "metadata-registry"
+      }
+    ],
+    "supportedQuestions": [
+      "Why is this service failing?",
+      "What breaks if this API changes?",
+      "Who depends on this component?",
+      "Why is this deployment risky?",
+      "Which repositories use this library?",
+      "Where did this dependency originate?",
+      "Which services communicate with this service?",
+      "Why is this architecture considered high risk?",
+      "What caused this runtime failure?",
+      "Which deployment introduced this issue?"
+    ],
+    "reasoningPipeline": [
+      "Intent Recognition",
+      "Entity Resolution",
+      "Knowledge Graph Traversal",
+      "Runtime Correlation",
+      "Policy Evaluation",
+      "Evidence Collection",
+      "Rule Evaluation",
+      "Confidence Calculation",
+      "Engineering Explanation"
+    ],
+    "reasoningStrategies": [
+      {
+        "name": "Dependency Reasoning",
+        "description": "Trace software dependencies."
+      },
+      {
+        "name": "Impact Reasoning",
+        "description": "Calculate downstream effects."
+      },
+      {
+        "name": "Architecture Reasoning",
+        "description": "Evaluate software architecture."
+      },
+      {
+        "name": "Runtime Reasoning",
+        "description": "Correlate runtime telemetry."
+      },
+      {
+        "name": "Policy Reasoning",
+        "description": "Explain policy violations."
+      },
+      {
+        "name": "Historical Reasoning",
+        "description": "Compare repository evolution."
+      }
+    ],
+    "evidenceSources": [
+      "Repository Metadata",
+      "Universal Intermediate Representation",
+      "Knowledge Graph",
+      "Runtime Metrics",
+      "Logs",
+      "Distributed Traces",
+      "Policies",
+      "Repository History"
+    ],
+    "output": {
+      "contains": [
+        "Answer",
+        "Evidence",
+        "Confidence Score",
+        "Affected Components",
+        "Recommendations",
+        "Supporting Relationships"
+      ],
+      "confidenceRange": "0-100"
+    },
+    "rules": [
+      "Never invent dependencies.",
+      "Never infer architecture without evidence.",
+      "Every answer must reference at least one evidence source.",
+      "Every recommendation must explain why it is recommended.",
+      "Answers must be deterministic for identical inputs.",
+      "Reasoning must remain language independent."
+    ],
+    "supportedOperations": [
+      "Dependency Traversal",
+      "Shortest Path",
+      "Blast Radius",
+      "Root Cause Analysis",
+      "Risk Evaluation",
+      "Policy Explanation",
+      "Architecture Discovery",
+      "Runtime Correlation"
+    ],
+    "integrations": {
+      "consumes": [
+        "Knowledge Graph",
+        "Digital Twin",
+        "Runtime Intelligence",
+        "Policy Engine"
+      ],
+      "produces": [
+        "Engineering Explanation",
+        "Reasoning Result",
+        "Confidence Score",
+        "Evidence Graph"
+      ]
+    },
+    "performanceTargets": {
+      "simpleQuery": "< 200 ms",
+      "complexReasoning": "< 2 seconds",
+      "graphTraversal": "< 500 ms"
+    },
+    "futureCapabilities": [
+      "Multi Repository Reasoning",
+      "Cross Organization Reasoning",
+      "Infrastructure Reasoning",
+      "Security Reasoning",
+      "Compliance Reasoning",
+      "Architecture Recommendation"
+    ]
+  },
+  {
+    "metadata": {
+      "project": "ForgeMind",
+      "specification": "repository-analysis",
+      "status": "approved"
+    },
+    "analysisEngine": {
+      "name": "ForgeMind Repository Analysis Engine",
+      "description": "Transforms source code into a Universal Intermediate Representation (UIR) for downstream intelligence services.",
+      "processingMode": "Incremental",
+      "architecture": "Pipeline",
+      "languageAgnostic": true
+    },
+    "supportedRepositoryProviders": [
+      "GitHub",
+      "GitLab",
+      "Bitbucket",
+      "Azure DevOps",
+      "Local Repository",
+      "ZIP Archive"
+    ],
+    "supportedLanguages": [
+      {
+        "name": "Java",
+        "parser": "Tree-sitter Java"
+      },
+      {
+        "name": "Kotlin",
+        "parser": "Tree-sitter Kotlin"
+      },
+      {
+        "name": "JavaScript",
+        "parser": "Tree-sitter JavaScript"
+      },
+      {
+        "name": "TypeScript",
+        "parser": "Tree-sitter TypeScript"
+      },
+      {
+        "name": "Python",
+        "parser": "Tree-sitter Python"
+      },
+      {
+        "name": "Go",
+        "parser": "Tree-sitter Go"
+      },
+      {
+        "name": "Rust",
+        "parser": "Tree-sitter Rust"
+      },
+      {
+        "name": "C#",
+        "parser": "Tree-sitter C Sharp"
+      },
+      {
+        "name": "C++",
+        "parser": "Tree-sitter CPP"
+      },
+      {
+        "name": "PHP",
+        "parser": "Tree-sitter PHP"
+      },
+      {
+        "name": "Ruby",
+        "parser": "Tree-sitter Ruby"
+      },
+      {
+        "name": "Swift",
+        "parser": "Tree-sitter Swift"
+      }
+    ],
+    "pipeline": [
+      {
+        "order": 1,
+        "stage": "Repository Discovery",
+        "service": "repository-service"
+      },
+      {
+        "order": 2,
+        "stage": "Repository Clone",
+        "service": "git-service"
+      },
+      {
+        "order": 3,
+        "stage": "Repository Validation",
+        "service": "repository-service"
+      },
+      {
+        "order": 4,
+        "stage": "Language Detection",
+        "service": "metadata-registry"
+      },
+      {
+        "order": 5,
+        "stage": "Framework Detection",
+        "service": "metadata-registry"
+      },
+      {
+        "order": 6,
+        "stage": "Build Tool Detection",
+        "service": "metadata-registry"
+      },
+      {
+        "order": 7,
+        "stage": "File Classification",
+        "service": "parser-service"
+      },
+      {
+        "order": 8,
+        "stage": "AST Generation",
+        "service": "parser-service"
+      },
+      {
+        "order": 9,
+        "stage": "Symbol Extraction",
+        "service": "semantic-service"
+      },
+      {
+        "order": 10,
+        "stage": "Dependency Analysis",
+        "service": "semantic-service"
+      },
+      {
+        "order": 11,
+        "stage": "Semantic Analysis",
+        "service": "semantic-service"
+      },
+      {
+        "order": 12,
+        "stage": "Framework Mapping",
+        "service": "semantic-service"
+      },
+      {
+        "order": 13,
+        "stage": "Universal Intermediate Representation",
+        "service": "uir-service"
+      },
+      {
+        "order": 14,
+        "stage": "Knowledge Graph Generation",
+        "service": "graph-service"
+      },
+      {
+        "order": 15,
+        "stage": "Digital Twin Synchronisation",
+        "service": "digital-twin-service"
+      },
+      {
+        "order": 16,
+        "stage": "Repository Indexing",
+        "service": "search-service"
+      },
+      {
+        "order": 17,
+        "stage": "Analysis Complete",
+        "service": "workflow-orchestrator"
+      }
+    ],
+    "detectedArtifacts": [
+      "Packages",
+      "Namespaces",
+      "Modules",
+      "Classes",
+      "Interfaces",
+      "Functions",
+      "Methods",
+      "Variables",
+      "Constants",
+      "Annotations",
+      "Decorators",
+      "Configuration Files",
+      "REST APIs",
+      "GraphQL APIs",
+      "Database Connections",
+      "Kafka Producers",
+      "Kafka Consumers",
+      "Queues",
+      "Topics",
+      "Dockerfiles",
+      "Kubernetes Manifests",
+      "CI/CD Pipelines",
+      "Environment Variables",
+      "Dependencies",
+      "Build Files"
+    ],
+    "frameworkDetection": {
+      "java": [
+        "Spring Boot",
+        "Quarkus",
+        "Micronaut"
+      ],
+      "typescript": [
+        "Express.js",
+        "NestJS",
+        "Next.js"
+      ],
+      "python": [
+        "FastAPI",
+        "Flask",
+        "Django"
+      ],
+      "dotnet": [
+        "ASP.NET Core"
+      ]
+    },
+    "incrementalAnalysis": {
+      "enabled": true,
+      "reanalyseOnlyChangedFiles": true,
+      "reusePreviousAnalysis": true,
+      "graphDeltaUpdates": true,
+      "digitalTwinDeltaUpdates": true
+    },
+    "ignoredFiles": [
+      "node_modules",
+      ".git",
+      ".idea",
+      ".vscode",
+      "dist",
+      "build",
+      "coverage",
+      "target",
+      "__pycache__"
+    ],
+    "generatedOutputs": [
+      "Universal Intermediate Representation",
+      "Knowledge Graph",
+      "Dependency Graph",
+      "Software Digital Twin",
+      "Repository Metadata",
+      "Search Index",
+      "Analysis Report"
+    ],
+    "performanceTargets": {
+      "largeRepositorySupport": true,
+      "parallelParsing": true,
+      "incrementalUpdates": true,
+      "streamProcessing": true
+    },
+    "pluginExtensionPoints": [
+      "Language Parser",
+      "Framework Detector",
+      "Semantic Analyzer",
+      "UIR Mapper",
+      "Repository Scanner",
+      "Metadata Provider"
+    ],
+    "errorHandling": {
+      "continueOnUnsupportedLanguage": true,
+      "retryFailedStages": true,
+      "storePartialResults": true,
+      "generateAnalysisReport": true
+    },
+    "qualityRules": [
+      "Repository analysis must be deterministic.",
+      "Every parsed entity must preserve source location.",
+      "Language-specific syntax must never reach downstream services.",
+      "Only the Universal Intermediate Representation is shared across intelligence services.",
+      "Analysis should be resumable after interruption.",
+      "Analysis must support repositories containing multiple programming languages."
+    ]
+  },
+  {
+    "metadata": {
+      "project": "ForgeMind",
+      "specification": "roadmap",
+      "status": "approved"
+    },
+    "roadmap": {
+      "strategy": "Milestone Driven",
+      "estimatedDuration": "6-12 Months",
+      "goal": "Build a production-ready Software Intelligence Platform."
+    },
+    "milestones": [
+      {
+        "id": "foundation",
+        "name": "Foundation",
+        "objective": "Establish the platform architecture and development environment.",
+        "deliverables": [
+          "Monorepo",
+          "Development Environment",
+          "CI/CD Pipeline",
+          "Authentication",
+          "API Gateway",
+          "Core SDK",
+          "Shared Libraries"
+        ],
+        "status": "Planned"
+      },
+      {
+        "id": "repository-intelligence",
+        "name": "Repository Intelligence",
+        "objective": "Understand repositories independent of programming language.",
+        "deliverables": [
+          "Git Integration",
+          "Repository Import",
+          "Language Detection",
+          "Framework Detection",
+          "Tree-sitter Integration",
+          "Semantic Analysis",
+          "Universal Intermediate Representation"
+        ],
+        "status": "Planned"
+      },
+      {
+        "id": "knowledge-graph",
+        "name": "Knowledge Graph",
+        "objective": "Build software relationships.",
+        "deliverables": [
+          "Neo4j Integration",
+          "Graph Builder",
+          "Dependency Analysis",
+          "Cross Repository Relationships",
+          "Architecture Discovery"
+        ],
+        "status": "Planned"
+      },
+      {
+        "id": "digital-twin",
+        "name": "Software Digital Twin",
+        "objective": "Maintain a live software representation.",
+        "deliverables": [
+          "Digital Twin Engine",
+          "Incremental Synchronisation",
+          "Health Model",
+          "Topology Engine",
+          "Runtime Correlation"
+        ],
+        "status": "Planned"
+      },
+      {
+        "id": "engineering-intelligence",
+        "name": "Engineering Intelligence",
+        "objective": "Provide explainable engineering insights.",
+        "deliverables": [
+          "Software Reasoning Engine",
+          "Impact Analysis",
+          "Policy Engine",
+          "Recommendation Engine"
+        ],
+        "status": "Planned"
+      },
+      {
+        "id": "platform",
+        "name": "Platform Features",
+        "objective": "Complete enterprise platform capabilities.",
+        "deliverables": [
+          "Plugin System",
+          "AI Context Export",
+          "Reporting",
+          "Notifications",
+          "Analytics",
+          "Global Search"
+        ],
+        "status": "Planned"
+      },
+      {
+        "id": "frontend",
+        "name": "Enterprise Frontend",
+        "objective": "Build the complete ForgeMind user experience.",
+        "deliverables": [
+          "Dashboard",
+          "Repository Explorer",
+          "Knowledge Graph",
+          "Digital Twin",
+          "Runtime Dashboard",
+          "Impact Analysis",
+          "Policy Center",
+          "Plugin Manager",
+          "Settings"
+        ],
+        "status": "Planned"
+      },
+      {
+        "id": "production",
+        "name": "Production Readiness",
+        "objective": "Prepare ForgeMind for production deployment.",
+        "deliverables": [
+          "Performance Optimisation",
+          "Security Hardening",
+          "Monitoring",
+          "Backup Strategy",
+          "Documentation",
+          "Demo Environment",
+          "Public Release"
+        ],
+        "status": "Planned"
+      }
+    ],
+    "successCriteria": [
+      "Repository analysis supports multiple programming languages.",
+      "Knowledge Graph generated automatically.",
+      "Software Digital Twin synchronises incrementally.",
+      "Reasoning Engine produces explainable answers.",
+      "Impact Analysis predicts downstream changes.",
+      "AI Context Export works with external AI assistants.",
+      "Platform supports plugins.",
+      "Enterprise-grade user experience."
+    ],
+    "futureVision": [
+      "Cloud-native deployment",
+      "Multi-tenant SaaS",
+      "Enterprise SSO",
+      "Marketplace",
+      "Team Collaboration",
+      "Infrastructure Digital Twin",
+      "Custom Plugin Marketplace"
+    ]
+  },
+  {
+    "metadata": {
+      "project": "ForgeMind",
+      "specification": "security",
+      "status": "approved"
+    },
+    "security": {
+      "name": "ForgeMind Security Model",
+      "description": "Defines the authentication, authorization, data protection and operational security standards for the ForgeMind platform."
+    },
+    "authentication": {
+      "strategy": "JWT",
+      "accessToken": {
+        "enabled": true,
+        "expiry": "15m"
+      },
+      "refreshToken": {
+        "enabled": true,
+        "expiry": "30d",
+        "rotation": true
+      },
+      "multiFactorAuthentication": {
+        "supported": true,
+        "requiredForAdministrators": true
+      }
+    },
+    "authorization": {
+      "model": "Role Based Access Control",
+      "roles": [
+        "Super Admin",
+        "Organization Admin",
+        "Workspace Admin",
+        "Developer",
+        "Viewer"
+      ]
+    },
+    "workspaceIsolation": {
+      "enabled": true,
+      "strategy": "Tenant Isolation",
+      "rules": [
+        "Users can only access authorized workspaces.",
+        "Repositories belong to exactly one workspace.",
+        "Policies are scoped to organizations or workspaces."
+      ]
+    },
+    "repositorySecurity": {
+      "cloneStrategy": "Read Only",
+      "credentialsStored": false,
+      "supportedAuthentication": [
+        "SSH",
+        "Personal Access Token",
+        "OAuth"
+      ]
+    },
+    "apiSecurity": {
+      "httpsOnly": true,
+      "corsEnabled": true,
+      "rateLimiting": true,
+      "requestValidation": true,
+      "responseValidation": true
+    },
+    "secretManagement": {
+      "storeSecretsInRepository": false,
+      "externalSecretManager": true,
+      "environmentVariables": true
+    },
+    "dataProtection": {
+      "encryptInTransit": true,
+      "encryptAtRest": true,
+      "sensitiveDataMasking": true
+    },
+    "auditLogging": {
+      "enabled": true,
+      "trackedEvents": [
+        "User Login",
+        "Repository Import",
+        "Policy Update",
+        "Plugin Installation",
+        "Role Change",
+        "Export Generation"
+      ]
+    },
+    "aiContextExport": {
+      "excludeSecrets": true,
+      "excludeTokens": true,
+      "excludePasswords": true,
+      "excludePrivateKeys": true,
+      "excludeEnvironmentSecrets": true,
+      "maskSensitiveValues": true
+    },
+    "pluginSecurity": {
+      "signedPlugins": true,
+      "sandboxExecution": true,
+      "permissionModel": true
+    },
+    "runtimeSecurity": {
+      "containerIsolation": true,
+      "leastPrivilege": true,
+      "nonRootContainers": true,
+      "networkPolicies": true
+    },
+    "securityHeaders": [
+      "Content-Security-Policy",
+      "Strict-Transport-Security",
+      "X-Content-Type-Options",
+      "Referrer-Policy",
+      "X-Frame-Options"
+    ],
+    "complianceTargets": [
+      "OWASP Top 10",
+      "CIS Benchmarks",
+      "SOC 2 Ready",
+      "GDPR Aware"
+    ],
+    "rules": [
+      "All APIs require authentication unless explicitly public.",
+      "Every request is authorized after authentication.",
+      "Secrets are never committed to repositories.",
+      "AI exports never expose sensitive information.",
+      "Every security event is auditable.",
+      "Every service communicates over HTTPS."
+    ]
+  },
+  {
+    "services": [
+      {
+        "id": "api-gateway",
+        "name": "API Gateway",
+        "type": "Gateway",
+        "technology": "Express.js",
+        "responsibility": [
+          "REST API",
+          "Authentication",
+          "Authorization",
+          "Routing",
+          "Rate Limiting",
+          "WebSocket Gateway"
+        ],
+        "database": null,
+        "dependsOn": [
+          "auth-service",
+          "repository-service",
+          "search-service",
+          "impact-service",
+          "runtime-service",
+          "export-service"
+        ],
+        "producesEvents": [],
+        "consumesEvents": [],
+        "public": true,
+        "scalable": true
+      },
+      {
+        "id": "auth-service",
+        "name": "Authentication Service",
+        "type": "Core",
+        "technology": "Express.js",
+        "responsibility": [
+          "User Authentication",
+          "JWT",
+          "RBAC",
+          "User Sessions"
+        ],
+        "database": "PostgreSQL",
+        "dependsOn": [],
+        "producesEvents": [
+          "UserCreated",
+          "UserUpdated"
+        ],
+        "consumesEvents": [],
+        "public": false,
+        "scalable": true
+      },
+      {
+        "id": "repository-service",
+        "name": "Repository Service",
+        "type": "Core",
+        "technology": "Express.js",
+        "responsibility": [
+          "Repository Registration",
+          "Repository Synchronization",
+          "Repository Metadata",
+          "Repository Lifecycle"
+        ],
+        "database": "PostgreSQL",
+        "dependsOn": [
+          "git-service"
+        ],
+        "producesEvents": [
+          "RepositoryImported",
+          "RepositoryUpdated",
+          "RepositoryDeleted"
+        ],
+        "consumesEvents": [],
+        "public": false,
+        "scalable": true
+      },
+      {
+        "id": "git-service",
+        "name": "Git Integration Service",
+        "type": "Integration",
+        "technology": "Express.js",
+        "responsibility": [
+          "Clone Repository",
+          "Pull Changes",
+          "Read Commits",
+          "Repository Watching"
+        ],
+        "database": null,
+        "dependsOn": [],
+        "producesEvents": [
+          "RepositorySynchronized"
+        ],
+        "consumesEvents": [
+          "RepositoryImported"
+        ],
+        "public": false,
+        "scalable": true
+      },
+      {
+        "id": "parser-service",
+        "name": "Parser Service",
+        "type": "Intelligence",
+        "technology": "Python",
+        "responsibility": [
+          "Tree-sitter Parsing",
+          "AST Generation",
+          "Symbol Extraction",
+          "Dependency Extraction"
+        ],
+        "database": null,
+        "dependsOn": [],
+        "producesEvents": [
+          "RepositoryParsed"
+        ],
+        "consumesEvents": [
+          "RepositorySynchronized"
+        ],
+        "public": false,
+        "scalable": true
+      },
+      {
+        "id": "semantic-service",
+        "name": "Semantic Analysis Service",
+        "type": "Intelligence",
+        "technology": "Python",
+        "responsibility": [
+          "Semantic Analysis",
+          "Framework Detection",
+          "Business Meaning Extraction"
+        ],
+        "database": null,
+        "dependsOn": [
+          "parser-service"
+        ],
+        "producesEvents": [
+          "SemanticAnalysisCompleted"
+        ],
+        "consumesEvents": [
+          "RepositoryParsed"
+        ],
+        "public": false,
+        "scalable": true
+      },
+      {
+        "id": "uir-service",
+        "name": "Universal Intermediate Representation Service",
+        "type": "Intelligence",
+        "technology": "Python",
+        "responsibility": [
+          "Generate UIR",
+          "Normalize Languages",
+          "Generate Metadata"
+        ],
+        "database": "Neo4j",
+        "dependsOn": [
+          "semantic-service"
+        ],
+        "producesEvents": [
+          "UIRGenerated"
+        ],
+        "consumesEvents": [
+          "SemanticAnalysisCompleted"
+        ],
+        "public": false,
+        "scalable": true
+      },
+      {
+        "id": "graph-service",
+        "name": "Knowledge Graph Service",
+        "type": "Core",
+        "technology": "Python",
+        "responsibility": [
+          "Knowledge Graph Generation",
+          "Graph Updates",
+          "Relationship Management"
+        ],
+        "database": "Neo4j",
+        "dependsOn": [
+          "uir-service"
+        ],
+        "producesEvents": [
+          "KnowledgeGraphUpdated"
+        ],
+        "consumesEvents": [
+          "UIRGenerated"
+        ],
+        "public": false,
+        "scalable": true
+      },
+      {
+        "id": "digital-twin-service",
+        "name": "Digital Twin Service",
+        "type": "Core",
+        "technology": "Python",
+        "responsibility": [
+          "Software Digital Twin",
+          "Synchronization",
+          "Version Tracking",
+          "Repository State"
+        ],
+        "database": "Neo4j",
+        "dependsOn": [
+          "graph-service"
+        ],
+        "producesEvents": [
+          "DigitalTwinUpdated"
+        ],
+        "consumesEvents": [
+          "KnowledgeGraphUpdated"
+        ],
+        "public": false,
+        "scalable": true
+      },
+      {
+        "id": "runtime-service",
+        "name": "Runtime Intelligence Service",
+        "type": "Runtime",
+        "technology": "Python",
+        "responsibility": [
+          "Logs",
+          "Metrics",
+          "Traces",
+          "Deployment Correlation"
+        ],
+        "database": "Neo4j",
+        "dependsOn": [
+          "digital-twin-service"
+        ],
+        "producesEvents": [
+          "RuntimeUpdated"
+        ],
+        "consumesEvents": [
+          "RuntimeEventReceived"
+        ],
+        "public": false,
+        "scalable": true
+      },
+      {
+        "id": "impact-service",
+        "name": "Change Impact Service",
+        "type": "Intelligence",
+        "technology": "Python",
+        "responsibility": [
+          "Risk Analysis",
+          "Blast Radius",
+          "Impact Prediction"
+        ],
+        "database": "Neo4j",
+        "dependsOn": [
+          "digital-twin-service"
+        ],
+        "producesEvents": [
+          "ImpactAnalysisCompleted"
+        ],
+        "consumesEvents": [
+          "DigitalTwinUpdated"
+        ],
+        "public": false,
+        "scalable": true
+      },
+      {
+        "id": "search-service",
+        "name": "Search Service",
+        "type": "Core",
+        "technology": "Python",
+        "responsibility": [
+          "Semantic Search",
+          "Repository Search",
+          "Graph Search"
+        ],
+        "database": "Neo4j",
+        "dependsOn": [
+          "graph-service"
+        ],
+        "producesEvents": [],
+        "consumesEvents": [
+          "KnowledgeGraphUpdated"
+        ],
+        "public": false,
+        "scalable": true
+      },
+      {
+        "id": "export-service",
+        "name": "AI Context Export Service",
+        "type": "Core",
+        "technology": "Python",
+        "responsibility": [
+          "Markdown Export",
+          "JSON Export",
+          "PDF Export",
+          "GraphML Export",
+          "AI Context Package"
+        ],
+        "database": "Object Storage",
+        "dependsOn": [
+          "digital-twin-service"
+        ],
+        "producesEvents": [
+          "ExportGenerated"
+        ],
+        "consumesEvents": [
+          "DigitalTwinUpdated"
+        ],
+        "public": false,
+        "scalable": true
+      },
+      {
+        "id": "notification-service",
+        "name": "Notification Service",
+        "type": "Platform",
+        "technology": "Express.js",
+        "responsibility": [
+          "Email",
+          "WebSocket Notifications",
+          "In-App Notifications"
+        ],
+        "database": "PostgreSQL",
+        "dependsOn": [],
+        "producesEvents": [],
+        "consumesEvents": [
+          "ExportGenerated",
+          "ImpactAnalysisCompleted",
+          "RuntimeUpdated"
+        ],
+        "public": false,
+        "scalable": true
+      },
+      {
+        "id": "analytics-service",
+        "name": "Analytics Service",
+        "type": "Platform",
+        "technology": "Python",
+        "responsibility": [
+          "Repository Metrics",
+          "Platform Analytics",
+          "Engineering Reports"
+        ],
+        "database": "PostgreSQL",
+        "dependsOn": [
+          "graph-service"
+        ],
+        "producesEvents": [
+          "AnalyticsUpdated"
+        ],
+        "consumesEvents": [
+          "KnowledgeGraphUpdated"
+        ],
+        "public": false,
+        "scalable": true
+      }
+    ]
+  },
+  {
+    "metadata": {
+      "project": "ForgeMind",
+      "specification": "ui",
+      "status": "approved"
+    },
+    "application": {
+      "name": "ForgeMind",
+      "type": "Enterprise SaaS",
+      "theme": "Dark First",
+      "responsive": true,
+      "layout": "Dashboard"
+    },
+    "navigation": {
+      "sidebar": [
+        "Dashboard",
+        "Repositories",
+        "Architecture",
+        "Knowledge Graph",
+        "Software Digital Twin",
+        "Runtime Intelligence",
+        "Impact Analysis",
+        "Software Reasoning",
+        "Policies",
+        "AI Context Export",
+        "Reports",
+        "Plugins",
+        "Settings"
+      ],
+      "topbar": [
+        "Global Search",
+        "Command Palette",
+        "Notifications",
+        "Theme Switcher",
+        "Profile"
+      ]
+    },
+    "screens": [
+      {
+        "id": "dashboard",
+        "title": "Dashboard",
+        "purpose": "Platform overview",
+        "widgets": [
+          "Repository Summary",
+          "Analysis Status",
+          "Runtime Health",
+          "Recent Activity",
+          "Quick Actions"
+        ]
+      },
+      {
+        "id": "repositories",
+        "title": "Repositories",
+        "purpose": "Repository management",
+        "widgets": [
+          "Repository Table",
+          "Repository Filters",
+          "Repository Search",
+          "Import Repository"
+        ]
+      },
+      {
+        "id": "repository-details",
+        "title": "Repository Details",
+        "purpose": "Repository overview",
+        "tabs": [
+          "Overview",
+          "Architecture",
+          "Dependencies",
+          "Runtime",
+          "Analysis",
+          "History"
+        ]
+      },
+      {
+        "id": "architecture",
+        "title": "Architecture Explorer",
+        "purpose": "System architecture visualization",
+        "widgets": [
+          "Architecture Graph",
+          "Dependency Tree",
+          "Node Inspector"
+        ]
+      },
+      {
+        "id": "knowledge-graph",
+        "title": "Knowledge Graph",
+        "purpose": "Explore software relationships",
+        "widgets": [
+          "Interactive Graph",
+          "Search",
+          "Filters",
+          "Relationship Inspector"
+        ]
+      },
+      {
+        "id": "digital-twin",
+        "title": "Software Digital Twin",
+        "purpose": "Unified software model",
+        "widgets": [
+          "Topology",
+          "Runtime State",
+          "Dependencies",
+          "Health"
+        ]
+      },
+      {
+        "id": "runtime",
+        "title": "Runtime Intelligence",
+        "purpose": "Observe running systems",
+        "widgets": [
+          "Metrics",
+          "Logs",
+          "Traces",
+          "Deployments"
+        ]
+      },
+      {
+        "id": "impact-analysis",
+        "title": "Impact Analysis",
+        "purpose": "Predict software impact",
+        "widgets": [
+          "Risk Score",
+          "Blast Radius",
+          "Affected Services",
+          "Recommendations"
+        ]
+      },
+      {
+        "id": "reasoning",
+        "title": "Software Reasoning",
+        "purpose": "Explain software behaviour",
+        "widgets": [
+          "Question Input",
+          "Evidence Panel",
+          "Graph Explorer",
+          "Recommendations"
+        ]
+      },
+      {
+        "id": "policies",
+        "title": "Policy Center",
+        "purpose": "Engineering governance",
+        "widgets": [
+          "Policy List",
+          "Violations",
+          "Compliance Score"
+        ]
+      },
+      {
+        "id": "exports",
+        "title": "AI Context Export",
+        "purpose": "Generate AI-ready exports",
+        "widgets": [
+          "Export Options",
+          "History",
+          "Download Center"
+        ]
+      },
+      {
+        "id": "reports",
+        "title": "Reports",
+        "purpose": "Engineering insights",
+        "widgets": [
+          "Report Library",
+          "Analytics",
+          "Downloads"
+        ]
+      },
+      {
+        "id": "plugins",
+        "title": "Plugin Manager",
+        "purpose": "Manage platform extensions",
+        "widgets": [
+          "Installed Plugins",
+          "Marketplace",
+          "Updates"
+        ]
+      },
+      {
+        "id": "settings",
+        "title": "Settings",
+        "purpose": "Application configuration",
+        "sections": [
+          "General",
+          "Workspace",
+          "Security",
+          "Plugins",
+          "Notifications",
+          "Appearance"
+        ]
+      }
+    ],
+    "globalComponents": [
+      "Sidebar",
+      "Top Navigation",
+      "Breadcrumb",
+      "Command Palette",
+      "Global Search",
+      "Notifications",
+      "Loading Skeleton",
+      "Toast",
+      "Modal",
+      "Confirmation Dialog"
+    ],
+    "responsive": {
+      "desktop": true,
+      "tablet": true,
+      "mobile": true
+    },
+    "keyboardShortcuts": {
+      "Ctrl+K": "Open Command Palette",
+      "Ctrl+/": "Global Search",
+      "Esc": "Close Dialog",
+      "Ctrl+Shift+E": "Export AI Context"
+    },
+    "designGoals": [
+      "Minimal",
+      "Professional",
+      "Fast",
+      "Explainable",
+      "Enterprise",
+      "Accessible",
+      "Consistent"
+    ]
+  },
+  {
+    "metadata": {
+      "project": "ForgeMind",
+      "specification": "workflows",
+      "status": "approved"
+    },
+    "workflows": [
+      {
+        "id": "repository-import",
+        "name": "Repository Import",
+        "description": "Imports a repository and prepares it for intelligence processing.",
+        "trigger": "User imports a repository.",
+        "steps": [
+          {
+            "order": 1,
+            "service": "api-gateway",
+            "action": "Validate request and authenticate user."
+          },
+          {
+            "order": 2,
+            "service": "repository-service",
+            "action": "Create repository record."
+          },
+          {
+            "order": 3,
+            "service": "workflow-orchestrator",
+            "action": "Create analysis workflow."
+          },
+          {
+            "order": 4,
+            "service": "git-service",
+            "action": "Clone repository."
+          },
+          {
+            "order": 5,
+            "service": "workflow-orchestrator",
+            "action": "Start repository analysis."
+          }
+        ],
+        "result": [
+          "Repository Registered",
+          "Workflow Started"
+        ]
+      },
+      {
+        "id": "repository-analysis",
+        "name": "Repository Analysis",
+        "description": "Transforms source code into a language-independent software model.",
+        "trigger": "Repository synchronized.",
+        "steps": [
+          {
+            "order": 1,
+            "service": "parser-service",
+            "action": "Generate AST."
+          },
+          {
+            "order": 2,
+            "service": "semantic-service",
+            "action": "Extract semantic meaning."
+          },
+          {
+            "order": 3,
+            "service": "uir-service",
+            "action": "Generate Universal Intermediate Representation."
+          },
+          {
+            "order": 4,
+            "service": "graph-service",
+            "action": "Generate Software Knowledge Graph."
+          },
+          {
+            "order": 5,
+            "service": "digital-twin-service",
+            "action": "Synchronize Software Digital Twin."
+          }
+        ],
+        "result": [
+          "Knowledge Graph Updated",
+          "Digital Twin Updated"
+        ]
+      },
+      {
+        "id": "runtime-correlation",
+        "name": "Runtime Correlation",
+        "description": "Correlates runtime telemetry with software architecture.",
+        "trigger": "Runtime event received.",
+        "steps": [
+          {
+            "order": 1,
+            "service": "runtime-service",
+            "action": "Collect runtime event."
+          },
+          {
+            "order": 2,
+            "service": "graph-service",
+            "action": "Locate affected software components."
+          },
+          {
+            "order": 3,
+            "service": "digital-twin-service",
+            "action": "Update runtime state."
+          },
+          {
+            "order": 4,
+            "service": "reasoning-engine",
+            "action": "Correlate runtime evidence."
+          }
+        ],
+        "result": [
+          "Runtime Intelligence Updated"
+        ]
+      },
+      {
+        "id": "impact-analysis",
+        "name": "Change Impact Analysis",
+        "description": "Predicts the effect of proposed software changes.",
+        "trigger": "User requests impact analysis.",
+        "steps": [
+          {
+            "order": 1,
+            "service": "impact-service",
+            "action": "Locate modified components."
+          },
+          {
+            "order": 2,
+            "service": "graph-service",
+            "action": "Traverse dependencies."
+          },
+          {
+            "order": 3,
+            "service": "reasoning-engine",
+            "action": "Calculate blast radius."
+          },
+          {
+            "order": 4,
+            "service": "impact-service",
+            "action": "Generate recommendations."
+          }
+        ],
+        "result": [
+          "Risk Score",
+          "Blast Radius",
+          "Recommendations"
+        ]
+      },
+      {
+        "id": "software-reasoning",
+        "name": "Software Reasoning",
+        "description": "Answers engineering questions using software evidence.",
+        "trigger": "User submits a reasoning query.",
+        "steps": [
+          {
+            "order": 1,
+            "service": "reasoning-engine",
+            "action": "Interpret engineering question."
+          },
+          {
+            "order": 2,
+            "service": "graph-service",
+            "action": "Retrieve software relationships."
+          },
+          {
+            "order": 3,
+            "service": "runtime-service",
+            "action": "Retrieve runtime evidence."
+          },
+          {
+            "order": 4,
+            "service": "reasoning-engine",
+            "action": "Produce evidence-backed explanation."
+          }
+        ],
+        "result": [
+          "Engineering Explanation",
+          "Confidence Score"
+        ]
+      },
+      {
+        "id": "policy-evaluation",
+        "name": "Policy Evaluation",
+        "description": "Evaluates repositories against engineering policies.",
+        "trigger": "Repository analysis completed.",
+        "steps": [
+          {
+            "order": 1,
+            "service": "policy-engine",
+            "action": "Load applicable policies."
+          },
+          {
+            "order": 2,
+            "service": "policy-engine",
+            "action": "Evaluate Software Digital Twin."
+          },
+          {
+            "order": 3,
+            "service": "policy-engine",
+            "action": "Generate violations."
+          }
+        ],
+        "result": [
+          "Compliance Report"
+        ]
+      },
+      {
+        "id": "ai-context-export",
+        "name": "AI Context Export",
+        "description": "Generates a portable AI-ready understanding of the project.",
+        "trigger": "User requests export.",
+        "steps": [
+          {
+            "order": 1,
+            "service": "export-service",
+            "action": "Collect project metadata."
+          },
+          {
+            "order": 2,
+            "service": "export-service",
+            "action": "Collect Digital Twin."
+          },
+          {
+            "order": 3,
+            "service": "export-service",
+            "action": "Collect Knowledge Graph."
+          },
+          {
+            "order": 4,
+            "service": "export-service",
+            "action": "Generate export package."
+          },
+          {
+            "order": 5,
+            "service": "notification-service",
+            "action": "Notify user."
+          }
+        ],
+        "result": [
+          "AI Context Package",
+          "Markdown Export",
+          "JSON Export",
+          "PDF Export"
+        ]
+      }
+    ],
+    "workflowRules": [
+      "Every workflow has a single trigger.",
+      "Every step belongs to one service.",
+      "Long-running workflows are coordinated by the Workflow Orchestrator.",
+      "Workflows are resumable after failure.",
+      "Every workflow emits observable events.",
+      "Workflow state is persisted.",
+      "Workflow progress is available in real time."
+    ]
+  }
+]

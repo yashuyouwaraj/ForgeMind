@@ -3,14 +3,33 @@
     "target": "ES2022",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
+
     "strict": true,
+
     "skipLibCheck": true,
+
     "esModuleInterop": true,
+
     "resolveJsonModule": true,
+
+    "allowSyntheticDefaultImports": true,
+
     "forceConsistentCasingInFileNames": true,
+
     "declaration": true,
+
+    "declarationMap": true,
+
     "sourceMap": true,
+
+    "incremental": true,
+
+    "composite": true,
+
+    "isolatedModules": true,
+
     "noUnusedLocals": true,
+
     "noUnusedParameters": true
   }
 }

@@ -1,22 +1,27 @@
 {
-  "name": "ForgeMind",
+  "name": "forgemind",
+  "private": true,
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "type": "module",
+  "packageManager": "pnpm@10.17.0",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "clean": "turbo run clean",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "husky"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
-      "version": "^11.17.0",
+      "version": "^10.17.0",
       "onFail": "download"
     }
   },
-  "type": "module",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "eslint": "^10.8.0",
@@ -24,7 +29,12 @@
     "lint-staged": "^17.2.0",
     "prettier": "^3.9.6",
     "turbo": "^2.10.6",
-    "typescript": "^7.0.2",
+    "typescript": "^5.9.2",
     "typescript-eslint": "^8.65.0"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,md,yml,yaml}": [
+      "prettier --write"
+    ]
   }
 }

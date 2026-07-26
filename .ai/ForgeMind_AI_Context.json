@@ -341,13 +341,8 @@
       "repository": "Monorepo",
       "processing": "Incremental",
       "communication": {
-        "synchronous": [
-          "REST API",
-          "WebSocket"
-        ],
-        "asynchronous": [
-          "Apache Kafka"
-        ]
+        "synchronous": ["REST API", "WebSocket"],
+        "asynchronous": ["Apache Kafka"]
       },
       "principles": [
         "Single Responsibility",
@@ -365,18 +360,12 @@
       {
         "name": "Presentation Layer",
         "responsibility": "User interface and user interaction.",
-        "technology": [
-          "Next.js",
-          "React",
-          "TypeScript"
-        ]
+        "technology": ["Next.js", "React", "TypeScript"]
       },
       {
         "name": "API Layer",
         "responsibility": "Authentication, routing, validation and request orchestration.",
-        "technology": [
-          "Express.js"
-        ]
+        "technology": ["Express.js"]
       },
       {
         "name": "Application Layer",
@@ -385,10 +374,7 @@
       {
         "name": "Intelligence Layer",
         "responsibility": "Repository analysis, semantic understanding, graph reasoning and software intelligence.",
-        "technology": [
-          "Python",
-          "FastAPI"
-        ]
+        "technology": ["Python", "FastAPI"]
       },
       {
         "name": "Data Layer",
@@ -551,12 +537,7 @@
       "Service Configuration",
       "Runtime Overrides"
     ],
-    "environments": [
-      "development",
-      "testing",
-      "staging",
-      "production"
-    ],
+    "environments": ["development", "testing", "staging", "production"],
     "globalConfiguration": {
       "applicationName": "ForgeMind",
       "defaultTimezone": "UTC",
@@ -566,65 +547,29 @@
     "serviceConfiguration": [
       {
         "service": "api-gateway",
-        "configuration": [
-          "Port",
-          "Rate Limits",
-          "JWT Settings",
-          "CORS",
-          "HTTPS"
-        ]
+        "configuration": ["Port", "Rate Limits", "JWT Settings", "CORS", "HTTPS"]
       },
       {
         "service": "repository-service",
-        "configuration": [
-          "Repository Storage",
-          "Clone Timeout",
-          "Maximum Repository Size"
-        ]
+        "configuration": ["Repository Storage", "Clone Timeout", "Maximum Repository Size"]
       },
       {
         "service": "workflow-orchestrator",
-        "configuration": [
-          "Retry Count",
-          "Retry Delay",
-          "Parallel Jobs",
-          "Job Timeout"
-        ]
+        "configuration": ["Retry Count", "Retry Delay", "Parallel Jobs", "Job Timeout"]
       },
       {
         "service": "parser-service",
-        "configuration": [
-          "Supported Languages",
-          "Parser Timeout",
-          "Maximum File Size"
-        ]
+        "configuration": ["Supported Languages", "Parser Timeout", "Maximum File Size"]
       },
       {
         "service": "runtime-service",
-        "configuration": [
-          "Metrics Interval",
-          "Trace Sampling",
-          "Log Retention"
-        ]
+        "configuration": ["Metrics Interval", "Trace Sampling", "Log Retention"]
       }
     ],
     "databaseConfiguration": {
-      "postgres": [
-        "Host",
-        "Port",
-        "Database",
-        "Connection Pool"
-      ],
-      "neo4j": [
-        "URI",
-        "Authentication",
-        "Pool Size"
-      ],
-      "redis": [
-        "Host",
-        "Port",
-        "TTL"
-      ]
+      "postgres": ["Host", "Port", "Database", "Connection Pool"],
+      "neo4j": ["URI", "Authentication", "Pool Size"],
+      "redis": ["Host", "Port", "TTL"]
     },
     "kafkaConfiguration": {
       "Bootstrap Servers": true,
@@ -714,33 +659,21 @@
         "name": "Redis",
         "type": "In-Memory Cache",
         "purpose": "Caching, distributed locks and temporary state",
-        "ownerServices": [
-          "api-gateway",
-          "workflow-orchestrator",
-          "repository-service"
-        ]
+        "ownerServices": ["api-gateway", "workflow-orchestrator", "repository-service"]
       },
       {
         "id": "object-storage",
         "name": "Object Storage",
         "type": "Blob Storage",
         "purpose": "Reports, AI exports, repository snapshots and generated artifacts",
-        "ownerServices": [
-          "export-service"
-        ]
+        "ownerServices": ["export-service"]
       }
     ],
     "postgresql": {
       "schemas": [
         {
           "name": "identity",
-          "tables": [
-            "users",
-            "roles",
-            "permissions",
-            "user_roles",
-            "refresh_tokens"
-          ]
+          "tables": ["users", "roles", "permissions", "user_roles", "refresh_tokens"]
         },
         {
           "name": "repositories",
@@ -753,34 +686,19 @@
         },
         {
           "name": "workspace",
-          "tables": [
-            "organizations",
-            "workspaces",
-            "workspace_members"
-          ]
+          "tables": ["organizations", "workspaces", "workspace_members"]
         },
         {
           "name": "jobs",
-          "tables": [
-            "workflow_jobs",
-            "workflow_steps",
-            "job_failures"
-          ]
+          "tables": ["workflow_jobs", "workflow_steps", "job_failures"]
         },
         {
           "name": "notifications",
-          "tables": [
-            "notifications",
-            "notification_templates"
-          ]
+          "tables": ["notifications", "notification_templates"]
         },
         {
           "name": "analytics",
-          "tables": [
-            "usage_metrics",
-            "platform_statistics",
-            "audit_logs"
-          ]
+          "tables": ["usage_metrics", "platform_statistics", "audit_logs"]
         }
       ]
     },
@@ -910,18 +828,7 @@
     "spacing": {
       "system": "8 Point Grid",
       "baseUnit": 8,
-      "scale": [
-        4,
-        8,
-        12,
-        16,
-        24,
-        32,
-        40,
-        48,
-        64,
-        80
-      ]
+      "scale": [4, 8, 12, 16, 24, 32, 40, 48, 64, 80]
     },
     "typography": {
       "primaryFont": "Inter",
@@ -982,12 +889,7 @@
     "animations": {
       "enabled": true,
       "duration": "150-250ms",
-      "principles": [
-        "Subtle",
-        "Fast",
-        "Meaningful",
-        "Never distracting"
-      ]
+      "principles": ["Subtle", "Fast", "Meaningful", "Never distracting"]
     },
     "loadingExperience": {
       "skeletonLoaders": true,
@@ -1035,14 +937,7 @@
       "Navigation remains consistent throughout the application.",
       "Dark mode is the primary design experience."
     ],
-    "inspiration": [
-      "Linear",
-      "Raycast",
-      "GitHub",
-      "Vercel",
-      "Grafana",
-      "Azure Portal"
-    ]
+    "inspiration": ["Linear", "Raycast", "GitHub", "Vercel", "Grafana", "Azure Portal"]
   },
   {
     "metadata": {
@@ -1152,11 +1047,7 @@
       "AI Context Generation"
     ],
     "healthModel": {
-      "levels": [
-        "Healthy",
-        "Warning",
-        "Critical"
-      ],
+      "levels": ["Healthy", "Warning", "Critical"],
       "signals": [
         "Build Failures",
         "Runtime Errors",
@@ -1210,14 +1101,7 @@
         "id": "organization",
         "name": "Organization",
         "description": "Top-level owner of workspaces and users.",
-        "attributes": [
-          "id",
-          "name",
-          "slug",
-          "status",
-          "createdAt",
-          "updatedAt"
-        ],
+        "attributes": ["id", "name", "slug", "status", "createdAt", "updatedAt"],
         "relationships": [
           {
             "type": "HAS_MANY",
@@ -1233,13 +1117,7 @@
         "id": "workspace",
         "name": "Workspace",
         "description": "Logical environment containing repositories and projects.",
-        "attributes": [
-          "id",
-          "name",
-          "description",
-          "visibility",
-          "createdAt"
-        ],
+        "attributes": ["id", "name", "description", "visibility", "createdAt"],
         "relationships": [
           {
             "type": "BELONGS_TO",
@@ -1259,13 +1137,7 @@
         "id": "project",
         "name": "Project",
         "description": "Logical collection of one or more repositories representing a software system.",
-        "attributes": [
-          "id",
-          "name",
-          "description",
-          "status",
-          "createdAt"
-        ],
+        "attributes": ["id", "name", "description", "status", "createdAt"],
         "relationships": [
           {
             "type": "HAS_MANY",
@@ -1281,14 +1153,7 @@
         "id": "repository",
         "name": "Repository",
         "description": "Source code repository imported into ForgeMind.",
-        "attributes": [
-          "id",
-          "name",
-          "provider",
-          "defaultBranch",
-          "url",
-          "status"
-        ],
+        "attributes": ["id", "name", "provider", "defaultBranch", "url", "status"],
         "relationships": [
           {
             "type": "BELONGS_TO",
@@ -1308,12 +1173,7 @@
         "id": "commit",
         "name": "Commit",
         "description": "Version control commit imported from the repository.",
-        "attributes": [
-          "hash",
-          "author",
-          "message",
-          "timestamp"
-        ],
+        "attributes": ["hash", "author", "message", "timestamp"],
         "relationships": [
           {
             "type": "BELONGS_TO",
@@ -1325,14 +1185,7 @@
         "id": "software-component",
         "name": "Software Component",
         "description": "Generic representation of a software entity.",
-        "attributes": [
-          "id",
-          "type",
-          "name",
-          "language",
-          "framework",
-          "version"
-        ],
+        "attributes": ["id", "type", "name", "language", "framework", "version"],
         "relationships": [
           {
             "type": "BELONGS_TO",
@@ -1348,12 +1201,7 @@
         "id": "api-endpoint",
         "name": "API Endpoint",
         "description": "HTTP endpoint exposed by a service.",
-        "attributes": [
-          "method",
-          "path",
-          "authentication",
-          "responseType"
-        ],
+        "attributes": ["method", "path", "authentication", "responseType"],
         "relationships": [
           {
             "type": "BELONGS_TO",
@@ -1365,13 +1213,7 @@
         "id": "service",
         "name": "Service",
         "description": "Deployable backend service.",
-        "attributes": [
-          "id",
-          "name",
-          "technology",
-          "version",
-          "status"
-        ],
+        "attributes": ["id", "name", "technology", "version", "status"],
         "relationships": [
           {
             "type": "HAS_MANY",
@@ -1391,11 +1233,7 @@
         "id": "database",
         "name": "Database",
         "description": "Persistent storage used by a service.",
-        "attributes": [
-          "id",
-          "name",
-          "type"
-        ],
+        "attributes": ["id", "name", "type"],
         "relationships": [
           {
             "type": "OWNED_BY",
@@ -1407,13 +1245,7 @@
         "id": "workflow-job",
         "name": "Workflow Job",
         "description": "Execution of a long-running workflow.",
-        "attributes": [
-          "id",
-          "status",
-          "progress",
-          "startedAt",
-          "completedAt"
-        ],
+        "attributes": ["id", "status", "progress", "startedAt", "completedAt"],
         "relationships": [
           {
             "type": "EXECUTED_BY",
@@ -1425,11 +1257,7 @@
         "id": "knowledge-graph",
         "name": "Knowledge Graph",
         "description": "Graph representation of software entities and relationships.",
-        "attributes": [
-          "id",
-          "version",
-          "lastUpdated"
-        ],
+        "attributes": ["id", "version", "lastUpdated"],
         "relationships": [
           {
             "type": "GENERATED_FROM",
@@ -1441,12 +1269,7 @@
         "id": "software-digital-twin",
         "name": "Software Digital Twin",
         "description": "Unified representation of the software system.",
-        "attributes": [
-          "id",
-          "version",
-          "health",
-          "lastSynced"
-        ],
+        "attributes": ["id", "version", "health", "lastSynced"],
         "relationships": [
           {
             "type": "GENERATED_FROM",
@@ -1462,12 +1285,7 @@
         "id": "runtime-model",
         "name": "Runtime Model",
         "description": "Live operational state of the software system.",
-        "attributes": [
-          "latency",
-          "cpu",
-          "memory",
-          "health"
-        ],
+        "attributes": ["latency", "cpu", "memory", "health"],
         "relationships": [
           {
             "type": "OBSERVES",
@@ -1479,12 +1297,7 @@
         "id": "analysis-report",
         "name": "Analysis Report",
         "description": "Generated report describing repository intelligence.",
-        "attributes": [
-          "id",
-          "type",
-          "format",
-          "generatedAt"
-        ],
+        "attributes": ["id", "type", "format", "generatedAt"],
         "relationships": [
           {
             "type": "GENERATED_FROM",
@@ -1496,12 +1309,7 @@
         "id": "ai-context-package",
         "name": "AI Context Package",
         "description": "Portable export that allows AI systems to understand a project without rescanning the repository.",
-        "attributes": [
-          "id",
-          "format",
-          "version",
-          "generatedAt"
-        ],
+        "attributes": ["id", "format", "version", "generatedAt"],
         "relationships": [
           {
             "type": "GENERATED_FROM",
@@ -1789,10 +1597,7 @@
       "examples": [
         {
           "entity": "PaymentService",
-          "aliases": [
-            "PaymentSvc",
-            "Payments"
-          ]
+          "aliases": ["PaymentSvc", "Payments"]
         }
       ]
     },
@@ -1920,15 +1725,8 @@
         "topic": "repository.events",
         "version": "1.0.0",
         "producer": "repository-service",
-        "consumers": [
-          "workflow-orchestrator"
-        ],
-        "payload": [
-          "repositoryId",
-          "workspaceId",
-          "provider",
-          "branch"
-        ]
+        "consumers": ["workflow-orchestrator"],
+        "payload": ["repositoryId", "workspaceId", "provider", "branch"]
       },
       {
         "id": "repository-synchronized",
@@ -1936,9 +1734,7 @@
         "topic": "repository.events",
         "version": "1.0.0",
         "producer": "git-service",
-        "consumers": [
-          "workflow-orchestrator"
-        ]
+        "consumers": ["workflow-orchestrator"]
       },
       {
         "id": "repository-parsed",
@@ -1946,9 +1742,7 @@
         "topic": "analysis.events",
         "version": "1.0.0",
         "producer": "parser-service",
-        "consumers": [
-          "workflow-orchestrator"
-        ]
+        "consumers": ["workflow-orchestrator"]
       },
       {
         "id": "semantic-analysis-completed",
@@ -1956,9 +1750,7 @@
         "topic": "analysis.events",
         "version": "1.0.0",
         "producer": "semantic-service",
-        "consumers": [
-          "workflow-orchestrator"
-        ]
+        "consumers": ["workflow-orchestrator"]
       },
       {
         "id": "uir-generated",
@@ -1966,9 +1758,7 @@
         "topic": "analysis.events",
         "version": "1.0.0",
         "producer": "uir-service",
-        "consumers": [
-          "workflow-orchestrator"
-        ]
+        "consumers": ["workflow-orchestrator"]
       },
       {
         "id": "knowledge-graph-updated",
@@ -1976,11 +1766,7 @@
         "topic": "graph.events",
         "version": "1.0.0",
         "producer": "graph-service",
-        "consumers": [
-          "workflow-orchestrator",
-          "search-service",
-          "analytics-service"
-        ]
+        "consumers": ["workflow-orchestrator", "search-service", "analytics-service"]
       },
       {
         "id": "digital-twin-updated",
@@ -1988,12 +1774,7 @@
         "topic": "digital-twin.events",
         "version": "1.0.0",
         "producer": "digital-twin-service",
-        "consumers": [
-          "impact-service",
-          "runtime-service",
-          "reasoning-engine",
-          "export-service"
-        ]
+        "consumers": ["impact-service", "runtime-service", "reasoning-engine", "export-service"]
       },
       {
         "id": "runtime-updated",
@@ -2001,10 +1782,7 @@
         "topic": "runtime.events",
         "version": "1.0.0",
         "producer": "runtime-service",
-        "consumers": [
-          "reasoning-engine",
-          "analytics-service"
-        ]
+        "consumers": ["reasoning-engine", "analytics-service"]
       },
       {
         "id": "impact-analysis-completed",
@@ -2012,10 +1790,7 @@
         "topic": "impact.events",
         "version": "1.0.0",
         "producer": "impact-service",
-        "consumers": [
-          "notification-service",
-          "analytics-service"
-        ]
+        "consumers": ["notification-service", "analytics-service"]
       },
       {
         "id": "export-generated",
@@ -2023,9 +1798,7 @@
         "topic": "export.events",
         "version": "1.0.0",
         "producer": "export-service",
-        "consumers": [
-          "notification-service"
-        ]
+        "consumers": ["notification-service"]
       },
       {
         "id": "plugin-installed",
@@ -2033,9 +1806,7 @@
         "topic": "platform.events",
         "version": "1.0.0",
         "producer": "metadata-registry",
-        "consumers": [
-          "workflow-orchestrator"
-        ]
+        "consumers": ["workflow-orchestrator"]
       }
     ],
     "workflowSequence": [
@@ -2077,283 +1848,132 @@
         "name": "Repository Import",
         "category": "Repository Management",
         "description": "Import a source code repository into ForgeMind for analysis.",
-        "ui": [
-          "Dashboard",
-          "Repository Explorer"
-        ],
-        "apis": [
-          "POST /repositories"
-        ],
-        "services": [
-          "repository-service",
-          "git-service",
-          "workflow-orchestrator"
-        ],
-        "events": [
-          "RepositoryImported",
-          "RepositorySynchronized"
-        ],
-        "databases": [
-          "postgres"
-        ],
-        "outputs": [
-          "Registered Repository",
-          "Workflow Started"
-        ]
+        "ui": ["Dashboard", "Repository Explorer"],
+        "apis": ["POST /repositories"],
+        "services": ["repository-service", "git-service", "workflow-orchestrator"],
+        "events": ["RepositoryImported", "RepositorySynchronized"],
+        "databases": ["postgres"],
+        "outputs": ["Registered Repository", "Workflow Started"]
       },
       {
         "id": "repository-analysis",
         "name": "Repository Analysis",
         "category": "Software Intelligence",
         "description": "Analyse repository structure and source code.",
-        "ui": [
-          "Repository Details"
-        ],
-        "apis": [
-          "POST /analysis/start"
-        ],
-        "services": [
-          "parser-service",
-          "semantic-service",
-          "uir-service"
-        ],
-        "events": [
-          "RepositoryParsed",
-          "SemanticAnalysisCompleted",
-          "UIRGenerated"
-        ],
-        "databases": [
-          "neo4j"
-        ],
-        "outputs": [
-          "Universal Intermediate Representation"
-        ]
+        "ui": ["Repository Details"],
+        "apis": ["POST /analysis/start"],
+        "services": ["parser-service", "semantic-service", "uir-service"],
+        "events": ["RepositoryParsed", "SemanticAnalysisCompleted", "UIRGenerated"],
+        "databases": ["neo4j"],
+        "outputs": ["Universal Intermediate Representation"]
       },
       {
         "id": "knowledge-graph",
         "name": "Knowledge Graph",
         "category": "Software Intelligence",
         "description": "Build and maintain software relationships.",
-        "ui": [
-          "Knowledge Graph"
-        ],
-        "apis": [
-          "GET /graph/{repositoryId}"
-        ],
-        "services": [
-          "graph-service"
-        ],
-        "events": [
-          "KnowledgeGraphUpdated"
-        ],
-        "databases": [
-          "neo4j"
-        ],
-        "outputs": [
-          "Software Knowledge Graph"
-        ]
+        "ui": ["Knowledge Graph"],
+        "apis": ["GET /graph/{repositoryId}"],
+        "services": ["graph-service"],
+        "events": ["KnowledgeGraphUpdated"],
+        "databases": ["neo4j"],
+        "outputs": ["Software Knowledge Graph"]
       },
       {
         "id": "digital-twin",
         "name": "Software Digital Twin",
         "category": "Software Intelligence",
         "description": "Maintain a live digital representation of the software system.",
-        "ui": [
-          "Software Digital Twin"
-        ],
-        "apis": [
-          "GET /digital-twin/{projectId}"
-        ],
-        "services": [
-          "digital-twin-service"
-        ],
-        "events": [
-          "DigitalTwinUpdated"
-        ],
-        "databases": [
-          "neo4j"
-        ],
-        "outputs": [
-          "Software Digital Twin"
-        ]
+        "ui": ["Software Digital Twin"],
+        "apis": ["GET /digital-twin/{projectId}"],
+        "services": ["digital-twin-service"],
+        "events": ["DigitalTwinUpdated"],
+        "databases": ["neo4j"],
+        "outputs": ["Software Digital Twin"]
       },
       {
         "id": "runtime-intelligence",
         "name": "Runtime Intelligence",
         "category": "Observability",
         "description": "Correlate runtime telemetry with software architecture.",
-        "ui": [
-          "Runtime Dashboard"
-        ],
-        "apis": [
-          "GET /runtime/health",
-          "GET /runtime/metrics",
-          "GET /runtime/logs"
-        ],
-        "services": [
-          "runtime-service"
-        ],
-        "events": [
-          "RuntimeUpdated"
-        ],
-        "databases": [
-          "neo4j"
-        ],
-        "outputs": [
-          "Runtime Model"
-        ]
+        "ui": ["Runtime Dashboard"],
+        "apis": ["GET /runtime/health", "GET /runtime/metrics", "GET /runtime/logs"],
+        "services": ["runtime-service"],
+        "events": ["RuntimeUpdated"],
+        "databases": ["neo4j"],
+        "outputs": ["Runtime Model"]
       },
       {
         "id": "impact-analysis",
         "name": "Change Impact Analysis",
         "category": "Engineering Intelligence",
         "description": "Predict the impact of software changes before deployment.",
-        "ui": [
-          "Impact Analysis"
-        ],
-        "apis": [
-          "POST /impact/analyse"
-        ],
-        "services": [
-          "impact-service"
-        ],
-        "events": [
-          "ImpactAnalysisCompleted"
-        ],
-        "databases": [
-          "neo4j"
-        ],
-        "outputs": [
-          "Blast Radius",
-          "Risk Score",
-          "Recommendations"
-        ]
+        "ui": ["Impact Analysis"],
+        "apis": ["POST /impact/analyse"],
+        "services": ["impact-service"],
+        "events": ["ImpactAnalysisCompleted"],
+        "databases": ["neo4j"],
+        "outputs": ["Blast Radius", "Risk Score", "Recommendations"]
       },
       {
         "id": "reasoning-engine",
         "name": "Software Reasoning",
         "category": "Engineering Intelligence",
         "description": "Provide explainable engineering reasoning using graph traversal and runtime evidence.",
-        "ui": [
-          "Reasoning Panel"
-        ],
-        "apis": [
-          "POST /reasoning/query",
-          "POST /reasoning/explain"
-        ],
-        "services": [
-          "reasoning-engine"
-        ],
+        "ui": ["Reasoning Panel"],
+        "apis": ["POST /reasoning/query", "POST /reasoning/explain"],
+        "services": ["reasoning-engine"],
         "events": [],
-        "databases": [
-          "neo4j"
-        ],
-        "outputs": [
-          "Engineering Explanation",
-          "Evidence",
-          "Confidence Score"
-        ]
+        "databases": ["neo4j"],
+        "outputs": ["Engineering Explanation", "Evidence", "Confidence Score"]
       },
       {
         "id": "policy-evaluation",
         "name": "Policy Evaluation",
         "category": "Governance",
         "description": "Evaluate repositories and architecture against engineering policies.",
-        "ui": [
-          "Policies"
-        ],
-        "apis": [
-          "GET /policies",
-          "POST /policies"
-        ],
-        "services": [
-          "policy-engine"
-        ],
+        "ui": ["Policies"],
+        "apis": ["GET /policies", "POST /policies"],
+        "services": ["policy-engine"],
         "events": [],
-        "databases": [
-          "postgres"
-        ],
-        "outputs": [
-          "Compliance Report",
-          "Violations",
-          "Recommendations"
-        ]
+        "databases": ["postgres"],
+        "outputs": ["Compliance Report", "Violations", "Recommendations"]
       },
       {
         "id": "repository-search",
         "name": "Repository Search",
         "category": "Discovery",
         "description": "Search repositories, software components and relationships.",
-        "ui": [
-          "Global Search"
-        ],
-        "apis": [
-          "GET /graph/search"
-        ],
-        "services": [
-          "search-service"
-        ],
+        "ui": ["Global Search"],
+        "apis": ["GET /graph/search"],
+        "services": ["search-service"],
         "events": [],
-        "databases": [
-          "neo4j"
-        ],
-        "outputs": [
-          "Search Results"
-        ]
+        "databases": ["neo4j"],
+        "outputs": ["Search Results"]
       },
       {
         "id": "ai-context-export",
         "name": "AI Context Export",
         "category": "Developer Productivity",
         "description": "Generate portable project intelligence for AI systems.",
-        "ui": [
-          "AI Context Export"
-        ],
-        "apis": [
-          "POST /exports/context"
-        ],
-        "services": [
-          "export-service"
-        ],
-        "events": [
-          "ExportGenerated"
-        ],
-        "databases": [
-          "object-storage"
-        ],
-        "outputs": [
-          "Markdown",
-          "JSON",
-          "PDF",
-          "GraphML",
-          "AI Context Package"
-        ]
+        "ui": ["AI Context Export"],
+        "apis": ["POST /exports/context"],
+        "services": ["export-service"],
+        "events": ["ExportGenerated"],
+        "databases": ["object-storage"],
+        "outputs": ["Markdown", "JSON", "PDF", "GraphML", "AI Context Package"]
       },
       {
         "id": "plugin-management",
         "name": "Plugin Management",
         "category": "Platform",
         "description": "Install, enable, disable and manage ForgeMind plugins.",
-        "ui": [
-          "Plugin Manager"
-        ],
-        "apis": [
-          "GET /plugins",
-          "POST /plugins/install"
-        ],
-        "services": [
-          "metadata-registry"
-        ],
-        "events": [
-          "PluginInstalled"
-        ],
-        "databases": [
-          "postgres"
-        ],
-        "outputs": [
-          "Installed Plugins",
-          "Plugin Status"
-        ]
+        "ui": ["Plugin Manager"],
+        "apis": ["GET /plugins", "POST /plugins/install"],
+        "services": ["metadata-registry"],
+        "events": ["PluginInstalled"],
+        "databases": ["postgres"],
+        "outputs": ["Installed Plugins", "Plugin Status"]
       }
     ],
     "featureRules": [
@@ -2379,12 +1999,7 @@
     "nodeCategories": [
       {
         "category": "Repository",
-        "nodes": [
-          "Repository",
-          "Branch",
-          "Commit",
-          "Tag"
-        ]
+        "nodes": ["Repository", "Branch", "Commit", "Tag"]
       },
       {
         "category": "Source Code",
@@ -2416,24 +2031,11 @@
       },
       {
         "category": "Infrastructure",
-        "nodes": [
-          "Container",
-          "Pod",
-          "Deployment",
-          "Cluster",
-          "CloudResource",
-          "LoadBalancer"
-        ]
+        "nodes": ["Container", "Pod", "Deployment", "Cluster", "CloudResource", "LoadBalancer"]
       },
       {
         "category": "Runtime",
-        "nodes": [
-          "RuntimeEvent",
-          "Trace",
-          "Metric",
-          "Log",
-          "Alert"
-        ]
+        "nodes": ["RuntimeEvent", "Trace", "Metric", "Log", "Alert"]
       }
     ],
     "relationshipTypes": [
@@ -2508,9 +2110,7 @@
       "Graph consistency is validated after every update."
     ],
     "integration": {
-      "producedBy": [
-        "graph-service"
-      ],
+      "producedBy": ["graph-service"],
       "consumedBy": [
         "digital-twin-service",
         "reasoning-engine",
@@ -2782,11 +2382,7 @@
     ],
     "architecture": {
       "style": "Microservices",
-      "communication": [
-        "REST",
-        "WebSocket",
-        "Apache Kafka"
-      ],
+      "communication": ["REST", "WebSocket", "Apache Kafka"],
       "deployment": "Cloud Native",
       "repositoryModel": "Monorepo",
       "processingModel": "Incremental",
@@ -2802,26 +2398,10 @@
         "Framer Motion",
         "Zustand"
       ],
-      "backend": [
-        "Express.js",
-        "TypeScript"
-      ],
-      "intelligence": [
-        "Python",
-        "FastAPI"
-      ],
-      "databases": [
-        "PostgreSQL",
-        "Neo4j",
-        "Redis",
-        "Object Storage"
-      ],
-      "infrastructure": [
-        "Docker",
-        "Kubernetes",
-        "NGINX",
-        "Apache Kafka"
-      ]
+      "backend": ["Express.js", "TypeScript"],
+      "intelligence": ["Python", "FastAPI"],
+      "databases": ["PostgreSQL", "Neo4j", "Redis", "Object Storage"],
+      "infrastructure": ["Docker", "Kubernetes", "NGINX", "Apache Kafka"]
     },
     "nonGoals": [
       "Not a chatbot.",
@@ -2834,11 +2414,7 @@
     "engineeringStandards": {
       "codeQuality": "Production Ready",
       "language": "TypeScript Strict",
-      "testing": [
-        "Unit",
-        "Integration",
-        "End-to-End"
-      ],
+      "testing": ["Unit", "Integration", "End-to-End"],
       "documentation": "Documentation First",
       "architecture": "Microservices",
       "security": "Enterprise First"
@@ -2846,18 +2422,8 @@
     "uiPrinciples": {
       "style": "Premium Enterprise SaaS",
       "theme": "Dark First",
-      "designLanguage": [
-        "Minimal",
-        "Modern",
-        "Soft Glassmorphism"
-      ],
-      "inspiration": [
-        "Vercel",
-        "Linear",
-        "Stripe Dashboard",
-        "Raycast",
-        "Notion Calendar"
-      ]
+      "designLanguage": ["Minimal", "Modern", "Soft Glassmorphism"],
+      "inspiration": ["Vercel", "Linear", "Stripe Dashboard", "Raycast", "Notion Calendar"]
     },
     "futureVision": {
       "objective": "ForgeMind becomes the intelligence layer between developers and software systems, allowing engineering teams to understand software through knowledge rather than manual exploration."
@@ -2990,12 +2556,7 @@
       "Runtime Correlation"
     ],
     "integrations": {
-      "consumes": [
-        "Knowledge Graph",
-        "Digital Twin",
-        "Runtime Intelligence",
-        "Policy Engine"
-      ],
+      "consumes": ["Knowledge Graph", "Digital Twin", "Runtime Intelligence", "Policy Engine"],
       "produces": [
         "Engineering Explanation",
         "Reasoning Result",
@@ -3203,24 +2764,10 @@
       "Build Files"
     ],
     "frameworkDetection": {
-      "java": [
-        "Spring Boot",
-        "Quarkus",
-        "Micronaut"
-      ],
-      "typescript": [
-        "Express.js",
-        "NestJS",
-        "Next.js"
-      ],
-      "python": [
-        "FastAPI",
-        "Flask",
-        "Django"
-      ],
-      "dotnet": [
-        "ASP.NET Core"
-      ]
+      "java": ["Spring Boot", "Quarkus", "Micronaut"],
+      "typescript": ["Express.js", "NestJS", "Next.js"],
+      "python": ["FastAPI", "Flask", "Django"],
+      "dotnet": ["ASP.NET Core"]
     },
     "incrementalAnalysis": {
       "enabled": true,
@@ -3453,13 +3000,7 @@
     },
     "authorization": {
       "model": "Role Based Access Control",
-      "roles": [
-        "Super Admin",
-        "Organization Admin",
-        "Workspace Admin",
-        "Developer",
-        "Viewer"
-      ]
+      "roles": ["Super Admin", "Organization Admin", "Workspace Admin", "Developer", "Viewer"]
     },
     "workspaceIsolation": {
       "enabled": true,
@@ -3473,11 +3014,7 @@
     "repositorySecurity": {
       "cloneStrategy": "Read Only",
       "credentialsStored": false,
-      "supportedAuthentication": [
-        "SSH",
-        "Personal Access Token",
-        "OAuth"
-      ]
+      "supportedAuthentication": ["SSH", "Personal Access Token", "OAuth"]
     },
     "apiSecurity": {
       "httpsOnly": true,
@@ -3533,12 +3070,7 @@
       "Referrer-Policy",
       "X-Frame-Options"
     ],
-    "complianceTargets": [
-      "OWASP Top 10",
-      "CIS Benchmarks",
-      "SOC 2 Ready",
-      "GDPR Aware"
-    ],
+    "complianceTargets": ["OWASP Top 10", "CIS Benchmarks", "SOC 2 Ready", "GDPR Aware"],
     "rules": [
       "All APIs require authentication unless explicitly public.",
       "Every request is authorized after authentication.",
@@ -3582,18 +3114,10 @@
         "name": "Authentication Service",
         "type": "Core",
         "technology": "Express.js",
-        "responsibility": [
-          "User Authentication",
-          "JWT",
-          "RBAC",
-          "User Sessions"
-        ],
+        "responsibility": ["User Authentication", "JWT", "RBAC", "User Sessions"],
         "database": "PostgreSQL",
         "dependsOn": [],
-        "producesEvents": [
-          "UserCreated",
-          "UserUpdated"
-        ],
+        "producesEvents": ["UserCreated", "UserUpdated"],
         "consumesEvents": [],
         "public": false,
         "scalable": true
@@ -3610,14 +3134,8 @@
           "Repository Lifecycle"
         ],
         "database": "PostgreSQL",
-        "dependsOn": [
-          "git-service"
-        ],
-        "producesEvents": [
-          "RepositoryImported",
-          "RepositoryUpdated",
-          "RepositoryDeleted"
-        ],
+        "dependsOn": ["git-service"],
+        "producesEvents": ["RepositoryImported", "RepositoryUpdated", "RepositoryDeleted"],
         "consumesEvents": [],
         "public": false,
         "scalable": true
@@ -3635,12 +3153,8 @@
         ],
         "database": null,
         "dependsOn": [],
-        "producesEvents": [
-          "RepositorySynchronized"
-        ],
-        "consumesEvents": [
-          "RepositoryImported"
-        ],
+        "producesEvents": ["RepositorySynchronized"],
+        "consumesEvents": ["RepositoryImported"],
         "public": false,
         "scalable": true
       },
@@ -3657,12 +3171,8 @@
         ],
         "database": null,
         "dependsOn": [],
-        "producesEvents": [
-          "RepositoryParsed"
-        ],
-        "consumesEvents": [
-          "RepositorySynchronized"
-        ],
+        "producesEvents": ["RepositoryParsed"],
+        "consumesEvents": ["RepositorySynchronized"],
         "public": false,
         "scalable": true
       },
@@ -3677,15 +3187,9 @@
           "Business Meaning Extraction"
         ],
         "database": null,
-        "dependsOn": [
-          "parser-service"
-        ],
-        "producesEvents": [
-          "SemanticAnalysisCompleted"
-        ],
-        "consumesEvents": [
-          "RepositoryParsed"
-        ],
+        "dependsOn": ["parser-service"],
+        "producesEvents": ["SemanticAnalysisCompleted"],
+        "consumesEvents": ["RepositoryParsed"],
         "public": false,
         "scalable": true
       },
@@ -3694,21 +3198,11 @@
         "name": "Universal Intermediate Representation Service",
         "type": "Intelligence",
         "technology": "Python",
-        "responsibility": [
-          "Generate UIR",
-          "Normalize Languages",
-          "Generate Metadata"
-        ],
+        "responsibility": ["Generate UIR", "Normalize Languages", "Generate Metadata"],
         "database": "Neo4j",
-        "dependsOn": [
-          "semantic-service"
-        ],
-        "producesEvents": [
-          "UIRGenerated"
-        ],
-        "consumesEvents": [
-          "SemanticAnalysisCompleted"
-        ],
+        "dependsOn": ["semantic-service"],
+        "producesEvents": ["UIRGenerated"],
+        "consumesEvents": ["SemanticAnalysisCompleted"],
         "public": false,
         "scalable": true
       },
@@ -3723,15 +3217,9 @@
           "Relationship Management"
         ],
         "database": "Neo4j",
-        "dependsOn": [
-          "uir-service"
-        ],
-        "producesEvents": [
-          "KnowledgeGraphUpdated"
-        ],
-        "consumesEvents": [
-          "UIRGenerated"
-        ],
+        "dependsOn": ["uir-service"],
+        "producesEvents": ["KnowledgeGraphUpdated"],
+        "consumesEvents": ["UIRGenerated"],
         "public": false,
         "scalable": true
       },
@@ -3747,15 +3235,9 @@
           "Repository State"
         ],
         "database": "Neo4j",
-        "dependsOn": [
-          "graph-service"
-        ],
-        "producesEvents": [
-          "DigitalTwinUpdated"
-        ],
-        "consumesEvents": [
-          "KnowledgeGraphUpdated"
-        ],
+        "dependsOn": ["graph-service"],
+        "producesEvents": ["DigitalTwinUpdated"],
+        "consumesEvents": ["KnowledgeGraphUpdated"],
         "public": false,
         "scalable": true
       },
@@ -3764,22 +3246,11 @@
         "name": "Runtime Intelligence Service",
         "type": "Runtime",
         "technology": "Python",
-        "responsibility": [
-          "Logs",
-          "Metrics",
-          "Traces",
-          "Deployment Correlation"
-        ],
+        "responsibility": ["Logs", "Metrics", "Traces", "Deployment Correlation"],
         "database": "Neo4j",
-        "dependsOn": [
-          "digital-twin-service"
-        ],
-        "producesEvents": [
-          "RuntimeUpdated"
-        ],
-        "consumesEvents": [
-          "RuntimeEventReceived"
-        ],
+        "dependsOn": ["digital-twin-service"],
+        "producesEvents": ["RuntimeUpdated"],
+        "consumesEvents": ["RuntimeEventReceived"],
         "public": false,
         "scalable": true
       },
@@ -3788,21 +3259,11 @@
         "name": "Change Impact Service",
         "type": "Intelligence",
         "technology": "Python",
-        "responsibility": [
-          "Risk Analysis",
-          "Blast Radius",
-          "Impact Prediction"
-        ],
+        "responsibility": ["Risk Analysis", "Blast Radius", "Impact Prediction"],
         "database": "Neo4j",
-        "dependsOn": [
-          "digital-twin-service"
-        ],
-        "producesEvents": [
-          "ImpactAnalysisCompleted"
-        ],
-        "consumesEvents": [
-          "DigitalTwinUpdated"
-        ],
+        "dependsOn": ["digital-twin-service"],
+        "producesEvents": ["ImpactAnalysisCompleted"],
+        "consumesEvents": ["DigitalTwinUpdated"],
         "public": false,
         "scalable": true
       },
@@ -3811,19 +3272,11 @@
         "name": "Search Service",
         "type": "Core",
         "technology": "Python",
-        "responsibility": [
-          "Semantic Search",
-          "Repository Search",
-          "Graph Search"
-        ],
+        "responsibility": ["Semantic Search", "Repository Search", "Graph Search"],
         "database": "Neo4j",
-        "dependsOn": [
-          "graph-service"
-        ],
+        "dependsOn": ["graph-service"],
         "producesEvents": [],
-        "consumesEvents": [
-          "KnowledgeGraphUpdated"
-        ],
+        "consumesEvents": ["KnowledgeGraphUpdated"],
         "public": false,
         "scalable": true
       },
@@ -3840,15 +3293,9 @@
           "AI Context Package"
         ],
         "database": "Object Storage",
-        "dependsOn": [
-          "digital-twin-service"
-        ],
-        "producesEvents": [
-          "ExportGenerated"
-        ],
-        "consumesEvents": [
-          "DigitalTwinUpdated"
-        ],
+        "dependsOn": ["digital-twin-service"],
+        "producesEvents": ["ExportGenerated"],
+        "consumesEvents": ["DigitalTwinUpdated"],
         "public": false,
         "scalable": true
       },
@@ -3857,19 +3304,11 @@
         "name": "Notification Service",
         "type": "Platform",
         "technology": "Express.js",
-        "responsibility": [
-          "Email",
-          "WebSocket Notifications",
-          "In-App Notifications"
-        ],
+        "responsibility": ["Email", "WebSocket Notifications", "In-App Notifications"],
         "database": "PostgreSQL",
         "dependsOn": [],
         "producesEvents": [],
-        "consumesEvents": [
-          "ExportGenerated",
-          "ImpactAnalysisCompleted",
-          "RuntimeUpdated"
-        ],
+        "consumesEvents": ["ExportGenerated", "ImpactAnalysisCompleted", "RuntimeUpdated"],
         "public": false,
         "scalable": true
       },
@@ -3878,21 +3317,11 @@
         "name": "Analytics Service",
         "type": "Platform",
         "technology": "Python",
-        "responsibility": [
-          "Repository Metrics",
-          "Platform Analytics",
-          "Engineering Reports"
-        ],
+        "responsibility": ["Repository Metrics", "Platform Analytics", "Engineering Reports"],
         "database": "PostgreSQL",
-        "dependsOn": [
-          "graph-service"
-        ],
-        "producesEvents": [
-          "AnalyticsUpdated"
-        ],
-        "consumesEvents": [
-          "KnowledgeGraphUpdated"
-        ],
+        "dependsOn": ["graph-service"],
+        "producesEvents": ["AnalyticsUpdated"],
+        "consumesEvents": ["KnowledgeGraphUpdated"],
         "public": false,
         "scalable": true
       }
@@ -3927,13 +3356,7 @@
         "Plugins",
         "Settings"
       ],
-      "topbar": [
-        "Global Search",
-        "Command Palette",
-        "Notifications",
-        "Theme Switcher",
-        "Profile"
-      ]
+      "topbar": ["Global Search", "Command Palette", "Notifications", "Theme Switcher", "Profile"]
     },
     "screens": [
       {
@@ -3963,132 +3386,73 @@
         "id": "repository-details",
         "title": "Repository Details",
         "purpose": "Repository overview",
-        "tabs": [
-          "Overview",
-          "Architecture",
-          "Dependencies",
-          "Runtime",
-          "Analysis",
-          "History"
-        ]
+        "tabs": ["Overview", "Architecture", "Dependencies", "Runtime", "Analysis", "History"]
       },
       {
         "id": "architecture",
         "title": "Architecture Explorer",
         "purpose": "System architecture visualization",
-        "widgets": [
-          "Architecture Graph",
-          "Dependency Tree",
-          "Node Inspector"
-        ]
+        "widgets": ["Architecture Graph", "Dependency Tree", "Node Inspector"]
       },
       {
         "id": "knowledge-graph",
         "title": "Knowledge Graph",
         "purpose": "Explore software relationships",
-        "widgets": [
-          "Interactive Graph",
-          "Search",
-          "Filters",
-          "Relationship Inspector"
-        ]
+        "widgets": ["Interactive Graph", "Search", "Filters", "Relationship Inspector"]
       },
       {
         "id": "digital-twin",
         "title": "Software Digital Twin",
         "purpose": "Unified software model",
-        "widgets": [
-          "Topology",
-          "Runtime State",
-          "Dependencies",
-          "Health"
-        ]
+        "widgets": ["Topology", "Runtime State", "Dependencies", "Health"]
       },
       {
         "id": "runtime",
         "title": "Runtime Intelligence",
         "purpose": "Observe running systems",
-        "widgets": [
-          "Metrics",
-          "Logs",
-          "Traces",
-          "Deployments"
-        ]
+        "widgets": ["Metrics", "Logs", "Traces", "Deployments"]
       },
       {
         "id": "impact-analysis",
         "title": "Impact Analysis",
         "purpose": "Predict software impact",
-        "widgets": [
-          "Risk Score",
-          "Blast Radius",
-          "Affected Services",
-          "Recommendations"
-        ]
+        "widgets": ["Risk Score", "Blast Radius", "Affected Services", "Recommendations"]
       },
       {
         "id": "reasoning",
         "title": "Software Reasoning",
         "purpose": "Explain software behaviour",
-        "widgets": [
-          "Question Input",
-          "Evidence Panel",
-          "Graph Explorer",
-          "Recommendations"
-        ]
+        "widgets": ["Question Input", "Evidence Panel", "Graph Explorer", "Recommendations"]
       },
       {
         "id": "policies",
         "title": "Policy Center",
         "purpose": "Engineering governance",
-        "widgets": [
-          "Policy List",
-          "Violations",
-          "Compliance Score"
-        ]
+        "widgets": ["Policy List", "Violations", "Compliance Score"]
       },
       {
         "id": "exports",
         "title": "AI Context Export",
         "purpose": "Generate AI-ready exports",
-        "widgets": [
-          "Export Options",
-          "History",
-          "Download Center"
-        ]
+        "widgets": ["Export Options", "History", "Download Center"]
       },
       {
         "id": "reports",
         "title": "Reports",
         "purpose": "Engineering insights",
-        "widgets": [
-          "Report Library",
-          "Analytics",
-          "Downloads"
-        ]
+        "widgets": ["Report Library", "Analytics", "Downloads"]
       },
       {
         "id": "plugins",
         "title": "Plugin Manager",
         "purpose": "Manage platform extensions",
-        "widgets": [
-          "Installed Plugins",
-          "Marketplace",
-          "Updates"
-        ]
+        "widgets": ["Installed Plugins", "Marketplace", "Updates"]
       },
       {
         "id": "settings",
         "title": "Settings",
         "purpose": "Application configuration",
-        "sections": [
-          "General",
-          "Workspace",
-          "Security",
-          "Plugins",
-          "Notifications",
-          "Appearance"
-        ]
+        "sections": ["General", "Workspace", "Security", "Plugins", "Notifications", "Appearance"]
       }
     ],
     "globalComponents": [
@@ -4163,10 +3527,7 @@
             "action": "Start repository analysis."
           }
         ],
-        "result": [
-          "Repository Registered",
-          "Workflow Started"
-        ]
+        "result": ["Repository Registered", "Workflow Started"]
       },
       {
         "id": "repository-analysis",
@@ -4200,10 +3561,7 @@
             "action": "Synchronize Software Digital Twin."
           }
         ],
-        "result": [
-          "Knowledge Graph Updated",
-          "Digital Twin Updated"
-        ]
+        "result": ["Knowledge Graph Updated", "Digital Twin Updated"]
       },
       {
         "id": "runtime-correlation",
@@ -4232,9 +3590,7 @@
             "action": "Correlate runtime evidence."
           }
         ],
-        "result": [
-          "Runtime Intelligence Updated"
-        ]
+        "result": ["Runtime Intelligence Updated"]
       },
       {
         "id": "impact-analysis",
@@ -4263,11 +3619,7 @@
             "action": "Generate recommendations."
           }
         ],
-        "result": [
-          "Risk Score",
-          "Blast Radius",
-          "Recommendations"
-        ]
+        "result": ["Risk Score", "Blast Radius", "Recommendations"]
       },
       {
         "id": "software-reasoning",
@@ -4296,10 +3648,7 @@
             "action": "Produce evidence-backed explanation."
           }
         ],
-        "result": [
-          "Engineering Explanation",
-          "Confidence Score"
-        ]
+        "result": ["Engineering Explanation", "Confidence Score"]
       },
       {
         "id": "policy-evaluation",
@@ -4323,9 +3672,7 @@
             "action": "Generate violations."
           }
         ],
-        "result": [
-          "Compliance Report"
-        ]
+        "result": ["Compliance Report"]
       },
       {
         "id": "ai-context-export",
@@ -4359,12 +3706,7 @@
             "action": "Notify user."
           }
         ],
-        "result": [
-          "AI Context Package",
-          "Markdown Export",
-          "JSON Export",
-          "PDF Export"
-        ]
+        "result": ["AI Context Package", "Markdown Export", "JSON Export", "PDF Export"]
       }
     ],
     "workflowRules": [

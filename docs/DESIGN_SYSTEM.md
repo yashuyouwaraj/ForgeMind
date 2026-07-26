@@ -195,16 +195,16 @@ JetBrains Mono
 
 # Typography Scale
 
-| Element | Size | Weight |
-|----------|------|--------|
-| Hero | 56px | Bold |
-| H1 | 40px | Bold |
-| H2 | 32px | Bold |
-| H3 | 24px | SemiBold |
-| H4 | 20px | SemiBold |
-| Body | 16px | Regular |
-| Small | 14px | Regular |
-| Caption | 12px | Medium |
+| Element | Size | Weight   |
+| ------- | ---- | -------- |
+| Hero    | 56px | Bold     |
+| H1      | 40px | Bold     |
+| H2      | 32px | Bold     |
+| H3      | 24px | SemiBold |
+| H4      | 20px | SemiBold |
+| Body    | 16px | Regular  |
+| Small   | 14px | Regular  |
+| Caption | 12px | Medium   |
 
 ---
 
@@ -289,7 +289,7 @@ Hover
 Every component should use subtle borders.
 
 ```css
-border: 1px solid rgba(255,255,255,.08);
+border: 1px solid rgba(255, 255, 255, 0.08);
 ```
 
 Avoid heavy outlines.

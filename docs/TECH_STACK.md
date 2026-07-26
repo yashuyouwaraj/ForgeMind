@@ -497,12 +497,12 @@ Jest
 
 ForgeMind stores different types of data.
 
-| Data | Technology |
-|------|------------|
-| Business Data | PostgreSQL |
-| Relationships | Neo4j |
-| Cache | Redis |
-| Files | Object Storage |
+| Data          | Technology     |
+| ------------- | -------------- |
+| Business Data | PostgreSQL     |
+| Relationships | Neo4j          |
+| Cache         | Redis          |
+| Files         | Object Storage |
 
 Each database is used where it performs best.
 
@@ -534,24 +534,24 @@ Advantages
 
 # Technology Summary
 
-| Layer | Technology |
-|---------|------------|
-| Frontend | Next.js |
-| UI | React |
-| Language | TypeScript |
-| Styling | Tailwind CSS |
-| Components | shadcn/ui |
-| Animation | Framer Motion |
-| Backend | Express.js |
-| AI | Python + FastAPI |
-| Messaging | Apache Kafka |
-| SQL Database | PostgreSQL |
-| Graph Database | Neo4j |
-| Cache | Redis |
+| Layer          | Technology              |
+| -------------- | ----------------------- |
+| Frontend       | Next.js                 |
+| UI             | React                   |
+| Language       | TypeScript              |
+| Styling        | Tailwind CSS            |
+| Components     | shadcn/ui               |
+| Animation      | Framer Motion           |
+| Backend        | Express.js              |
+| AI             | Python + FastAPI        |
+| Messaging      | Apache Kafka            |
+| SQL Database   | PostgreSQL              |
+| Graph Database | Neo4j                   |
+| Cache          | Redis                   |
 | Object Storage | MinIO / S3 / Azure Blob |
-| Containers | Docker |
-| Orchestration | Kubernetes |
-| CI/CD | GitHub Actions |
+| Containers     | Docker                  |
+| Orchestration  | Kubernetes              |
+| CI/CD          | GitHub Actions          |
 
 ---
 

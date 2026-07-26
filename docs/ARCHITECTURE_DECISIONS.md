@@ -322,12 +322,12 @@ Use multiple storage technologies based on responsibility.
 
 ### Storage Strategy
 
-| Storage | Responsibility |
-|----------|----------------|
-| PostgreSQL | Business data |
-| Neo4j | Knowledge Graph |
-| Redis | Cache |
-| Object Storage | Large files |
+| Storage        | Responsibility  |
+| -------------- | --------------- |
+| PostgreSQL     | Business data   |
+| Neo4j          | Knowledge Graph |
+| Redis          | Cache           |
+| Object Storage | Large files     |
 
 ---
 

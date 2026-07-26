@@ -2,7 +2,7 @@
 
 > **The Universal Software Intelligence Platform**
 
-*"Understand Software. Not Just Code."*
+_"Understand Software. Not Just Code."_
 
 ---
 
@@ -4720,19 +4720,19 @@ Generate
 
 Each service owns only its required data.
 
-| Service | Primary Storage |
-|----------|-----------------|
-| Repository Service | PostgreSQL |
-| Git Integration | PostgreSQL |
-| Parser Service | Temporary Memory |
-| Semantic Analysis | Temporary Memory |
-| UIR Service | Neo4j |
-| Knowledge Graph | Neo4j |
-| Digital Twin | Neo4j |
-| Runtime Intelligence | Neo4j + Redis |
-| Search | Neo4j |
-| Analytics | PostgreSQL |
-| Notifications | PostgreSQL |
+| Service              | Primary Storage  |
+| -------------------- | ---------------- |
+| Repository Service   | PostgreSQL       |
+| Git Integration      | PostgreSQL       |
+| Parser Service       | Temporary Memory |
+| Semantic Analysis    | Temporary Memory |
+| UIR Service          | Neo4j            |
+| Knowledge Graph      | Neo4j            |
+| Digital Twin         | Neo4j            |
+| Runtime Intelligence | Neo4j + Redis    |
+| Search               | Neo4j            |
+| Analytics            | PostgreSQL       |
+| Notifications        | PostgreSQL       |
 
 ---
 
@@ -4906,11 +4906,11 @@ Each storage technology has a well-defined responsibility.
 
 # Storage Strategy
 
-| Storage | Purpose |
-|----------|---------|
-| PostgreSQL | Business and application data |
-| Neo4j | Software Knowledge Graph and Digital Twin |
-| Redis | Cache, sessions and temporary data |
+| Storage        | Purpose                                   |
+| -------------- | ----------------------------------------- |
+| PostgreSQL     | Business and application data             |
+| Neo4j          | Software Knowledge Graph and Digital Twin |
+| Redis          | Cache, sessions and temporary data        |
 | Object Storage | Reports, exports and repository snapshots |
 
 ---
@@ -5165,18 +5165,18 @@ Examples
 
 Each service owns its own data.
 
-| Service | Database |
-|----------|----------|
-| Authentication | PostgreSQL |
-| Organizations | PostgreSQL |
-| Projects | PostgreSQL |
-| Repository Metadata | PostgreSQL |
-| Knowledge Graph | Neo4j |
-| Digital Twin | Neo4j |
-| Runtime Relationships | Neo4j |
-| Search Cache | Redis |
-| Sessions | Redis |
-| Export Files | Object Storage |
+| Service               | Database       |
+| --------------------- | -------------- |
+| Authentication        | PostgreSQL     |
+| Organizations         | PostgreSQL     |
+| Projects              | PostgreSQL     |
+| Repository Metadata   | PostgreSQL     |
+| Knowledge Graph       | Neo4j          |
+| Digital Twin          | Neo4j          |
+| Runtime Relationships | Neo4j          |
+| Search Cache          | Redis          |
+| Sessions              | Redis          |
+| Export Files          | Object Storage |
 
 ---
 
@@ -5887,18 +5887,18 @@ Requests exceeding limits receive HTTP 429 responses.
 
 Common HTTP status codes
 
-| Code | Meaning |
-|------|---------|
-| 200 | Success |
-| 201 | Created |
-| 400 | Bad Request |
-| 401 | Unauthorized |
-| 403 | Forbidden |
-| 404 | Not Found |
-| 409 | Conflict |
-| 422 | Validation Failed |
-| 429 | Too Many Requests |
-| 500 | Internal Server Error |
+| Code | Meaning               |
+| ---- | --------------------- |
+| 200  | Success               |
+| 201  | Created               |
+| 400  | Bad Request           |
+| 401  | Unauthorized          |
+| 403  | Forbidden             |
+| 404  | Not Found             |
+| 409  | Conflict              |
+| 422  | Validation Failed     |
+| 429  | Too Many Requests     |
+| 500  | Internal Server Error |
 
 ---
 
@@ -8594,13 +8594,13 @@ Examples
 
 Important root files include:
 
-| File | Purpose |
-|------|----------|
-| package.json | Workspace configuration |
+| File                | Purpose                     |
+| ------------------- | --------------------------- |
+| package.json        | Workspace configuration     |
 | pnpm-workspace.yaml | Monorepo package management |
-| turbo.json | Build orchestration |
-| .env.example | Environment variables |
-| README.md | Project introduction |
+| turbo.json          | Build orchestration         |
+| .env.example        | Environment variables       |
+| README.md           | Project introduction        |
 
 ---
 
@@ -9677,17 +9677,17 @@ These rules are centrally managed and reusable.
 
 Examples
 
-| Extension | Language |
-|-----------|----------|
-| .java | Java |
-| .kt | Kotlin |
-| .ts | TypeScript |
-| .tsx | React |
-| .py | Python |
-| .go | Go |
-| .rs | Rust |
-| .cs | C# |
-| .cpp | C++ |
+| Extension | Language   |
+| --------- | ---------- |
+| .java     | Java       |
+| .kt       | Kotlin     |
+| .ts       | TypeScript |
+| .tsx      | React      |
+| .py       | Python     |
+| .go       | Go         |
+| .rs       | Rust       |
+| .cs       | C#         |
+| .cpp      | C++        |
 
 ---
 

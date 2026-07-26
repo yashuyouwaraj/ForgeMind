@@ -156,18 +156,18 @@ tests/
 
 # Documentation
 
-| Document | Description |
-|----------|-------------|
-| Project Vision | Product vision |
-| Product Overview | Platform overview |
-| System Architecture | High-level architecture |
-| Software Digital Twin | Core intelligence model |
-| Universal Intermediate Representation | Language-independent model |
-| Software Knowledge Graph | Relationship engine |
-| Intelligence Engine | Decision engine |
-| Runtime Intelligence | Production understanding |
-| Change Impact Analysis | Dependency prediction |
-| AI Context Export | Portable project intelligence |
+| Document                              | Description                   |
+| ------------------------------------- | ----------------------------- |
+| Project Vision                        | Product vision                |
+| Product Overview                      | Platform overview             |
+| System Architecture                   | High-level architecture       |
+| Software Digital Twin                 | Core intelligence model       |
+| Universal Intermediate Representation | Language-independent model    |
+| Software Knowledge Graph              | Relationship engine           |
+| Intelligence Engine                   | Decision engine               |
+| Runtime Intelligence                  | Production understanding      |
+| Change Impact Analysis                | Dependency prediction         |
+| AI Context Export                     | Portable project intelligence |
 
 Complete documentation is available in the **docs/** directory.
 

@@ -22,7 +22,5 @@
     "clean": {
       "cache": false
     }
-  },
-  "lib": ["ES2023"],
-  "types": ["node"]
+  }
 }

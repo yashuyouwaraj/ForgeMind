@@ -1,5 +1,5 @@
 {
-  "name": "@forgemind/shared-validation",
+  "name": "@forgemind/shared-errors",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -18,13 +18,5 @@
     "build": "tsc -b",
     "dev": "tsc -b --watch",
     "typecheck": "tsc -b --noEmit"
-  },
-  "dependencies": {
-    "@forgemind/shared-errors": "workspace:*",
-    "express": "^5.1.0",
-    "zod": "^4.4.3"
-  },
-  "devDependencies": {
-    "@types/express": "^5.0.6"
   }
 }

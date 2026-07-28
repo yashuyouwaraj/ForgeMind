@@ -15,9 +15,12 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
-    "lint": "tsc --noEmit",
-    "typecheck": "tsc --noEmit"
+    "build": "tsc -b",
+    "typecheck": "tsc -b --noEmit",
+    "dev": "tsc -b --watch"
+  },
+  "dependencies": {
+    "pino": "^9.14.0",
+    "pino-pretty": "^13.1.1"
   }
 }

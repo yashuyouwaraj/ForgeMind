@@ -8,10 +8,7 @@ export interface RequestContext {
   startTime: number;
 
   userId?: string;
-
   workspaceId?: string;
-
   repositoryId?: string;
-
   jobId?: string;
 }

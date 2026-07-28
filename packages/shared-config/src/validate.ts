@@ -4,9 +4,13 @@ export function validateEnvironment() {
   const result = environmentSchema.safeParse(process.env);
 
   if (!result.success) {
-    console.error("Invalid environment configuration");
-    console.error(result.error.format());
-    process.exit(1);
+    throw new Error(
+      `Invalid environment configuration: ${JSON.stringify(
+        result.error.format(),
+        null,
+        2,
+      )}`,
+    );
   }
 
   return result.data;

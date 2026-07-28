@@ -1,5 +1,4 @@
-import express = require("express");
-import type { Express } from "express";
+import express, { type Express } from "express";
 
 const app: Express = express();
 

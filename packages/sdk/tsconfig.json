@@ -2,10 +2,11 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "rootDir": "./src",
-    "outDir": "./dist",
-    "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo"
+    "outDir": "./dist"
   },
-  "include": ["src"],
+  "include": [
+    "src"
+  ],
   "references": [
     {
       "path": "../shared-types"
@@ -15,6 +16,15 @@
     },
     {
       "path": "../shared-config"
+    },
+    {
+      "path": "../shared-logger"
+    },
+    {
+      "path": "../shared-errors"
+    },
+    {
+      "path": "../shared-validation"
     }
   ]
 }

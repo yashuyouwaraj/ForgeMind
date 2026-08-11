@@ -3,3 +3,4 @@ export * from "./date/timestamp.js";
 export * from "./object/is-empty.js";
 export * from "./retry/retry.js";
 export * from "./uuid/generate-uuid.js";
+export * from "./request/generate-request-id.js";

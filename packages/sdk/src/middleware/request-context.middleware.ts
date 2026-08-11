@@ -1,9 +1,11 @@
 import type { NextFunction, Request, Response } from "express";
 import { generateRequestId } from "@forgemind/shared-utils";
 
-declare module "express-serve-static-core" {
-  interface Request {
-    requestId?: string;
+declare global {
+  namespace Express {
+    interface Request {
+      requestId?: string;
+    }
   }
 }
 

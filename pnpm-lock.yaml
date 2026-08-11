@@ -41,6 +41,9 @@ importers:
       '@forgemind/shared-config':
         specifier: workspace:*
         version: link:../shared-config
+      '@forgemind/shared-errors':
+        specifier: workspace:*
+        version: link:../shared-errors
       '@forgemind/shared-utils':
         specifier: workspace:*
         version: link:../shared-utils

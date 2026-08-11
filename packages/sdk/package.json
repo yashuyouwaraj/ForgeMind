@@ -22,7 +22,8 @@
   },
   "dependencies": {
     "@forgemind/shared-config": "workspace:*",
-    "@forgemind/shared-utils": "workspace:*"
+    "@forgemind/shared-utils": "workspace:*",
+    "@forgemind/shared-errors": "workspace:*"
   },
   "devDependencies": {
     "@types/express": "^5.0.6"

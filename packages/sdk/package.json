@@ -26,6 +26,7 @@
     "@forgemind/shared-utils": "workspace:*",
     "compression": "^1.8.2",
     "cors": "^2.8.6",
+    "express": "^5.2.1",
     "helmet": "^8.3.0"
   },
   "devDependencies": {

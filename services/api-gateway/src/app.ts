@@ -1,5 +1,8 @@
-import express, { type Express } from "express";
+import { config, createForgeMindApp } from "@forgemind/sdk";
 
-const app: Express = express();
+const app = createForgeMindApp({
+	serviceName: "api-gateway",
+	apiPrefix: config.API_PREFIX,
+});
 
 export default app;

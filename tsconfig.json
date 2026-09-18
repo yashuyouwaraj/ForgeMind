@@ -15,7 +15,8 @@
     },
     {
       "path": "./packages/shared-errors"
-    },{
+    },
+    {
       "path": "./packages/shared-validation"
     },
     {
@@ -23,6 +24,9 @@
     },
     {
       "path": "./services/api-gateway"
+    },
+    {
+      "path": "./services/auth-service"
     }
   ]
 }

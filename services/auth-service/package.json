@@ -9,6 +9,10 @@
   },
   "dependencies": {
     "@forgemind/sdk": "workspace:*",
+    "jsonwebtoken": "^9.0.2",
     "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10"
   }
 }

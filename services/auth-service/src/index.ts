@@ -10,6 +10,8 @@ export {
   type AuthConfig,
 } from "./config/auth-config.js";
 
+export { JwtService } from "./infrastructure/jwt/jwt-service.js";
+
 const app = createForgeMindApp({
   serviceName: "auth-service",
   requestLogging: true,

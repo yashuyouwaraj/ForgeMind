@@ -1,5 +1,15 @@
 import { createForgeMindApp } from "@forgemind/sdk";
 
+export type {
+  AuthenticatedUser,
+  AuthTokenPayload,
+} from "./domain/auth/auth-types.js";
+
+export {
+  loadAuthConfig,
+  type AuthConfig,
+} from "./config/auth-config.js";
+
 const app = createForgeMindApp({
   serviceName: "auth-service",
   requestLogging: true,

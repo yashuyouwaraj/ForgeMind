@@ -145,6 +145,12 @@ importers:
       '@forgemind/sdk':
         specifier: workspace:*
         version: link:../../packages/sdk
+      '@forgemind/shared-errors':
+        specifier: workspace:*
+        version: link:../../packages/shared-errors
+      express:
+        specifier: ^5.2.1
+        version: 5.2.1
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.3
@@ -152,6 +158,9 @@ importers:
         specifier: ^4.4.3
         version: 4.4.3
     devDependencies:
+      '@types/express':
+        specifier: ^5.0.6
+        version: 5.0.6
       '@types/jsonwebtoken':
         specifier: ^9.0.10
         version: 9.0.10

@@ -1,5 +1,9 @@
 import { createForgeMindApp } from "@forgemind/sdk";
 
+export {
+  createAuthenticationMiddleware,
+} from "./middleware/authenticate.js";
+
 export type {
   AuthenticatedUser,
   AuthTokenPayload,

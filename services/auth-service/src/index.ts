@@ -9,6 +9,11 @@ export type {
 
 export { prisma } from "./infrastructure/database/prisma.js";
 
+export {
+  UserRepository,
+  type CreateUserInput,
+} from "./repositories/user-repository.js";
+
 export { loadAuthConfig, type AuthConfig } from "./config/auth-config.js";
 
 export { JwtService } from "./infrastructure/jwt/jwt-service.js";

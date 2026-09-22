@@ -1,18 +1,15 @@
 import { createForgeMindApp } from "@forgemind/sdk";
 
-export {
-  createAuthenticationMiddleware,
-} from "./middleware/authenticate.js";
+export { createAuthenticationMiddleware } from "./middleware/authenticate.js";
 
 export type {
   AuthenticatedUser,
   AuthTokenPayload,
 } from "./domain/auth/auth-types.js";
 
-export {
-  loadAuthConfig,
-  type AuthConfig,
-} from "./config/auth-config.js";
+export { prisma } from "./infrastructure/database/prisma.js";
+
+export { loadAuthConfig, type AuthConfig } from "./config/auth-config.js";
 
 export { JwtService } from "./infrastructure/jwt/jwt-service.js";
 

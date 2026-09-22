@@ -139,4 +139,12 @@ export class AuthService {
       refreshToken: newRefreshToken,
     };
   }
+
+  async logout(refreshToken: string): Promise<void> {
+    const tokenData = await this.refreshTokenService.consume(refreshToken);
+
+    if (!tokenData) {
+      throw new AuthenticationError("Invalid or expired refresh token");
+    }
+  }
 }

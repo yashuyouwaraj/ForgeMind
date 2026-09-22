@@ -8,7 +8,12 @@ import {
   type RegisterInput,
 } from "../../application/auth-service.js";
 
-import { loginSchema, refreshSchema, registerSchema } from "./auth-schemas.js";
+import {
+  loginSchema,
+  refreshSchema,
+  registerSchema,
+  logoutSchema,
+} from "./auth-schemas.js";
 
 export function createAuthRoutes(authService: AuthService): Router {
   const router = Router();
@@ -51,6 +56,16 @@ export function createAuthRoutes(authService: AuthService): Router {
         success: true,
         data: result,
       });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.post("/logout", validate(logoutSchema), async (req, res, next) => {
+    try {
+      await authService.logout(req.body.refreshToken);
+
+      res.status(204).send();
     } catch (error) {
       next(error);
     }

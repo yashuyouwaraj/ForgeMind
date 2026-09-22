@@ -4,15 +4,10 @@ import { prisma } from "../database/prisma.js";
 
 export class RefreshTokenService {
   private hash(token: string): string {
-    return createHash("sha256")
-      .update(token)
-      .digest("hex");
+    return createHash("sha256").update(token).digest("hex");
   }
 
-  async create(
-    userId: string,
-    expiresAt: Date,
-  ): Promise<string> {
+  async create(userId: string, expiresAt: Date): Promise<string> {
     const token = randomBytes(48).toString("base64url");
 
     await prisma.refreshToken.create({
@@ -31,12 +26,11 @@ export class RefreshTokenService {
   } | null> {
     const tokenHash = this.hash(token);
 
-    const storedToken =
-      await prisma.refreshToken.findUnique({
-        where: {
-          tokenHash,
-        },
-      });
+    const storedToken = await prisma.refreshToken.findUnique({
+      where: {
+        tokenHash,
+      },
+    });
 
     if (
       !storedToken ||

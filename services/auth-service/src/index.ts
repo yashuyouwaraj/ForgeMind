@@ -20,12 +20,9 @@ export { JwtService } from "./infrastructure/jwt/jwt-service.js";
 export { PasswordService } from "./infrastructure/security/password-service.js";
 
 export {
-  RefreshTokenService,
-} from "./infrastructure/security/refresh-token-service.js";
-
-export {
   AuthService,
   type AuthResult,
+  type RefreshResult,
   type RegisterInput,
   type LoginInput,
 } from "./application/auth-service.js";
@@ -36,17 +33,20 @@ import { JwtService } from "./infrastructure/jwt/jwt-service.js";
 import { PasswordService } from "./infrastructure/security/password-service.js";
 import { UserRepository } from "./repositories/user-repository.js";
 import { loadAuthConfig } from "./config/auth-config.js";
+import { RefreshTokenService } from "./infrastructure/security/refresh-token-service.js";
 
 const authConfig = loadAuthConfig();
 
 const userRepository = new UserRepository();
 const passwordService = new PasswordService();
 const jwtService = new JwtService(authConfig);
+const refreshTokenService = new RefreshTokenService();
 
 const authService = new AuthService(
   userRepository,
   passwordService,
   jwtService,
+  refreshTokenService,
 );
 
 const app = createForgeMindApp({

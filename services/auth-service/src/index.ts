@@ -19,6 +19,13 @@ export { loadAuthConfig, type AuthConfig } from "./config/auth-config.js";
 export { JwtService } from "./infrastructure/jwt/jwt-service.js";
 export { PasswordService } from "./infrastructure/security/password-service.js";
 
+export {
+  AuthService,
+  type AuthResult,
+  type RegisterInput,
+  type LoginInput,
+} from "./application/auth-service.js";
+
 const app = createForgeMindApp({
   serviceName: "auth-service",
   requestLogging: true,

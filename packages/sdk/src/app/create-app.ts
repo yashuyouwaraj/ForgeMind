@@ -20,6 +20,7 @@ export function createForgeMindApp(
     security = true,
     compression: enableCompression = true,
     apiPrefix = "/api",
+    registerRoutes,
   } = options;
 
   app.set("serviceName", serviceName);
@@ -49,6 +50,8 @@ export function createForgeMindApp(
   }
 
   app.get(`${apiPrefix}/health`, healthHandler);
+
+  registerRoutes?.(app);
 
   app.use(notFoundHandler);
   app.use(errorHandler);

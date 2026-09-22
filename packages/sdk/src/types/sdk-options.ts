@@ -1,3 +1,5 @@
+import type { Express } from "express";
+
 export interface ForgeMindAppOptions {
   /**
    * Unique name of the service using the ForgeMind SDK.
@@ -43,4 +45,9 @@ export interface ForgeMindAppOptions {
    * Defaults to the configured API_PREFIX.
    */
   apiPrefix?: string;
+
+  /**
+   * Register service-specific routes before terminal middleware is installed.
+   */
+  registerRoutes?: (app: Express) => void;
 }

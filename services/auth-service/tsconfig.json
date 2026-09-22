@@ -11,6 +11,9 @@
     },
     {
       "path": "../../packages/shared-errors"
+    },
+    {
+      "path": "../../packages/shared-validation"
     }
   ]
 }

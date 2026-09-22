@@ -1,0 +1,14 @@
+import { z } from "zod";
+
+export const registerSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+});
+
+export const loginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+});
+
+export type RegisterRequest = z.infer<typeof registerSchema>;
+export type LoginRequest = z.infer<typeof loginSchema>;

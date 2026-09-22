@@ -26,6 +26,25 @@ export {
   type LoginInput,
 } from "./application/auth-service.js";
 
+import { createAuthRoutes } from "./api/auth/auth-routes.js";
+import { AuthService } from "./application/auth-service.js";
+import { JwtService } from "./infrastructure/jwt/jwt-service.js";
+import { PasswordService } from "./infrastructure/security/password-service.js";
+import { UserRepository } from "./repositories/user-repository.js";
+import { loadAuthConfig } from "./config/auth-config.js";
+
+const authConfig = loadAuthConfig();
+
+const userRepository = new UserRepository();
+const passwordService = new PasswordService();
+const jwtService = new JwtService(authConfig);
+
+const authService = new AuthService(
+  userRepository,
+  passwordService,
+  jwtService,
+);
+
 const app = createForgeMindApp({
   serviceName: "auth-service",
   requestLogging: true,
@@ -33,6 +52,9 @@ const app = createForgeMindApp({
   security: true,
   compression: true,
   apiPrefix: "/api",
+  registerRoutes: (app) => {
+    app.use("/api/auth", createAuthRoutes(authService));
+  },
 });
 
 const port = Number(process.env.PORT ?? 3001);

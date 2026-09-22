@@ -21,6 +21,8 @@ export const errorHandler: ErrorRequestHandler = (
     return;
   }
 
+  console.error("Unhandled request error:", error);
+
   res.status(500).json({
     success: false,
     error: {

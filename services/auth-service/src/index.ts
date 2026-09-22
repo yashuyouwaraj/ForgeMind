@@ -20,6 +20,10 @@ export { JwtService } from "./infrastructure/jwt/jwt-service.js";
 export { PasswordService } from "./infrastructure/security/password-service.js";
 
 export {
+  RefreshTokenService,
+} from "./infrastructure/security/refresh-token-service.js";
+
+export {
   AuthService,
   type AuthResult,
   type RegisterInput,

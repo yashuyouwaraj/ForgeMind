@@ -8,7 +8,9 @@ export type {
 } from "./domain/auth/auth-types.js";
 
 export { prisma } from "./infrastructure/database/prisma.js";
+export { AuthorizationService } from "./application/authorization-service.js";
 
+export { createAuthorizationMiddleware } from "./middleware/authorize.js";
 export {
   UserRepository,
   type CreateUserInput,

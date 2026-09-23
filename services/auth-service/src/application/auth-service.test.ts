@@ -149,4 +149,5 @@ describe("AuthService", () => {
       }),
     ).rejects.toThrow("Invalid email or password");
   });
+  
 });

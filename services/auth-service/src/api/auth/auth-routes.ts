@@ -14,8 +14,13 @@ import {
   registerSchema,
   logoutSchema,
 } from "./auth-schemas.js";
+import { createAuthenticationMiddleware } from "../../index.js";
+import { AuthenticationError } from "@forgemind/shared-errors";
 
-export function createAuthRoutes(authService: AuthService): Router {
+export function createAuthRoutes(
+  authService: AuthService,
+  authenticate: ReturnType<typeof createAuthenticationMiddleware>,
+): Router {
   const router = Router();
 
   router.post("/register", validate(registerSchema), async (req, res, next) => {
@@ -66,6 +71,23 @@ export function createAuthRoutes(authService: AuthService): Router {
       await authService.logout(req.body.refreshToken);
 
       res.status(204).send();
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.get("/profile", authenticate, async (req, res, next) => {
+    try {
+      if (!req.user) {
+        throw new AuthenticationError("Authentication is required");
+      }
+
+      const profile = await authService.getProfile(req.user.userId);
+
+      res.status(200).json({
+        success: true,
+        data: profile,
+      });
     } catch (error) {
       next(error);
     }

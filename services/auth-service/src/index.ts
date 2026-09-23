@@ -36,6 +36,8 @@ import { PasswordService } from "./infrastructure/security/password-service.js";
 import { UserRepository } from "./repositories/user-repository.js";
 import { loadAuthConfig } from "./config/auth-config.js";
 import { RefreshTokenService } from "./infrastructure/security/refresh-token-service.js";
+import { AuthorizationService } from "./application/authorization-service.js";
+import { createAuthenticationMiddleware } from "./middleware/authenticate.js";
 
 const authConfig = loadAuthConfig();
 
@@ -43,12 +45,15 @@ const userRepository = new UserRepository();
 const passwordService = new PasswordService();
 const jwtService = new JwtService(authConfig);
 const refreshTokenService = new RefreshTokenService();
+const authorizationService = new AuthorizationService();
+const authenticate = createAuthenticationMiddleware(jwtService);
 
 const authService = new AuthService(
   userRepository,
   passwordService,
   jwtService,
   refreshTokenService,
+  authorizationService,
 );
 
 const app = createForgeMindApp({
@@ -59,7 +64,7 @@ const app = createForgeMindApp({
   compression: true,
   apiPrefix: "/api",
   registerRoutes: (app) => {
-    app.use("/api/auth", createAuthRoutes(authService));
+    app.use("/api/auth", createAuthRoutes(authService, authenticate));
   },
 });
 

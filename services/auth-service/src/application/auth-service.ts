@@ -5,7 +5,7 @@ import { JwtService } from "../infrastructure/jwt/jwt-service.js";
 import { PasswordService } from "../infrastructure/security/password-service.js";
 import { UserRepository } from "../repositories/user-repository.js";
 import { RefreshTokenService } from "../infrastructure/security/refresh-token-service.js";
-
+import { AuthorizationService } from "./authorization-service.js";
 export interface RegisterInput {
   email: string;
   password: string;
@@ -33,6 +33,7 @@ export class AuthService {
     private readonly passwordService: PasswordService,
     private readonly jwtService: JwtService,
     private readonly refreshTokenService: RefreshTokenService,
+    private readonly authorizationService: AuthorizationService,
   ) {}
 
   async register(input: RegisterInput): Promise<AuthResult> {
@@ -146,5 +147,27 @@ export class AuthService {
     if (!tokenData) {
       throw new AuthenticationError("Invalid or expired refresh token");
     }
+  }
+
+  async getProfile(userId: string): Promise<{
+    id: string;
+    email: string;
+    isActive: boolean;
+    roles: string[];
+  }> {
+    const user = await this.userRepository.findById(userId);
+
+    if (!user || !user.isActive) {
+      throw new AuthenticationError("Authenticated user was not found");
+    }
+
+    const roles = await this.authorizationService.getUserRoles(userId);
+
+    return {
+      id: user.id,
+      email: user.email,
+      isActive: user.isActive,
+      roles,
+    };
   }
 }

@@ -8,6 +8,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@forgemind/sdk": "workspace:*"
+    "@forgemind/sdk": "workspace:*",
+    "@prisma/client": "^7.10.0"
+  },
+  "devDependencies": {
+    "dotenv": "^17.4.2",
+    "prisma": "7.10.0"
   }
 }

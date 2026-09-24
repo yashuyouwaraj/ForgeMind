@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@forgemind/sdk": "workspace:*",
+    "@forgemind/shared-auth": "workspace:*",
     "@forgemind/shared-errors": "workspace:*",
     "@forgemind/shared-validation": "workspace:*",
     "@prisma/adapter-pg": "^7.10.0",

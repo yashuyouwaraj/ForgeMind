@@ -1,4 +1,4 @@
-import type { AuthenticatedUser } from "../domain/auth/auth-types.js";
+import type { AuthenticatedUser } from "@forgemind/shared-auth";
 
 declare global {
   namespace Express {

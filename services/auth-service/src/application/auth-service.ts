@@ -1,6 +1,6 @@
 import { AuthenticationError, ConflictError } from "@forgemind/shared-errors";
 
-import type { AuthenticatedUser } from "../domain/auth/auth-types.js";
+import type { AuthenticatedUser } from "@forgemind/shared-auth";
 import { JwtService } from "../infrastructure/jwt/jwt-service.js";
 import { PasswordService } from "../infrastructure/security/password-service.js";
 import { UserRepository } from "../repositories/user-repository.js";

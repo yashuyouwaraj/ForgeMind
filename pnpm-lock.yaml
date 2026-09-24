@@ -145,6 +145,9 @@ importers:
       '@forgemind/sdk':
         specifier: workspace:*
         version: link:../../packages/sdk
+      '@forgemind/shared-auth':
+        specifier: workspace:*
+        version: link:../../packages/shared-auth
       '@forgemind/shared-errors':
         specifier: workspace:*
         version: link:../../packages/shared-errors

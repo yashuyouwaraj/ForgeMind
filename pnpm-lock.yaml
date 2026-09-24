@@ -191,10 +191,16 @@ importers:
       '@forgemind/sdk':
         specifier: workspace:*
         version: link:../../packages/sdk
+      '@forgemind/shared-errors':
+        specifier: workspace:*
+        version: link:../../packages/shared-errors
       '@prisma/client':
         specifier: ^7.10.0
         version: 7.10.0(prisma@7.10.0(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@5.9.3))(typescript@5.9.3)
     devDependencies:
+      '@types/node':
+        specifier: ^24.13.3
+        version: 24.13.3
       dotenv:
         specifier: ^17.4.2
         version: 17.4.2

@@ -2,12 +2,16 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "dist"
+    "outDir": "dist",
+    "types": ["node"]
   },
   "include": ["src"],
   "references": [
     {
       "path": "../../packages/sdk"
+    },
+    {
+      "path": "../../packages/shared-errors"
     }
   ]
 }

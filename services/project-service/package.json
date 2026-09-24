@@ -9,9 +9,11 @@
   },
   "dependencies": {
     "@forgemind/sdk": "workspace:*",
+    "@forgemind/shared-errors": "workspace:*",
     "@prisma/client": "^7.10.0"
   },
   "devDependencies": {
+    "@types/node": "^24.13.3",
     "dotenv": "^17.4.2",
     "prisma": "7.10.0"
   }

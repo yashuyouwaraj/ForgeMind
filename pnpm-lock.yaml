@@ -191,13 +191,28 @@ importers:
       '@forgemind/sdk':
         specifier: workspace:*
         version: link:../../packages/sdk
+      '@forgemind/shared-auth':
+        specifier: workspace:*
+        version: link:../../packages/shared-auth
       '@forgemind/shared-errors':
         specifier: workspace:*
         version: link:../../packages/shared-errors
+      '@forgemind/shared-validation':
+        specifier: workspace:*
+        version: link:../../packages/shared-validation
       '@prisma/client':
         specifier: ^7.10.0
         version: 7.10.0(prisma@7.10.0(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@5.9.3))(typescript@5.9.3)
+      express:
+        specifier: ^5.2.1
+        version: 5.2.1
+      zod:
+        specifier: ^4.4.3
+        version: 4.4.3
     devDependencies:
+      '@types/express':
+        specifier: ^5.0.6
+        version: 5.0.6
       '@types/node':
         specifier: ^24.13.3
         version: 24.13.3

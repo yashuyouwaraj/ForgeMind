@@ -12,6 +12,9 @@
     },
     {
       "path": "../../packages/shared-errors"
+    },
+    {
+      "path": "../../packages/shared-types"
     }
   ]
 }

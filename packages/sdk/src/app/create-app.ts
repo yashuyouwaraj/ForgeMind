@@ -21,6 +21,7 @@ export function createForgeMindApp(
     compression: enableCompression = true,
     apiPrefix = "/api",
     registerRoutes,
+    registerErrorHandlers = true,
   } = options;
 
   app.set("serviceName", serviceName);
@@ -53,8 +54,10 @@ export function createForgeMindApp(
 
   registerRoutes?.(app);
 
-  app.use(notFoundHandler);
-  app.use(errorHandler);
+  if (registerErrorHandlers) {
+    app.use(notFoundHandler);
+    app.use(errorHandler);
+  }
 
   return app;
 }

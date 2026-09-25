@@ -26,13 +26,6 @@ const jwtService = new JwtService(jwtSecret);
 const projectRepository = new ProjectRepository();
 const projectService = new ProjectService(projectRepository);
 const projectRouter = createProjectRoutes(projectService, jwtService);
-console.log(
-  "project-router-stack",
-  projectRouter.stack.map((layer: any) => ({
-    route: layer.route && layer.route.path,
-    methods: layer.route && layer.route.methods,
-  })),
-);
 
 app.use("/api/projects", projectRouter);
 app.use(notFoundHandler);

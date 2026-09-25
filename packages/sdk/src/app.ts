@@ -17,6 +17,7 @@ export function createForgeMindApp(options: ForgeMindAppOptions): Express {
     security = true,
     compression: enableCompression = true,
     apiPrefix = "/api",
+    registerRoutes,
     registerErrorHandlers = true,
   } = options;
 
@@ -44,6 +45,8 @@ export function createForgeMindApp(options: ForgeMindAppOptions): Express {
   }
 
   app.get(`${apiPrefix}/health`, healthHandler);
+
+  registerRoutes?.(app);
 
   if (registerErrorHandlers) {
     app.use(notFoundHandler);

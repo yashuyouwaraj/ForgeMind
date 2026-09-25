@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "build": "tsc -b",
+    "dev": "prisma generate --schema prisma/schema.prisma && tsx watch src/index.ts",
+    "build": "prisma generate --schema prisma/schema.prisma && tsc -b",
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit"
   },

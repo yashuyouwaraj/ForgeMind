@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc -b",
+    "dev": "prisma generate --schema prisma/schema.prisma && tsx watch src/index.ts",
+    "build": "prisma generate --schema prisma/schema.prisma && tsc -b",
+    "start": "node dist/index.js",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -12,12 +14,15 @@
     "@forgemind/shared-auth": "workspace:*",
     "@forgemind/shared-errors": "workspace:*",
     "@forgemind/shared-validation": "workspace:*",
+    "@prisma/adapter-pg": "^7.10.0",
     "@prisma/client": "^7.10.0",
     "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
     "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.13.3",
     "dotenv": "^17.4.2",
     "prisma": "7.10.0"

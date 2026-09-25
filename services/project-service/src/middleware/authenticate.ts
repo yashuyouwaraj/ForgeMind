@@ -1,16 +1,10 @@
 import type { NextFunction, Request, Response } from "express";
 import { AuthenticationError } from "@forgemind/shared-errors";
 import type { AuthenticatedUser } from "@forgemind/shared-auth";
-
-interface JwtVerifier {
-  verify(token: string): {
-    userId: string;
-    workspaceId: string;
-  };
-}
+import { JwtService } from "../infrastructure/security/jwt-service.js";
 
 export function createAuthenticationMiddleware(
-  jwtService: JwtVerifier,
+  jwtService: JwtService,
 ) {
   return (
     req: Request,

@@ -1,19 +1,29 @@
+import type { NextFunction, Request, Response } from "express";
 import { Router } from "express";
+import { AuthenticationError } from "@forgemind/shared-errors";
 import { validate } from "@forgemind/shared-validation";
-import type { Request, Response, NextFunction } from "express";
+import { ProjectService } from "../../application/project-service.js";
 import {
   createProjectSchema,
   updateProjectSchema,
 } from "./project-schema.js";
-import { ProjectService } from "../../application/project-service.js";
+import { createAuthenticationMiddleware } from "../../middleware/authenticate.js";
+import { JwtService } from "../../infrastructure/security/jwt-service.js";
+
+const getRouteParamId = (value: string | string[] | undefined): string => {
+  if (Array.isArray(value)) {
+    return value[0] ?? "";
+  }
+
+  return value ?? "";
+};
 
 export function createProjectRoutes(
   projectService: ProjectService,
-  authenticate: ReturnType<
-    typeof import("../../middleware/authenticate.js").createAuthenticationMiddleware
-  >,
+  jwtService: JwtService,
 ): Router {
   const router = Router();
+  const authenticate = createAuthenticationMiddleware(jwtService);
 
   router.post(
     "/",
@@ -22,6 +32,7 @@ export function createProjectRoutes(
     async (req: Request, res: Response, next: NextFunction) => {
       try {
         if (!req.user) {
+          next(new AuthenticationError("Authentication token is required"));
           return;
         }
 
@@ -46,6 +57,7 @@ export function createProjectRoutes(
     async (req: Request, res: Response, next: NextFunction) => {
       try {
         if (!req.user) {
+          next(new AuthenticationError("Authentication token is required"));
           return;
         }
 
@@ -69,10 +81,12 @@ export function createProjectRoutes(
     async (req: Request, res: Response, next: NextFunction) => {
       try {
         if (!req.user) {
+          next(new AuthenticationError("Authentication token is required"));
           return;
         }
 
-        const projectId = String(req.params.id);
+        const projectId = getRouteParamId(req.params.id);
+
         const project = await projectService.getProject(
           projectId,
           req.user.userId,
@@ -95,10 +109,12 @@ export function createProjectRoutes(
     async (req: Request, res: Response, next: NextFunction) => {
       try {
         if (!req.user) {
+          next(new AuthenticationError("Authentication token is required"));
           return;
         }
 
-        const projectId = String(req.params.id);
+        const projectId = getRouteParamId(req.params.id);
+
         const project = await projectService.updateProject(
           projectId,
           req.user.userId,
@@ -121,10 +137,12 @@ export function createProjectRoutes(
     async (req: Request, res: Response, next: NextFunction) => {
       try {
         if (!req.user) {
+          next(new AuthenticationError("Authentication token is required"));
           return;
         }
 
-        const projectId = String(req.params.id);
+        const projectId = getRouteParamId(req.params.id);
+
         await projectService.deleteProject(
           projectId,
           req.user.userId,

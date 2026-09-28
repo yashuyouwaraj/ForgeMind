@@ -1,4 +1,4 @@
-import type { Project } from "@prisma/client";
+import type { Project } from "../generated/prisma/index.js";
 import { prisma } from "../infrastructure/database/prisma.js";
 
 export interface CreateProjectRepositoryInput {

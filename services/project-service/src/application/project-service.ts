@@ -1,19 +1,15 @@
-import {
-  NotFoundError,
-} from "@forgemind/shared-errors";
+import { NotFoundError } from "@forgemind/shared-errors";
 import type {
   CreateProjectInput,
   Project,
+  ProjectPagination,
   UpdateProjectInput,
 } from "../domain/project/project-types.js";
-import {
-  ProjectRepository,
-} from "../repositories/project-repository.js";
+
+import { ProjectRepository } from "../repositories/project-repository.js";
 
 export class ProjectService {
-  constructor(
-    private readonly projectRepository: ProjectRepository,
-  ) {}
+  constructor(private readonly projectRepository: ProjectRepository) {}
 
   async createProject(
     ownerId: string,
@@ -26,14 +22,21 @@ export class ProjectService {
     });
   }
 
-  async listProjects(ownerId: string): Promise<Project[]> {
-    return this.projectRepository.findByOwnerId(ownerId);
+  async listProjects(
+    ownerId: string,
+    pagination: ProjectPagination,
+  ): Promise<{
+    projects: Project[];
+    total: number;
+  }> {
+    return this.projectRepository.findByOwnerId(
+      ownerId,
+      pagination.page,
+      pagination.pageSize,
+    );
   }
 
-  async getProject(
-    projectId: string,
-    ownerId: string,
-  ): Promise<Project> {
+  async getProject(projectId: string, ownerId: string): Promise<Project> {
     const project = await this.projectRepository.findById(projectId);
 
     if (!project || project.ownerId !== ownerId) {
@@ -56,10 +59,7 @@ export class ProjectService {
     });
   }
 
-  async deleteProject(
-    projectId: string,
-    ownerId: string,
-  ): Promise<void> {
+  async deleteProject(projectId: string, ownerId: string): Promise<void> {
     await this.getProject(projectId, ownerId);
     await this.projectRepository.delete(projectId);
   }

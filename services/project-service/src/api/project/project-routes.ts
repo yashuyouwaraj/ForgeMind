@@ -5,8 +5,9 @@ import { validate } from "@forgemind/shared-validation";
 import { ProjectService } from "../../application/project-service.js";
 import {
   createProjectSchema,
+  projectPaginationSchema,
   updateProjectSchema,
-} from "./project-schema.js";
+} from "../project/project-schema.js";
 import { createAuthenticationMiddleware } from "../../middleware/authenticate.js";
 import { JwtService } from "../../infrastructure/security/jwt-service.js";
 
@@ -57,17 +58,30 @@ export function createProjectRoutes(
     async (req: Request, res: Response, next: NextFunction) => {
       try {
         if (!req.user) {
-          next(new AuthenticationError("Authentication token is required"));
           return;
         }
 
-        const projects = await projectService.listProjects(
+        const pagination = projectPaginationSchema.parse(req.query);
+
+        const result = await projectService.listProjects(
           req.user.userId,
+          pagination,
         );
+
+        const totalPages =
+          result.total === 0
+            ? 0
+            : Math.ceil(result.total / pagination.pageSize);
 
         res.status(200).json({
           success: true,
-          data: projects,
+          data: result.projects,
+          pagination: {
+            page: pagination.page,
+            pageSize: pagination.pageSize,
+            totalPages,
+            totalRecords: result.total,
+          },
         });
       } catch (error) {
         next(error);
@@ -143,10 +157,7 @@ export function createProjectRoutes(
 
         const projectId = getRouteParamId(req.params.id);
 
-        await projectService.deleteProject(
-          projectId,
-          req.user.userId,
-        );
+        await projectService.deleteProject(projectId, req.user.userId);
 
         res.status(204).send();
       } catch (error) {

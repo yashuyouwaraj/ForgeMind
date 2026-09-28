@@ -16,3 +16,8 @@ export interface UpdateProjectInput {
   name?: string;
   description?: string | null;
 }
+
+export interface ProjectPagination {
+  page: number;
+  pageSize: number;
+}

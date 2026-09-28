@@ -13,9 +13,7 @@ export interface UpdateProjectRepositoryInput {
 }
 
 export class ProjectRepository {
-  async create(
-    input: CreateProjectRepositoryInput,
-  ): Promise<Project> {
+  async create(input: CreateProjectRepositoryInput): Promise<Project> {
     return prisma.project.create({
       data: {
         name: input.name,
@@ -28,15 +26,6 @@ export class ProjectRepository {
   async findById(id: string): Promise<Project | null> {
     return prisma.project.findUnique({
       where: { id },
-    });
-  }
-
-  async findByOwnerId(ownerId: string): Promise<Project[]> {
-    return prisma.project.findMany({
-      where: { ownerId },
-      orderBy: {
-        createdAt: "desc",
-      },
     });
   }
 
@@ -54,5 +43,32 @@ export class ProjectRepository {
     return prisma.project.delete({
       where: { id },
     });
+  }
+
+  async findByOwnerId(
+    ownerId: string,
+    page: number,
+    pageSize: number,
+  ): Promise<{ projects: Project[]; total: number }> {
+    const skip = (page - 1) * pageSize;
+
+    const [projects, total] = await prisma.$transaction([
+      prisma.project.findMany({
+        where: { ownerId },
+        orderBy: {
+          createdAt: "desc",
+        },
+        skip,
+        take: pageSize,
+      }),
+      prisma.project.count({
+        where: { ownerId },
+      }),
+    ]);
+
+    return {
+      projects,
+      total,
+    };
   }
 }

@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import { NotFoundError } from "@forgemind/shared-errors";
 
 import { createProjectApp } from "../../app.js";
+import type { ProjectMembershipService } from "../../application/project-membership-service.js";
 import type { ProjectService } from "../../application/project-service.js";
 import { JwtService } from "../../infrastructure/security/jwt-service.js";
 
@@ -40,6 +41,12 @@ function createProjectServiceMock() {
 function createTestApp(projectService: ProjectService) {
   return createProjectApp({
     projectService,
+    projectMembershipService: {
+      addMember: vi.fn(),
+      listMembers: vi.fn(),
+      updateMemberRole: vi.fn(),
+      removeMember: vi.fn(),
+    } as unknown as ProjectMembershipService,
     jwtService: new JwtService(JWT_SECRET),
   });
 }

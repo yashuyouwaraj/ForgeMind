@@ -9,15 +9,40 @@ datasource db {
 }
 
 model Project {
-  id          String   @id @default(uuid()) @db.Uuid
+  id          String              @id @default(uuid()) @db.Uuid
   name        String
   description String?
-  ownerId     String   @db.Uuid
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  ownerId     String              @db.Uuid
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  memberships ProjectMembership[]
 
   @@index([ownerId])
   @@map("projects")
   @@schema("project")
 }
 
+enum ProjectRole {
+  OWNER
+  ADMINISTRATOR
+  MAINTAINER
+  DEVELOPER
+  VIEWER
+
+  @@schema("project")
+}
+
+model ProjectMembership {
+  projectId String      @db.Uuid
+  userId    String      @db.Uuid
+  role      ProjectRole
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, userId])
+  @@index([userId])
+  @@map("project_memberships")
+  @@schema("project")
+}

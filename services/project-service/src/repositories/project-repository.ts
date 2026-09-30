@@ -14,12 +14,24 @@ export interface UpdateProjectRepositoryInput {
 
 export class ProjectRepository {
   async create(input: CreateProjectRepositoryInput): Promise<Project> {
-    return prisma.project.create({
-      data: {
-        name: input.name,
-        description: input.description,
-        ownerId: input.ownerId,
-      },
+    return prisma.$transaction(async (transaction) => {
+      const project = await transaction.project.create({
+        data: {
+          name: input.name,
+          description: input.description,
+          ownerId: input.ownerId,
+        },
+      });
+
+      await transaction.projectMembership.create({
+        data: {
+          projectId: project.id,
+          userId: input.ownerId,
+          role: "OWNER",
+        },
+      });
+
+      return project;
     });
   }
 

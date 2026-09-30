@@ -1,3 +1,5 @@
+import "dotenv/config";
+
 import { JwtService } from "./infrastructure/security/jwt-service.js";
 import { ProjectRepository } from "./repositories/project-repository.js";
 import { ProjectService } from "./application/project-service.js";

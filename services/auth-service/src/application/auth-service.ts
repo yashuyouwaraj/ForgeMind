@@ -1,5 +1,5 @@
 import { AuthenticationError, ConflictError } from "@forgemind/shared-errors";
-
+import type { UserInformation } from "../domain/user/user-types.js";
 import type { AuthenticatedUser } from "@forgemind/shared-auth";
 import { JwtService } from "../infrastructure/jwt/jwt-service.js";
 import { PasswordService } from "../infrastructure/security/password-service.js";
@@ -149,12 +149,7 @@ export class AuthService {
     }
   }
 
-  async getProfile(userId: string): Promise<{
-    id: string;
-    email: string;
-    isActive: boolean;
-    roles: string[];
-  }> {
+  async getProfile(userId: string): Promise<UserInformation> {
     const user = await this.userRepository.findById(userId);
 
     if (!user || !user.isActive) {

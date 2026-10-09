@@ -149,5 +149,113 @@ describe("AuthService", () => {
       }),
     ).rejects.toThrow("Invalid email or password");
   });
-  
+
+
+  it("returns user information with assigned roles", async () => {
+    const userRepository = {
+      findById: vi.fn().mockResolvedValue({
+        id: "user-1",
+        email: "test@forgemind.local",
+        passwordHash: "hashed-password",
+        isActive: true,
+      }),
+      findByEmail: vi.fn(),
+      create: vi.fn(),
+    };
+
+    const passwordService = {
+      hash: vi.fn(),
+      verify: vi.fn(),
+    };
+
+    const jwtService = {
+      sign: vi.fn(),
+      verify: vi.fn(),
+    };
+
+    const refreshTokenService = {
+      create: vi.fn(),
+      consume: vi.fn(),
+      revokeAll: vi.fn(),
+    };
+
+    const authorizationService = {
+      getUserRoles: vi.fn().mockResolvedValue(["ADMINISTRATOR", "DEVELOPER"]),
+    };
+
+    const authService = new AuthService(
+      userRepository as never,
+      passwordService as never,
+      jwtService as never,
+      refreshTokenService as never,
+      authorizationService as never,
+    );
+
+    await expect(authService.getProfile("user-1")).resolves.toEqual({
+      id: "user-1",
+      email: "test@forgemind.local",
+      isActive: true,
+      roles: ["ADMINISTRATOR", "DEVELOPER"],
+    });
+
+    expect(userRepository.findById).toHaveBeenCalledWith("user-1");
+    expect(authorizationService.getUserRoles).toHaveBeenCalledWith("user-1");
+  });
+
+  it("rejects profile requests for a missing or inactive user", async () => {
+    const userRepository = {
+      findById: vi.fn().mockResolvedValue(null),
+      findByEmail: vi.fn(),
+      create: vi.fn(),
+    };
+
+    const passwordService = {
+      hash: vi.fn(),
+      verify: vi.fn(),
+    };
+
+    const jwtService = {
+      sign: vi.fn(),
+      verify: vi.fn(),
+    };
+
+    const refreshTokenService = {
+      create: vi.fn(),
+      consume: vi.fn(),
+      revokeAll: vi.fn(),
+    };
+
+    const authorizationService = {
+      getUserRoles: vi.fn(),
+    };
+
+    const authService = new AuthService(
+      userRepository as never,
+      passwordService as never,
+      jwtService as never,
+      refreshTokenService as never,
+      authorizationService as never,
+    );
+
+    await expect(authService.getProfile("missing-user")).rejects.toThrow(
+      "Authenticated user was not found",
+    );
+
+    expect(authorizationService.getUserRoles).not.toHaveBeenCalled();
+
+    userRepository.findById.mockResolvedValue({
+      id: "user-2",
+      email: "inactive@forgemind.local",
+      passwordHash: "hashed-password",
+      isActive: false,
+    });
+
+    await expect(authService.getProfile("user-2")).rejects.toThrow(
+      "Authenticated user was not found",
+    );
+
+    expect(authorizationService.getUserRoles).not.toHaveBeenCalled();
+  });
+
+
 });

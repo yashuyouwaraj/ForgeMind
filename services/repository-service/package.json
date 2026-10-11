@@ -14,12 +14,14 @@
     "@forgemind/sdk": "workspace:*",
     "@forgemind/shared-auth": "workspace:*",
     "@forgemind/shared-errors": "workspace:*",
+    "@forgemind/shared-events": "workspace:*",
     "@forgemind/shared-validation": "workspace:*",
     "@prisma/adapter-pg": "^7.10.0",
     "@prisma/client": "^7.10.0",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
+    "kafkajs": "^2.2.4",
     "zod": "^4.4.3"
   },
   "devDependencies": {

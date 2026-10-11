@@ -1,0 +1,35 @@
+{
+    "name": "@forgemind/git-service",
+    "version": "1.0.0",
+    "private": true,
+    "type": "module",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "scripts": {
+        "build": "tsc -b",
+        "dev": "tsx watch src/index.ts",
+        "lint": "tsc --noEmit",
+        "typecheck": "tsc --noEmit",
+        "test": "vitest run"
+    },
+    "dependencies": {
+        "@forgemind/sdk": "workspace:*",
+        "@forgemind/shared-auth": "workspace:*",
+        "@forgemind/shared-config": "workspace:*",
+        "@forgemind/shared-errors": "workspace:*",
+        "@forgemind/shared-events": "workspace:*",
+        "@forgemind/shared-logger": "workspace:*",
+        "dotenv": "^17.4.2",
+        "express": "^5.2.1",
+        "jsonwebtoken": "^9.0.3",
+        "simple-git": "^3.36.0"
+    },
+    "devDependencies": {
+        "@types/express": "^5.0.0",
+        "@types/jsonwebtoken": "^9.0.10",
+        "@types/node": "^24.13.3",
+        "tsx": "^4.23.1",
+        "typescript": "^5.9.2",
+        "vitest": "^5.0.1"
+    }
+}

@@ -99,7 +99,14 @@ describe("Repository routes", () => {
 
     expect(
       repositoryServiceMock.registerRepository,
-    ).toHaveBeenCalledWith(input);
+    ).toHaveBeenCalledWith(
+      input,
+      expect.objectContaining({
+        ownerId: userId,
+        correlationId: expect.any(String),
+        traceId: expect.any(String),
+      }),
+    );
   });
 
   it("does not register a repository when project access is denied", async () => {

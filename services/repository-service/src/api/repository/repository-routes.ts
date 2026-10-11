@@ -1,9 +1,7 @@
-
 import type { NextFunction, Request, Response } from "express";
 import { Router } from "express";
-import {
-  AuthenticationError,
-} from "@forgemind/shared-errors";
+import { AuthenticationError } from "@forgemind/shared-errors";
+import { randomUUID } from "node:crypto";
 import { validate } from "@forgemind/shared-validation";
 import { RepositoryService } from "../../application/repository-service.js";
 import { JwtService } from "../../infrastructure/security/jwt-service.js";
@@ -14,10 +12,8 @@ import {
   repositoryPaginationSchema,
 } from "./repository-schema.js";
 
-const getRouteParamId = (
-  value: string | string[] | undefined,
-): string => {
-  return Array.isArray(value) ? value[0] ?? "" : value ?? "";
+const getRouteParamId = (value: string | string[] | undefined): string => {
+  return Array.isArray(value) ? (value[0] ?? "") : (value ?? "");
 };
 
 export function createRepositoryRoutes(
@@ -35,17 +31,13 @@ export function createRepositoryRoutes(
     async (req: Request, res: Response, next: NextFunction) => {
       try {
         if (!req.user) {
-          throw new AuthenticationError(
-            "Authentication token is required",
-          );
+          throw new AuthenticationError("Authentication token is required");
         }
 
         const authorization = req.header("Authorization");
 
         if (!authorization) {
-          throw new AuthenticationError(
-            "Authentication token is required",
-          );
+          throw new AuthenticationError("Authentication token is required");
         }
 
         await projectAccessClient.assertProjectOwner(
@@ -53,8 +45,19 @@ export function createRepositoryRoutes(
           authorization,
         );
 
-        const repository =
-          await repositoryService.registerRepository(req.body);
+        const correlationId =
+          req.header("x-correlation-id")?.trim() || randomUUID();
+
+        const traceId = req.header("x-trace-id")?.trim() || randomUUID();
+
+        const repository = await repositoryService.registerRepository(
+          req.body,
+          {
+            ownerId: req.user.userId,
+            correlationId,
+            traceId,
+          },
+        );
 
         res.status(201).json({
           success: true,
@@ -72,17 +75,13 @@ export function createRepositoryRoutes(
     async (req: Request, res: Response, next: NextFunction) => {
       try {
         if (!req.user) {
-          throw new AuthenticationError(
-            "Authentication token is required",
-          );
+          throw new AuthenticationError("Authentication token is required");
         }
 
         const authorization = req.header("Authorization");
 
         if (!authorization) {
-          throw new AuthenticationError(
-            "Authentication token is required",
-          );
+          throw new AuthenticationError("Authentication token is required");
         }
 
         const pagination = repositoryPaginationSchema.parse(req.query);
@@ -125,25 +124,18 @@ export function createRepositoryRoutes(
     async (req: Request, res: Response, next: NextFunction) => {
       try {
         if (!req.user) {
-          throw new AuthenticationError(
-            "Authentication token is required",
-          );
+          throw new AuthenticationError("Authentication token is required");
         }
 
         const authorization = req.header("Authorization");
 
         if (!authorization) {
-          throw new AuthenticationError(
-            "Authentication token is required",
-          );
+          throw new AuthenticationError("Authentication token is required");
         }
 
-        const repositoryId = getRouteParamId(
-          req.params.repositoryId,
-        );
+        const repositoryId = getRouteParamId(req.params.repositoryId);
 
-        const repository =
-          await repositoryService.getRepository(repositoryId);
+        const repository = await repositoryService.getRepository(repositoryId);
 
         await projectAccessClient.assertProjectOwner(
           repository.projectId,

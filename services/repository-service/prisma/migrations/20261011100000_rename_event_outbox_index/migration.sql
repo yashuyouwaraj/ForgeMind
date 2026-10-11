@@ -1,0 +1,3 @@
+
+ALTER INDEX "repository"."event_outbox_publishedAt_deadLetteredAt_nextAttemptAt_lockedUnt"
+RENAME TO "event_outbox_publishedAt_deadLetteredAt_nextAttemptAt_locke_idx";

@@ -1,19 +1,19 @@
-
 import { NotFoundError } from "@forgemind/shared-errors";
+import type { RepositoryEventContext } from "../repositories/repository-repository.js";
 import type { RegisterRepositoryInput } from "../domain/repository/repository-types.js";
 import type { RepositoryRepository } from "../repositories/repository-repository.js";
 export class RepositoryService {
-  constructor(
-    private readonly repositoryRepository: RepositoryRepository,
-  ) {}
+  constructor(private readonly repositoryRepository: RepositoryRepository) {}
 
-  async registerRepository(input: RegisterRepositoryInput) {
-    return this.repositoryRepository.create(input);
+  async registerRepository(
+    input: RegisterRepositoryInput,
+    context: RepositoryEventContext,
+  ) {
+    return this.repositoryRepository.create(input, context);
   }
 
   async getRepository(repositoryId: string) {
-    const repository =
-      await this.repositoryRepository.findById(repositoryId);
+    const repository = await this.repositoryRepository.findById(repositoryId);
 
     if (!repository) {
       throw new NotFoundError("Repository not found");

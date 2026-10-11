@@ -13,3 +13,4 @@ export * from "./domain/semantic-analysis-error.js";
 export * from "./domain/uir-error.js";
 export * from "./domain/graph-error.js";
 export * from "./domain/runtime-error.js";
+export * from "./http/service-unavailable-error.js";

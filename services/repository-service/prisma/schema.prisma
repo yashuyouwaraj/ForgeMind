@@ -36,3 +36,25 @@ model Repository {
   @@map("repositories")
   @@schema("repository")
 }
+
+model EventOutbox {
+  id            String    @id @default(uuid()) @db.Uuid
+  eventId       String    @unique @db.Uuid
+  eventType     String
+  eventVersion  Int       @default(1)
+  payload       Json
+  occurredAt    DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+  publishedAt   DateTime?
+  deadLetteredAt DateTime?
+  attempts      Int       @default(0)
+  nextAttemptAt DateTime  @default(now())
+  lastError     String?
+  lockedUntil   DateTime?
+  lockedBy      String?
+
+
+  @@index([publishedAt, deadLetteredAt, nextAttemptAt, lockedUntil])
+  @@map("event_outbox")
+  @@schema("repository")
+}

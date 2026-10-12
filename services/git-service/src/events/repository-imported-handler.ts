@@ -1,11 +1,13 @@
-
 import { createHash } from "node:crypto";
 import type {
   RepositoryImportedEvent,
   RepositorySyncFailedEvent,
   RepositorySynchronizedEvent,
 } from "@forgemind/shared-events";
-import type { GitOperations } from "../git/git-operations.js";
+import type {
+  GitOperationResult,
+  GitOperations,
+} from "../git/git-operations.js";
 
 export interface RepositoryEventPublisher {
   publish(
@@ -19,7 +21,29 @@ export interface RepositoryImportedHandlerDependencies {
     "cloneRepository" | "synchronizeRepository"
   >;
   publisher: RepositoryEventPublisher;
+  retry?: {
+    maxAttempts?: number;
+    initialDelayMs?: number;
+    maxDelayMs?: number;
+    sleep?: (milliseconds: number) => Promise<void>;
+  };
 }
+
+interface OperationFailure {
+  failureCode: string;
+  retryable: boolean;
+}
+
+type OperationResult =
+  | { success: true; result: GitOperationResult }
+  | { success: false; failure: OperationFailure };
+
+const PERMANENT_FAILURE_CODES = new Set([
+  "INVALID_REPOSITORY_ID",
+  "REPOSITORY_REMOTE_MISMATCH",
+  "REPOSITORY_WORKSPACE_DIRTY",
+  "REPOSITORY_DETACHED_HEAD",
+]);
 
 function isImportedEvent(value: unknown): value is RepositoryImportedEvent {
   if (typeof value !== "object" || value === null) return false;
@@ -33,8 +57,11 @@ function isImportedEvent(value: unknown): value is RepositoryImportedEvent {
     typeof event.eventId !== "string" ||
     !event.eventId.trim() ||
     typeof event.correlationId !== "string" ||
+    !event.correlationId.trim() ||
     typeof event.traceId !== "string" ||
+    !event.traceId.trim() ||
     typeof event.occurredAt !== "string" ||
+    !Number.isFinite(Date.parse(event.occurredAt)) ||
     typeof data !== "object" ||
     data === null
   ) {
@@ -58,10 +85,6 @@ function isImportedEvent(value: unknown): value is RepositoryImportedEvent {
   );
 }
 
-/**
- * Deterministic UUID-shaped identifiers make a repeated delivery of the same
- * imported event produce the same outcome event ID.
- */
 function outcomeEventId(sourceEventId: string, outcome: string): string {
   const bytes = createHash("sha1")
     .update(`forgemind:repository-imported:${sourceEventId}:${outcome}`)
@@ -82,39 +105,104 @@ function outcomeEventId(sourceEventId: string, outcome: string): string {
   ].join("-");
 }
 
-function getFailure(error: unknown): {
-  failureCode: string;
-  retryable: boolean;
-} {
-  const code =
-    error instanceof Error ? error.message : "GIT_OPERATION_FAILED";
+function classifyFailure(error: unknown): OperationFailure {
+  const message = error instanceof Error ? error.message : "";
 
-  const permanentCodes = new Set([
-    "INVALID_REPOSITORY_ID",
-    "INVALID_REPOSITORY_URL",
-    "UNSUPPORTED_REPOSITORY_PROVIDER",
-    "REPOSITORY_REMOTE_MISMATCH",
-  ]);
+  // Only expose stable codes, never raw Git output, URLs, credentials,
+  // filesystem paths, or arbitrary third-party error messages.
+  const knownCode = /^[A-Z][A-Z0-9_]{0,99}$/.test(message) ? message : "";
 
-  // Never publish raw Git errors, URLs, credentials, or filesystem paths.
-  const knownCodes = new Set([
-    ...permanentCodes,
-    "REPOSITORY_WORKSPACE_ALREADY_EXISTS",
-    "REPOSITORY_WORKSPACE_NOT_FOUND",
-    "REPOSITORY_WORKSPACE_DIRTY",
-    "REPOSITORY_DETACHED_HEAD",
-  ]);
+  const permanent =
+    PERMANENT_FAILURE_CODES.has(knownCode) ||
+    knownCode.startsWith("INVALID_") ||
+    knownCode.startsWith("UNSUPPORTED_");
 
   return {
-    failureCode: knownCodes.has(code) ? code : "GIT_OPERATION_FAILED",
-    retryable: !permanentCodes.has(code),
+    failureCode: knownCode || "GIT_OPERATION_FAILED",
+    retryable: !permanent,
   };
+}
+
+function delay(milliseconds: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
 export function createRepositoryImportedHandler({
   gitOperations,
   publisher,
+  retry,
 }: RepositoryImportedHandlerDependencies) {
+  const maxAttempts = retry?.maxAttempts ?? 3;
+  const initialDelayMs = retry?.initialDelayMs ?? 250;
+  const maxDelayMs = retry?.maxDelayMs ?? 2_000;
+  const sleep = retry?.sleep ?? delay;
+
+  if (!Number.isInteger(maxAttempts) || maxAttempts < 1 || maxAttempts > 10) {
+    throw new Error("INVALID_GIT_RETRY_MAX_ATTEMPTS");
+  }
+
+  if (
+    !Number.isFinite(initialDelayMs) ||
+    initialDelayMs < 0 ||
+    !Number.isFinite(maxDelayMs) ||
+    maxDelayMs < initialDelayMs
+  ) {
+    throw new Error("INVALID_GIT_RETRY_DELAY");
+  }
+
+  async function execute(
+    event: RepositoryImportedEvent,
+  ): Promise<OperationResult> {
+    for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+      try {
+        let result: GitOperationResult;
+
+        try {
+          result = await gitOperations.cloneRepository(
+            event.data.repositoryId,
+            event.data.url,
+          );
+        } catch (error) {
+          if (
+            !(error instanceof Error) ||
+            error.message !== "REPOSITORY_WORKSPACE_ALREADY_EXISTS"
+          ) {
+            throw error;
+          }
+
+          result = await gitOperations.synchronizeRepository(
+            event.data.repositoryId,
+            event.data.url,
+          );
+        }
+
+        return { success: true, result };
+      } catch (error) {
+        const failure = classifyFailure(error);
+
+        if (!failure.retryable || attempt === maxAttempts) {
+          return { success: false, failure };
+        }
+
+        const waitMs = Math.min(
+          initialDelayMs * 2 ** (attempt - 1),
+          maxDelayMs,
+        );
+
+        await sleep(waitMs);
+      }
+    }
+
+    // Defensive fallback; validated maxAttempts guarantees the loop runs.
+    return {
+      success: false,
+      failure: {
+        failureCode: "GIT_OPERATION_FAILED",
+        retryable: true,
+      },
+    };
+  }
+
   return async function handleRepositoryImported(
     value: unknown,
   ): Promise<void> {
@@ -124,28 +212,10 @@ export function createRepositoryImportedHandler({
 
     const event = value;
     const repository = event.data;
+    const operation = await execute(event);
 
-    try {
-      let result;
-
-      try {
-        result = await gitOperations.cloneRepository(
-          repository.repositoryId,
-          repository.url,
-        );
-      } catch (error) {
-        if (
-          !(error instanceof Error) ||
-          error.message !== "REPOSITORY_WORKSPACE_ALREADY_EXISTS"
-        ) {
-          throw error;
-        }
-
-        result = await gitOperations.synchronizeRepository(
-          repository.repositoryId,
-          repository.url,
-        );
-      }
+    if (operation.success) {
+      const result = operation.result;
 
       const outcome: RepositorySynchronizedEvent = {
         eventId: outcomeEventId(event.eventId, "synchronized"),
@@ -165,29 +235,28 @@ export function createRepositoryImportedHandler({
         },
       };
 
+      // Deliberately outside the Git-operation catch: publication failure
+      // must propagate to the Kafka consumer.
       await publisher.publish(outcome);
-    } catch (error) {
-      const failure = getFailure(error);
-
-      const outcome: RepositorySyncFailedEvent = {
-        eventId: outcomeEventId(event.eventId, "failed"),
-        eventType: "RepositorySyncFailed",
-        eventVersion: 1,
-        occurredAt: new Date().toISOString(),
-        correlationId: event.correlationId,
-        traceId: event.traceId,
-        data: {
-          repositoryId: repository.repositoryId,
-          projectId: repository.projectId,
-          ownerId: repository.ownerId,
-          failureCode: failure.failureCode,
-          retryable: failure.retryable,
-        },
-      };
-
-      // If outcome publication fails, propagate the error. The Kafka input
-      // must not be acknowledged as successfully handled.
-      await publisher.publish(outcome);
+      return;
     }
+
+    const outcome: RepositorySyncFailedEvent = {
+      eventId: outcomeEventId(event.eventId, "failed"),
+      eventType: "RepositorySyncFailed",
+      eventVersion: 1,
+      occurredAt: new Date().toISOString(),
+      correlationId: event.correlationId,
+      traceId: event.traceId,
+      data: {
+        repositoryId: repository.repositoryId,
+        projectId: repository.projectId,
+        ownerId: repository.ownerId,
+        failureCode: operation.failure.failureCode,
+        retryable: operation.failure.retryable,
+      },
+    };
+
+    await publisher.publish(outcome);
   };
 }

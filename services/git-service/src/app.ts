@@ -4,8 +4,8 @@ import { GitOperations } from "./git/git-operations.js";
 import { createGitRouter } from "./git/git.controller.js";
 import { RepositoryAccessClient } from "./security/repository-access-client.js";
 
-const gitOperations = new GitOperations();
-const repositoryAccessClient = new RepositoryAccessClient();
+export const gitOperations = new GitOperations();
+export const repositoryAccessClient = new RepositoryAccessClient();
 
 const app = createForgeMindApp({
   serviceName: "git-service",

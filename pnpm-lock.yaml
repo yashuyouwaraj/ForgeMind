@@ -218,6 +218,9 @@ importers:
       jsonwebtoken:
         specifier: ^9.0.3
         version: 9.0.3
+      kafkajs:
+        specifier: ^2.2.4
+        version: 2.2.4
       simple-git:
         specifier: ^3.36.0
         version: 3.36.0

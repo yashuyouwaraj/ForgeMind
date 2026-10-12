@@ -1,3 +1,4 @@
+
 import type { Server } from "node:http";
 
 export interface RuntimeConsumer {
@@ -14,6 +15,7 @@ export interface GitServiceRuntimeDependencies {
   consumer: RuntimeConsumer;
   publisher: RuntimePublisher;
   port: number;
+  shutdownTimeoutMs?: number;
 }
 
 export interface GitServiceRuntime {
@@ -22,9 +24,7 @@ export interface GitServiceRuntime {
 }
 
 function waitForListening(server: Server): Promise<void> {
-  if (server.listening) {
-    return Promise.resolve();
-  }
+  if (server.listening) return Promise.resolve();
 
   return new Promise<void>((resolve, reject) => {
     const cleanup = () => {
@@ -45,18 +45,42 @@ function waitForListening(server: Server): Promise<void> {
     server.once("listening", onListening);
     server.once("error", onError);
 
-    // Handle the server becoming ready between the initial check
-    // and registration of the event listeners.
-    if (server.listening) {
-      onListening();
-    }
+    if (server.listening) onListening();
+  });
+}
+
+function withTimeout<T>(
+  operation: Promise<T>,
+  timeoutMs: number,
+  errorCode: string,
+  onTimeout?: () => void,
+): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => {
+      try {
+        onTimeout?.();
+      } catch {
+        // Preserve the timeout as the primary failure.
+      }
+
+      reject(new Error(errorCode));
+    }, timeoutMs);
+
+    operation.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (error: unknown) => {
+        clearTimeout(timer);
+        reject(error);
+      },
+    );
   });
 }
 
 function closeServer(server: Server | null): Promise<void> {
-  if (!server || !server.listening) {
-    return Promise.resolve();
-  }
+  if (!server || !server.listening) return Promise.resolve();
 
   return new Promise<void>((resolve, reject) => {
     server.close((error) => {
@@ -70,18 +94,71 @@ function closeServer(server: Server | null): Promise<void> {
   });
 }
 
+function collectFailures(
+  results: PromiseSettledResult<unknown>[],
+): unknown[] {
+  return results.flatMap((result) =>
+    result.status === "rejected" ? [result.reason] : [],
+  );
+}
+
 export function createGitServiceRuntime({
   listen,
   consumer,
   publisher,
   port,
+  shutdownTimeoutMs = 10_000,
 }: GitServiceRuntimeDependencies): GitServiceRuntime {
+  if (!Number.isFinite(shutdownTimeoutMs) || shutdownTimeoutMs <= 0) {
+    throw new Error("INVALID_SHUTDOWN_TIMEOUT");
+  }
+
   let server: Server | null = null;
   let started = false;
   let stopping = false;
 
   let startPromise: Promise<void> | null = null;
   let stopPromise: Promise<void> | null = null;
+
+  async function closeResources(): Promise<void> {
+    const currentServer = server;
+
+    const serverClose = withTimeout(
+      closeServer(currentServer),
+      shutdownTimeoutMs,
+      "HTTP_SERVER_SHUTDOWN_TIMEOUT",
+      () => {
+        // Force-close active HTTP connections after graceful close times out.
+        currentServer?.closeAllConnections?.();
+      },
+    );
+
+    const results = await Promise.allSettled([
+      serverClose,
+      withTimeout(
+        consumer.close(),
+        shutdownTimeoutMs,
+        "KAFKA_CONSUMER_SHUTDOWN_TIMEOUT",
+      ),
+      withTimeout(
+        publisher.close(),
+        shutdownTimeoutMs,
+        "KAFKA_PUBLISHER_SHUTDOWN_TIMEOUT",
+      ),
+    ]);
+
+    server = null;
+    started = false;
+
+    const failures = collectFailures(results);
+
+    if (failures.length > 0) {
+      throw new AggregateError(
+        failures,
+        "GIT_SERVICE_CLEANUP_FAILED",
+      );
+    }
+  }
 
   async function startInternal(): Promise<void> {
     try {
@@ -99,26 +176,21 @@ export function createGitServiceRuntime({
       }
 
       started = true;
-    } catch (error) {
-      const results = await Promise.allSettled([
-        closeServer(server),
-        consumer.close(),
-        publisher.close(),
-      ]);
+    } catch (startupError) {
+      try {
+        await closeResources();
+      } catch (cleanupError) {
+        if (startupError instanceof Error) {
+          Object.assign(startupError, { cleanupError });
+        }
+      }
 
-      server = null;
-
-      // Preserve the startup error as the primary failure.
-      void results;
-      throw error;
+      throw startupError;
     }
   }
 
   async function start(): Promise<void> {
-    if (stopping) {
-      throw new Error("GIT_SERVICE_SHUTTING_DOWN");
-    }
-
+    if (stopping) throw new Error("GIT_SERVICE_SHUTTING_DOWN");
     if (started) return;
     if (startPromise) return startPromise;
 
@@ -133,26 +205,17 @@ export function createGitServiceRuntime({
 
   async function stopInternal(): Promise<void> {
     if (startPromise) {
-      await startPromise.catch(() => undefined);
+      await withTimeout(
+        startPromise.catch(() => undefined),
+        shutdownTimeoutMs,
+        "GIT_SERVICE_STARTUP_SHUTDOWN_TIMEOUT",
+      ).catch((error: unknown) => {
+        // Continue cleanup even if startup does not settle in time.
+        return error;
+      });
     }
 
-    const results = await Promise.allSettled([
-      closeServer(server),
-      consumer.close(),
-      publisher.close(),
-    ]);
-
-    server = null;
-    started = false;
-
-    const failure = results.find(
-      (result): result is PromiseRejectedResult =>
-        result.status === "rejected",
-    );
-
-    if (failure) {
-      throw failure.reason;
-    }
+    await closeResources();
   }
 
   function stop(): Promise<void> {

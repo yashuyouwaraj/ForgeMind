@@ -265,64 +265,52 @@ export class KafkaRepositoryEventConsumer
     }
   }
 
-  private async deadLetter(
-    topic: string,
-    partition: number,
-    message: EachMessagePayload["message"],
-    failureCode: string,
-  ): Promise<void> {
-    const headers: Record<string, string | string[] | null> = {};
+private async deadLetter(
+  topic: string,
+  partition: number,
+  message: EachMessagePayload["message"],
+  failureCode: string,
+): Promise<void> {
+  const deadLetteredAt = new Date().toISOString();
 
-    for (const [name, value] of Object.entries(message.headers ?? {})) {
-      if (value === undefined) {
-        headers[name] = null;
-      } else if (Array.isArray(value)) {
-        headers[name] = value.map((item) =>
-          Buffer.isBuffer(item) ? item.toString("utf8") : item,
-        );
-      } else {
-        headers[name] = Buffer.isBuffer(value)
-          ? value.toString("utf8")
-          : value;
-      }
-    }
+  // Do not copy the original payload, message key, or arbitrary headers.
+  // They may contain credentials, repository URLs, or untrusted data.
+  const deadLetterRecord = {
+    sourceTopic: topic,
+    sourcePartition: partition,
+    sourceOffset: message.offset,
+    failureCode,
+    deadLetteredAt,
+  };
 
-    await this.producer.send({
-      topic: this.deadLetterTopic,
-      acks: -1,
-      messages: [
-        {
-          key: message.key?.toString() ?? null,
-          value: JSON.stringify({
-            sourceTopic: topic,
-            sourcePartition: partition,
-            sourceOffset: message.offset,
-            originalKey: message.key?.toString() ?? null,
-            originalValue: message.value?.toString("utf8") ?? null,
-            originalHeaders: headers,
-            failureCode,
-            deadLetteredAt: new Date().toISOString(),
-          }),
-          headers: {
-            failureCode,
-            sourceTopic: topic,
-            sourcePartition: String(partition),
-            sourceOffset: message.offset,
-          },
-        },
-      ],
-    });
-
-    logger.error(
+  // Keep the original message uncommitted if publication fails.
+  // The caller must commit the source offset only after this succeeds.
+  await this.producer.send({
+    topic: this.deadLetterTopic,
+    acks: -1,
+    messages: [
       {
-        failureCode,
-        sourceTopic: topic,
-        sourcePartition: partition,
-        sourceOffset: message.offset,
+        value: JSON.stringify(deadLetterRecord),
+        headers: {
+          failureCode,
+          sourceTopic: topic,
+          sourcePartition: String(partition),
+          sourceOffset: message.offset,
+        },
       },
-      "Repository event moved to dead-letter topic",
-    );
-  }
+    ],
+  });
+
+  logger.error(
+    {
+      failureCode,
+      sourceTopic: topic,
+      sourcePartition: partition,
+      sourceOffset: message.offset,
+    },
+    "Repository event moved to dead-letter topic",
+  );
+}
 
   private async commitOffset(
     topic: string,

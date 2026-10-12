@@ -259,4 +259,66 @@ describe("KafkaRepositoryEventConsumer", () => {
     expect(mocks.consumer.disconnect).toHaveBeenCalledTimes(1);
     expect(mocks.producer.disconnect).toHaveBeenCalledTimes(1);
   });
+
+  it("does not copy sensitive payload data into dead-letter records", async () => {
+    const sensitiveUrl =
+      "https://user:secret-token@github.com/example/private.git";
+
+    const sensitiveEvent = {
+      ...importedEvent,
+      data: {
+        ...importedEvent.data,
+        url: sensitiveUrl,
+      },
+    };
+
+    // An unknown event type is dead-lettered without invoking the handler.
+    await createStartedConsumer(vi.fn().mockResolvedValue(undefined));
+
+    const eachMessage = await getEachMessage();
+
+    await eachMessage(
+      createMessage(
+        JSON.stringify({
+          ...sensitiveEvent,
+          eventType: "UnexpectedEvent",
+        }),
+      ),
+    );
+
+    const sendCall = mocks.producer.send.mock.calls[0]?.[0];
+
+    expect(sendCall).toBeDefined();
+
+    const messages = sendCall?.messages;
+    expect(messages).toHaveLength(1);
+
+    const deadLetterValue = messages?.[0]?.value;
+
+    expect(typeof deadLetterValue).toBe("string");
+
+    const deadLetterRecord = JSON.parse(
+      deadLetterValue as string,
+    ) as Record<string, unknown>;
+
+    expect(JSON.stringify(deadLetterRecord)).not.toContain(
+      "secret-token",
+    );
+    expect(JSON.stringify(deadLetterRecord)).not.toContain(
+      sensitiveUrl,
+    );
+
+    expect(deadLetterRecord).not.toHaveProperty("originalValue");
+    expect(deadLetterRecord).not.toHaveProperty("originalHeaders");
+    expect(deadLetterRecord).not.toHaveProperty("originalKey");
+
+    expect(deadLetterRecord).toMatchObject({
+      sourceTopic: "repository.events",
+      sourcePartition: 0,
+      sourceOffset: "10",
+      failureCode: "UNSUPPORTED_REPOSITORY_EVENT_TYPE",
+    });
+
+    expect(mocks.consumer.commitOffsets).toHaveBeenCalledOnce();
+  });
 });

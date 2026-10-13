@@ -1,4 +1,3 @@
-
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { RepositoryImportedEvent } from "@forgemind/shared-events";
 import {
@@ -265,5 +264,50 @@ describe("createRepositoryImportedHandler", () => {
 
     expect(gitOperations.cloneRepository).not.toHaveBeenCalled();
     expect(publisher.publish).not.toHaveBeenCalled();
+  });
+
+  it("does not publish RepositorySynchronized when synchronization fails", async () => {
+    const { gitOperations, publisher, sleep } = createDependencies();
+
+    vi.mocked(gitOperations.cloneRepository).mockRejectedValue(
+      new Error("REPOSITORY_WORKSPACE_ALREADY_EXISTS"),
+    );
+
+    vi.mocked(gitOperations.synchronizeRepository).mockRejectedValue(
+      new Error("FETCH_FAILED"),
+    );
+
+    const handler = createRepositoryImportedHandler({
+      gitOperations,
+      publisher,
+      retry: {
+        maxAttempts: 2,
+        initialDelayMs: 10,
+        maxDelayMs: 20,
+        sleep,
+      },
+    });
+
+    await handler(importedEvent);
+
+    expect(gitOperations.cloneRepository).toHaveBeenCalledTimes(2);
+    expect(gitOperations.synchronizeRepository).toHaveBeenCalledTimes(2);
+
+    expect(publisher.publish).toHaveBeenCalledTimes(1);
+    expect(publisher.publish).toHaveBeenCalledWith(
+      expect.objectContaining({
+        eventType: "RepositorySyncFailed",
+        data: expect.objectContaining({
+          failureCode: "FETCH_FAILED",
+          retryable: true,
+        }),
+      }),
+    );
+
+    expect(publisher.publish).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        eventType: "RepositorySynchronized",
+      }),
+    );
   });
 });

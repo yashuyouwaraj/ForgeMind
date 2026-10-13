@@ -195,4 +195,19 @@ describe("GitOperations", () => {
     ).toHaveLength(1);
     expect(cloneCount).toBe(1);
   });
+
+  it("does not pull when fetching the remote fails", async () => {
+    await mkdir(path.join(workspaceRoot, repositoryId));
+
+    gitMocks.fetch.mockRejectedValue(new Error("FETCH_FAILED"));
+
+    const operations = new GitOperations({ workspaceRoot });
+
+    await expect(
+      operations.synchronizeRepository(repositoryId, remoteUrl),
+    ).rejects.toThrow("FETCH_FAILED");
+
+    expect(gitMocks.fetch).toHaveBeenCalledWith("origin");
+    expect(gitMocks.pull).not.toHaveBeenCalled();
+  });
 });

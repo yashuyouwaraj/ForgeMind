@@ -210,4 +210,20 @@ describe("GitOperations", () => {
     expect(gitMocks.fetch).toHaveBeenCalledWith("origin");
     expect(gitMocks.pull).not.toHaveBeenCalled();
   });
+
+  it("does not report success when a fast-forward pull fails", async () => {
+    await mkdir(path.join(workspaceRoot, repositoryId));
+
+    gitMocks.pull.mockRejectedValue(new Error("PULL_FAILED"));
+
+    const operations = new GitOperations({ workspaceRoot });
+
+    await expect(
+      operations.synchronizeRepository(repositoryId, remoteUrl),
+    ).rejects.toThrow("PULL_FAILED");
+
+    expect(gitMocks.fetch).toHaveBeenCalledWith("origin");
+    expect(gitMocks.pull).toHaveBeenCalledWith("origin", "main", ["--ff-only"]);
+    expect(gitMocks.revparse).not.toHaveBeenCalledWith(["HEAD"]);
+  });
 });

@@ -6,15 +6,39 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 
 const execFileAsync = promisify(execFile);
+let isolatedGitConfigPath: string | undefined;
 
 async function runGit(cwd: string, args: string[]): Promise<string> {
-  const { stdout } = await execFileAsync("git", args, {
-    cwd,
-    windowsHide: true,
-    maxBuffer: 1024 * 1024,
-  });
+  try {
+    const { stdout } = await execFileAsync("git", args, {
+      cwd,
+      windowsHide: true,
+      maxBuffer: 1024 * 1024,
+      env: {
+        ...process.env,
+        GIT_CONFIG_NOSYSTEM: "1",
+        GIT_CONFIG_GLOBAL: isolatedGitConfigPath,
+        GIT_TERMINAL_PROMPT: "0",
+      },
+    });
 
-  return stdout.trim();
+    return stdout.trim();
+  } catch (error) {
+    const gitError = error as Error & {
+      stdout?: string;
+      stderr?: string;
+    };
+
+    const details = [
+      `Git command failed: git ${args.join(" ")}`,
+      `Working directory: ${cwd}`,
+      gitError.message,
+      gitError.stdout?.trim(),
+      gitError.stderr?.trim(),
+    ].filter(Boolean);
+
+    throw new Error(details.join("\n"), { cause: error });
+  }
 }
 
 async function configureGitIdentity(cwd: string): Promise<void> {
@@ -27,14 +51,21 @@ describe("Git fast-forward integration", () => {
   let root: string | undefined;
 
   afterEach(async () => {
-    if (root) {
-      await rm(root, { recursive: true, force: true });
+    try {
+      if (root) {
+        await rm(root, { recursive: true, force: true });
+      }
+    } finally {
       root = undefined;
+      isolatedGitConfigPath = undefined;
     }
   });
 
   it("preserves divergent local history and recovers after merging", async () => {
     root = await mkdtemp(path.join(tmpdir(), "forgemind-git-integration-"));
+
+    isolatedGitConfigPath = path.join(root, "empty.gitconfig");
+    await writeFile(isolatedGitConfigPath, "");
 
     const remotePath = path.join(root, "remote.git");
     const seedPath = path.join(root, "seed");

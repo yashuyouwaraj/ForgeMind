@@ -166,6 +166,54 @@ describe("GitOperations", () => {
     expect(gitMocks.clone).toHaveBeenCalledTimes(2);
   });
 
+  it("continues queued operations after an earlier clone fails", async () => {
+    const started: string[] = [];
+    let releaseFirst!: () => void;
+
+    const firstCloneGate = new Promise<void>((resolve) => {
+      releaseFirst = resolve;
+    });
+
+    gitMocks.clone.mockImplementation(
+      async (_url: string, destination: string) => {
+        const repositoryName = path.basename(destination).split(".staging-")[0];
+
+        started.push(repositoryName);
+
+        if (repositoryName === "repo-first") {
+          await firstCloneGate;
+          throw new Error("FIRST_CLONE_FAILED");
+        }
+
+        await mkdir(destination, { recursive: true });
+      },
+    );
+
+    const operations = new GitOperations({
+      workspaceRoot,
+      maxConcurrentOperations: 1,
+    });
+
+    const first = operations.cloneRepository("repo-first", remoteUrl);
+    const second = operations.cloneRepository("repo-second", remoteUrl);
+    const third = operations.cloneRepository("repo-third", remoteUrl);
+
+    // Allow the first clone to enter its mocked operation.
+    await vi.waitFor(() => {
+      expect(started).toEqual(["repo-first"]);
+    });
+
+    releaseFirst();
+
+    const results = await Promise.allSettled([first, second, third]);
+
+    expect(results[0]?.status).toBe("rejected");
+    expect(results[1]?.status).toBe("fulfilled");
+    expect(results[2]?.status).toBe("fulfilled");
+
+    expect(started).toEqual(["repo-first", "repo-second", "repo-third"]);
+  });
+
   it("serializes simultaneous clone requests for the same repository", async () => {
     let cloneCount = 0;
 

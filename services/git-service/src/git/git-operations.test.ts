@@ -274,4 +274,126 @@ describe("GitOperations", () => {
     expect(gitMocks.pull).toHaveBeenCalledWith("origin", "main", ["--ff-only"]);
     expect(gitMocks.revparse).not.toHaveBeenCalledWith(["HEAD"]);
   });
+
+  it("recovers on a subsequent synchronization after fetch fails", async () => {
+    await mkdir(path.join(workspaceRoot, repositoryId));
+    gitMocks.fetch.mockRejectedValueOnce(new Error("FETCH_FAILED"));
+
+    const operations = new GitOperations({ workspaceRoot });
+
+    await expect(
+      operations.synchronizeRepository(repositoryId, remoteUrl),
+    ).rejects.toThrow("FETCH_FAILED");
+
+    await expect(
+      operations.synchronizeRepository(repositoryId, remoteUrl),
+    ).resolves.toMatchObject({
+      repositoryId,
+      branch: "main",
+      headCommit: "a".repeat(40),
+    });
+
+    expect(gitMocks.fetch).toHaveBeenCalledTimes(2);
+    expect(gitMocks.pull).toHaveBeenCalledTimes(1);
+  });
+
+  it("recovers on a subsequent synchronization after pull fails", async () => {
+    await mkdir(path.join(workspaceRoot, repositoryId));
+    gitMocks.pull.mockRejectedValueOnce(new Error("PULL_FAILED"));
+
+    const operations = new GitOperations({ workspaceRoot });
+
+    await expect(
+      operations.synchronizeRepository(repositoryId, remoteUrl),
+    ).rejects.toThrow("PULL_FAILED");
+
+    await expect(
+      operations.synchronizeRepository(repositoryId, remoteUrl),
+    ).resolves.toMatchObject({
+      repositoryId,
+      branch: "main",
+      headCommit: "a".repeat(40),
+    });
+
+    expect(gitMocks.fetch).toHaveBeenCalledTimes(2);
+    expect(gitMocks.pull).toHaveBeenCalledTimes(2);
+  });
+
+  it("allows a queued synchronization after an earlier fetch fails", async () => {
+    await mkdir(path.join(workspaceRoot, repositoryId));
+
+    let fetchAttempts = 0;
+    let releaseFirstFetch!: () => void;
+
+    const firstFetchGate = new Promise<void>((resolve) => {
+      releaseFirstFetch = resolve;
+    });
+
+    gitMocks.fetch.mockImplementation(async () => {
+      fetchAttempts += 1;
+
+      if (fetchAttempts === 1) {
+        await firstFetchGate;
+        throw new Error("FETCH_FAILED");
+      }
+    });
+
+    const operations = new GitOperations({ workspaceRoot });
+
+    const first = operations.synchronizeRepository(repositoryId, remoteUrl);
+
+    await vi.waitFor(() => {
+      expect(fetchAttempts).toBe(1);
+    });
+
+    const second = operations.synchronizeRepository(repositoryId, remoteUrl);
+
+    releaseFirstFetch();
+
+    const results = await Promise.allSettled([first, second]);
+
+    expect(results[0]?.status).toBe("rejected");
+    expect(results[1]?.status).toBe("fulfilled");
+    expect(fetchAttempts).toBe(2);
+    expect(gitMocks.pull).toHaveBeenCalledTimes(1);
+  });
+
+  it("allows a queued synchronization after an earlier pull fails", async () => {
+    await mkdir(path.join(workspaceRoot, repositoryId));
+
+    let pullAttempts = 0;
+    let releaseFirstPull!: () => void;
+
+    const firstPullGate = new Promise<void>((resolve) => {
+      releaseFirstPull = resolve;
+    });
+
+    gitMocks.pull.mockImplementation(async () => {
+      pullAttempts += 1;
+
+      if (pullAttempts === 1) {
+        await firstPullGate;
+        throw new Error("PULL_FAILED");
+      }
+    });
+
+    const operations = new GitOperations({ workspaceRoot });
+
+    const first = operations.synchronizeRepository(repositoryId, remoteUrl);
+
+    await vi.waitFor(() => {
+      expect(pullAttempts).toBe(1);
+    });
+
+    const second = operations.synchronizeRepository(repositoryId, remoteUrl);
+
+    releaseFirstPull();
+
+    const results = await Promise.allSettled([first, second]);
+
+    expect(results[0]?.status).toBe("rejected");
+    expect(results[1]?.status).toBe("fulfilled");
+    expect(pullAttempts).toBe(2);
+    expect(gitMocks.fetch).toHaveBeenCalledTimes(2);
+  });
 });

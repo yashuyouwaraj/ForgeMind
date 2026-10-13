@@ -1,4 +1,3 @@
-
 import type { Server } from "node:http";
 
 export interface RuntimeConsumer {
@@ -94,9 +93,7 @@ function closeServer(server: Server | null): Promise<void> {
   });
 }
 
-function collectFailures(
-  results: PromiseSettledResult<unknown>[],
-): unknown[] {
+function collectFailures(results: PromiseSettledResult<unknown>[]): unknown[] {
   return results.flatMap((result) =>
     result.status === "rejected" ? [result.reason] : [],
   );
@@ -119,8 +116,9 @@ export function createGitServiceRuntime({
 
   let startPromise: Promise<void> | null = null;
   let stopPromise: Promise<void> | null = null;
+  let cleanupPromise: Promise<void> | null = null;
 
-  async function closeResources(): Promise<void> {
+  async function closeResourcesInternal(): Promise<void> {
     const currentServer = server;
 
     const serverClose = withTimeout(
@@ -128,7 +126,6 @@ export function createGitServiceRuntime({
       shutdownTimeoutMs,
       "HTTP_SERVER_SHUTDOWN_TIMEOUT",
       () => {
-        // Force-close active HTTP connections after graceful close times out.
         currentServer?.closeAllConnections?.();
       },
     );
@@ -153,11 +150,15 @@ export function createGitServiceRuntime({
     const failures = collectFailures(results);
 
     if (failures.length > 0) {
-      throw new AggregateError(
-        failures,
-        "GIT_SERVICE_CLEANUP_FAILED",
-      );
+      throw new AggregateError(failures, "GIT_SERVICE_CLEANUP_FAILED");
     }
+  }
+
+  function closeResources(): Promise<void> {
+    if (cleanupPromise) return cleanupPromise;
+
+    cleanupPromise = closeResourcesInternal();
+    return cleanupPromise;
   }
 
   async function startInternal(): Promise<void> {
@@ -204,18 +205,51 @@ export function createGitServiceRuntime({
   }
 
   async function stopInternal(): Promise<void> {
+    let startupTimeout: unknown;
+
     if (startPromise) {
-      await withTimeout(
-        startPromise.catch(() => undefined),
-        shutdownTimeoutMs,
-        "GIT_SERVICE_STARTUP_SHUTDOWN_TIMEOUT",
-      ).catch((error: unknown) => {
-        // Continue cleanup even if startup does not settle in time.
-        return error;
-      });
+      try {
+        await withTimeout(
+          startPromise.catch(() => undefined),
+          shutdownTimeoutMs,
+          "GIT_SERVICE_STARTUP_SHUTDOWN_TIMEOUT",
+        );
+      } catch (error) {
+        startupTimeout = error;
+      }
     }
 
-    await closeResources();
+    let cleanupFailure: unknown;
+
+    try {
+      await closeResources();
+    } catch (error) {
+      cleanupFailure = error;
+    }
+
+    // Preserve the established cleanup error contract when cleanup alone fails.
+    if (startupTimeout === undefined) {
+      if (cleanupFailure !== undefined) {
+        throw cleanupFailure;
+      }
+
+      return;
+    }
+
+    // When both startup waiting and cleanup fail, retain both failures.
+    if (cleanupFailure !== undefined) {
+      const cleanupErrors =
+        cleanupFailure instanceof AggregateError
+          ? [...cleanupFailure.errors]
+          : [cleanupFailure];
+
+      throw new AggregateError(
+        [startupTimeout, ...cleanupErrors],
+        "GIT_SERVICE_SHUTDOWN_FAILED",
+      );
+    }
+
+    throw startupTimeout;
   }
 
   function stop(): Promise<void> {

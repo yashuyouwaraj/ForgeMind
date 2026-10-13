@@ -195,4 +195,40 @@ describe("Git Service runtime", () => {
 
     expect(harness.publisher.close).toHaveBeenCalledOnce();
   });
+
+  it("reports a startup timeout during shutdown and avoids duplicate cleanup", async () => {
+    const harness = createHarness(10);
+
+    let resolveConsumerStart!: () => void;
+
+    harness.consumer.start.mockImplementation(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveConsumerStart = resolve;
+        }),
+    );
+
+    const startPromise = harness.runtime
+      .start()
+      .catch((error: unknown) => error);
+
+    // Allow startup to enter the pending consumer.start() call.
+    await Promise.resolve();
+
+    await expect(harness.runtime.stop()).rejects.toThrow(
+      "GIT_SERVICE_STARTUP_SHUTDOWN_TIMEOUT",
+    );
+
+    expect(harness.consumer.close).toHaveBeenCalledOnce();
+    expect(harness.publisher.close).toHaveBeenCalledOnce();
+
+    // Let startup finish after shutdown has already timed out.
+    resolveConsumerStart();
+
+    await expect(startPromise).resolves.toBeInstanceOf(Error);
+
+    // Startup cleanup must not close the same resources a second time.
+    expect(harness.consumer.close).toHaveBeenCalledOnce();
+    expect(harness.publisher.close).toHaveBeenCalledOnce();
+  });
 });

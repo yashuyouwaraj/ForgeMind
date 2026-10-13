@@ -396,4 +396,44 @@ describe("GitOperations", () => {
     expect(pullAttempts).toBe(2);
     expect(gitMocks.fetch).toHaveBeenCalledTimes(2);
   });
+
+  it("rejects a non-positive clone timeout", () => {
+    expect(
+      () => new GitOperations({ workspaceRoot, cloneTimeoutMs: 0 }),
+    ).toThrow("INVALID_GIT_OPERATION_TIMEOUT");
+  });
+
+  it("rejects a non-positive command timeout", () => {
+    expect(
+      () => new GitOperations({ workspaceRoot, commandTimeoutMs: 0 }),
+    ).toThrow("INVALID_GIT_OPERATION_TIMEOUT");
+  });
+
+  it("rejects a non-positive concurrency limit", () => {
+    expect(
+      () => new GitOperations({ workspaceRoot, maxConcurrentOperations: 0 }),
+    ).toThrow("INVALID_MAX_CONCURRENT_OPERATIONS");
+  });
+
+  it("rejects synchronization when the workspace does not exist", async () => {
+    const operations = new GitOperations({ workspaceRoot });
+
+    await expect(
+      operations.synchronizeRepository(repositoryId, remoteUrl),
+    ).rejects.toThrow("REPOSITORY_WORKSPACE_NOT_FOUND");
+
+    expect(gitMocks.remote).not.toHaveBeenCalled();
+    expect(gitMocks.fetch).not.toHaveBeenCalled();
+    expect(gitMocks.pull).not.toHaveBeenCalled();
+  });
+
+  it("rejects an invalid repository ID before invoking Git", async () => {
+    const operations = new GitOperations({ workspaceRoot });
+
+    await expect(
+      operations.cloneRepository("../invalid", remoteUrl),
+    ).rejects.toThrow("INVALID_REPOSITORY_ID");
+
+    expect(gitMocks.clone).not.toHaveBeenCalled();
+  });
 });

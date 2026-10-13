@@ -221,6 +221,7 @@ describe("Git Service runtime", () => {
 
     expect(harness.consumer.close).toHaveBeenCalledOnce();
     expect(harness.publisher.close).toHaveBeenCalledOnce();
+    expect(harness.listen).not.toHaveBeenCalled();
 
     // Let startup finish after shutdown has already timed out.
     resolveConsumerStart();

@@ -436,4 +436,105 @@ describe("GitOperations", () => {
 
     expect(gitMocks.clone).not.toHaveBeenCalled();
   });
+
+  it("passes the configured timeout to clone operations", async () => {
+    const operations = new GitOperations({
+      workspaceRoot,
+      cloneTimeoutMs: 5_000,
+    });
+
+    await operations.cloneRepository(repositoryId, remoteUrl);
+
+    const { simpleGit } = await import("simple-git");
+
+    expect(simpleGit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        timeout: { block: 5_000 },
+        maxConcurrentProcesses: 1,
+      }),
+    );
+  });
+
+  it("passes the configured command timeout to synchronization", async () => {
+    await mkdir(path.join(workspaceRoot, repositoryId));
+
+    const operations = new GitOperations({
+      workspaceRoot,
+      commandTimeoutMs: 7_000,
+    });
+
+    await operations.synchronizeRepository(repositoryId, remoteUrl);
+
+    const { simpleGit } = await import("simple-git");
+
+    expect(simpleGit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        baseDir: path.join(workspaceRoot, repositoryId),
+        timeout: { block: 7_000 },
+        maxConcurrentProcesses: 1,
+      }),
+    );
+  });
+
+  it("preserves other workspaces when a clone fails", async () => {
+    await mkdir(path.join(workspaceRoot, "repo-existing"));
+    gitMocks.clone.mockRejectedValueOnce(new Error("CLONE_TIMEOUT"));
+
+    const operations = new GitOperations({ workspaceRoot });
+
+    await expect(
+      operations.cloneRepository(repositoryId, remoteUrl),
+    ).rejects.toThrow("CLONE_TIMEOUT");
+
+    expect(await readdir(workspaceRoot)).toEqual(["repo-existing"]);
+  });
+
+  it("allows a clone retry after an earlier clone fails", async () => {
+    gitMocks.clone.mockRejectedValueOnce(new Error("CLONE_TIMEOUT"));
+
+    const operations = new GitOperations({
+      workspaceRoot,
+      maxConcurrentOperations: 1,
+    });
+
+    await expect(
+      operations.cloneRepository(repositoryId, remoteUrl),
+    ).rejects.toThrow("CLONE_TIMEOUT");
+
+    await expect(
+      operations.cloneRepository(repositoryId, remoteUrl),
+    ).resolves.toMatchObject({
+      repositoryId,
+      branch: "main",
+      headCommit: "a".repeat(40),
+    });
+
+    expect(gitMocks.clone).toHaveBeenCalledTimes(2);
+    expect(await readdir(workspaceRoot)).toEqual([repositoryId]);
+  });
+
+  it("releases the concurrency slot after synchronization fails", async () => {
+    await mkdir(path.join(workspaceRoot, repositoryId));
+    await mkdir(path.join(workspaceRoot, "repo-second"));
+
+    gitMocks.fetch.mockRejectedValueOnce(new Error("FETCH_TIMEOUT"));
+
+    const operations = new GitOperations({
+      workspaceRoot,
+      maxConcurrentOperations: 1,
+    });
+
+    await expect(
+      operations.synchronizeRepository(repositoryId, remoteUrl),
+    ).rejects.toThrow("FETCH_TIMEOUT");
+
+    await expect(
+      operations.synchronizeRepository("repo-second", remoteUrl),
+    ).resolves.toMatchObject({
+      repositoryId: "repo-second",
+      branch: "main",
+    });
+
+    expect(gitMocks.fetch).toHaveBeenCalledTimes(2);
+  });
 });

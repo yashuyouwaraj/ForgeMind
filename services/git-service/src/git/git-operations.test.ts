@@ -537,4 +537,99 @@ describe("GitOperations", () => {
 
     expect(gitMocks.fetch).toHaveBeenCalledTimes(2);
   });
+
+  it("shares one operation deadline across cloning and result collection", async () => {
+    const operations = new GitOperations({
+      workspaceRoot,
+      operationTimeoutMs: 5_000,
+    });
+
+    await operations.cloneRepository(repositoryId, remoteUrl);
+
+    const { simpleGit } = await import("simple-git");
+    const calls = vi.mocked(simpleGit).mock.calls;
+
+    expect(calls).toHaveLength(2);
+
+    const cloneOptions = calls[0]?.[0];
+    const resultOptions = calls[1]?.[0];
+
+    expect(cloneOptions).toEqual(
+      expect.objectContaining({
+        abort: expect.any(AbortSignal),
+      }),
+    );
+
+    expect(resultOptions?.abort).toBe(cloneOptions?.abort);
+  });
+
+  it("rejects a non-finite operation timeout", () => {
+    expect(
+      () =>
+        new GitOperations({
+          workspaceRoot,
+          operationTimeoutMs: Number.POSITIVE_INFINITY,
+        }),
+    ).toThrow("INVALID_GIT_OPERATION_TIMEOUT");
+  });
+
+  it("normalizes an aborted Git operation to GIT_OPERATION_TIMEOUT", async () => {
+    const operations = new GitOperations({
+      workspaceRoot,
+      operationTimeoutMs: 1,
+    });
+
+    gitMocks.clone.mockImplementation(
+      () =>
+        new Promise((_resolve, reject) => {
+          setTimeout(() => reject(new Error("Abort signal received")), 10);
+        }),
+    );
+
+    await expect(
+      operations.cloneRepository(
+        "timeout-repository",
+        "https://github.com/example/repository.git",
+      ),
+    ).rejects.toThrow("GIT_OPERATION_TIMEOUT");
+  });
+
+  it("preserves ordinary clone errors when the deadline has not expired", async () => {
+    const failure = new Error("Git network failure");
+
+    gitMocks.clone.mockRejectedValueOnce(failure);
+
+    const operations = new GitOperations({
+      workspaceRoot,
+      operationTimeoutMs: 5_000,
+    });
+
+    await expect(
+      operations.cloneRepository(
+        "ordinary-failure",
+        "https://github.com/example/repository.git",
+      ),
+    ).rejects.toBe(failure);
+  });
+
+  it("rejects a clone that completes after its deadline", async () => {
+    gitMocks.clone.mockImplementationOnce(
+      () =>
+        new Promise<void>((resolve) => {
+          setTimeout(resolve, 25);
+        }),
+    );
+
+    const operations = new GitOperations({
+      workspaceRoot,
+      operationTimeoutMs: 1,
+    });
+
+    await expect(
+      operations.cloneRepository(
+        "late-clone",
+        "https://github.com/example/repository.git",
+      ),
+    ).rejects.toThrow("GIT_OPERATION_TIMEOUT");
+  });
 });

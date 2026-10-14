@@ -1,12 +1,17 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { afterEach, describe, expect, it } from "vitest";
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm, writeFile, readdir } from "node:fs/promises";
+import { pathToFileURL } from "node:url";
+import { GitOperations } from "./git-operations.js";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
 const execFileAsync = promisify(execFile);
 let isolatedGitConfigPath: string | undefined;
+const originalGitConfigGlobal = process.env.GIT_CONFIG_GLOBAL;
+const originalGitConfigNosystem = process.env.GIT_CONFIG_NOSYSTEM;
+const originalGitTerminalPrompt = process.env.GIT_TERMINAL_PROMPT;
 
 async function runGit(cwd: string, args: string[]): Promise<string> {
   try {
@@ -58,6 +63,24 @@ describe("Git fast-forward integration", () => {
     } finally {
       root = undefined;
       isolatedGitConfigPath = undefined;
+
+      if (originalGitConfigGlobal === undefined) {
+        delete process.env.GIT_CONFIG_GLOBAL;
+      } else {
+        process.env.GIT_CONFIG_GLOBAL = originalGitConfigGlobal;
+      }
+
+      if (originalGitConfigNosystem === undefined) {
+        delete process.env.GIT_CONFIG_NOSYSTEM;
+      } else {
+        process.env.GIT_CONFIG_NOSYSTEM = originalGitConfigNosystem;
+      }
+
+      if (originalGitTerminalPrompt === undefined) {
+        delete process.env.GIT_TERMINAL_PROMPT;
+      } else {
+        process.env.GIT_TERMINAL_PROMPT = originalGitTerminalPrompt;
+      }
     }
   });
 
@@ -154,5 +177,102 @@ describe("Git fast-forward integration", () => {
     ).toBe("remote work\n");
 
     expect(await runGit(workspacePath, ["status", "--porcelain"])).toBe("");
+  });
+
+  it("times out a real clone, cleans up, and permits a retry", async () => {
+    root = await mkdtemp(path.join(tmpdir(), "forgemind-git-timeout-"));
+
+    isolatedGitConfigPath = path.join(root, "empty.gitconfig");
+    process.env.GIT_CONFIG_GLOBAL = isolatedGitConfigPath;
+    process.env.GIT_CONFIG_NOSYSTEM = "1";
+    process.env.GIT_TERMINAL_PROMPT = "0";
+
+    await writeFile(isolatedGitConfigPath, "");
+
+    const remotePath = path.join(root, "remote.git");
+    const seedPath = path.join(root, "seed");
+    const workspaceRoot = path.join(root, "workspaces");
+    const repositoryId = "timeout-repository";
+    const remoteUrl = "https://github.com/example/repository.git";
+
+    await runGit(root, ["init", "--bare", "--initial-branch=main", remotePath]);
+    await runGit(root, ["init", "--initial-branch=main", seedPath]);
+    await configureGitIdentity(seedPath);
+
+    await writeFile(
+      path.join(seedPath, ".gitattributes"),
+      "slow.txt filter=slow\n",
+    );
+    await writeFile(path.join(seedPath, "slow.txt"), "test content\n");
+
+    await runGit(seedPath, ["add", ".gitattributes", "slow.txt"]);
+    await runGit(seedPath, ["commit", "-m", "Add slow-filter fixture"]);
+    await runGit(seedPath, ["remote", "add", "origin", remotePath]);
+    await runGit(seedPath, ["push", "-u", "origin", "main"]);
+
+    // Keep the production URL validation unchanged. Git rewrites this
+    // approved test URL to the local bare repository in this isolated config.
+    const slowFilterPath = path.join(root, "slow-filter.cjs");
+
+    await writeFile(
+      slowFilterPath,
+      [
+        "const chunks = [];",
+        'process.stdin.on("data", chunk => chunks.push(chunk));',
+        'process.stdin.on("end", () => {',
+        "  setTimeout(() => {",
+        "    process.stdout.write(Buffer.concat(chunks));",
+        "  }, 1500);",
+        "});",
+        "",
+      ].join("\n"),
+    );
+
+    await writeFile(
+      isolatedGitConfigPath,
+      [
+        `[url "${pathToFileURL(remotePath).href}"]`,
+        `    insteadOf = ${remoteUrl}`,
+        "",
+        '[filter "slow"]',
+        `    smudge = node '${slowFilterPath.replace(/\\/g, "/")}'`,
+        "    required = true",
+        "",
+      ].join("\n"),
+    );
+
+    const timedOperations = new GitOperations({
+      workspaceRoot,
+      operationTimeoutMs: 300,
+      cloneTimeoutMs: 5_000,
+      maxConcurrentOperations: 1,
+    });
+
+    await expect(
+      timedOperations.cloneRepository(repositoryId, remoteUrl),
+    ).rejects.toThrow("GIT_OPERATION_TIMEOUT");
+
+    // A failed clone must not leave a published or staging workspace.
+    expect(await readdir(workspaceRoot)).toEqual([]);
+
+    // Retry with enough time for the real Git filter subprocess to finish.
+    const retryOperations = new GitOperations({
+      workspaceRoot,
+      operationTimeoutMs: 5_000,
+      cloneTimeoutMs: 5_000,
+      maxConcurrentOperations: 1,
+    });
+
+    await expect(
+      retryOperations.cloneRepository(repositoryId, remoteUrl),
+    ).resolves.toMatchObject({
+      repositoryId,
+      branch: "main",
+    });
+
+    const workspaces = await readdir(workspaceRoot);
+
+    expect(workspaces).toEqual([repositoryId]);
+    expect(workspaces.some((name) => name.includes(".staging-"))).toBe(false);
   });
 });

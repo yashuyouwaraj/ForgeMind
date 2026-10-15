@@ -268,7 +268,7 @@ export class GitOperations {
           await git.fetch("origin");
           assertOperationWithinDeadline(deadlineExceeded);
 
-          await git.pull("origin", branch, ["--ff-only"]);
+          await git.merge(["--ff-only", `origin/${branch}`]);
           assertOperationWithinDeadline(deadlineExceeded);
 
           const result = await this.getResult(

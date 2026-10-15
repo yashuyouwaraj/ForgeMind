@@ -9,7 +9,7 @@ const gitMocks = vi.hoisted(() => ({
   status: vi.fn(),
   revparse: vi.fn(),
   fetch: vi.fn(),
-  pull: vi.fn(),
+  merge: vi.fn(),
 }));
 
 vi.mock("simple-git", () => ({
@@ -43,7 +43,7 @@ describe("GitOperations", () => {
       args[0] === "--abbrev-ref" ? "main" : "a".repeat(40),
     );
     gitMocks.fetch.mockResolvedValue(undefined);
-    gitMocks.pull.mockResolvedValue(undefined);
+    gitMocks.merge.mockResolvedValue(undefined);
   });
 
   afterEach(async () => {
@@ -99,7 +99,7 @@ describe("GitOperations", () => {
     ).rejects.toThrow("REPOSITORY_REMOTE_MISMATCH");
 
     expect(gitMocks.fetch).not.toHaveBeenCalled();
-    expect(gitMocks.pull).not.toHaveBeenCalled();
+    expect(gitMocks.merge).not.toHaveBeenCalled();
   });
 
   it("rejects a dirty working tree before fetching or pulling", async () => {
@@ -115,7 +115,7 @@ describe("GitOperations", () => {
     ).rejects.toThrow("REPOSITORY_WORKSPACE_DIRTY");
 
     expect(gitMocks.fetch).not.toHaveBeenCalled();
-    expect(gitMocks.pull).not.toHaveBeenCalled();
+    expect(gitMocks.merge).not.toHaveBeenCalled();
   });
 
   it("rejects detached HEAD before fetching or pulling", async () => {
@@ -129,7 +129,7 @@ describe("GitOperations", () => {
     ).rejects.toThrow("REPOSITORY_DETACHED_HEAD");
 
     expect(gitMocks.fetch).not.toHaveBeenCalled();
-    expect(gitMocks.pull).not.toHaveBeenCalled();
+    expect(gitMocks.merge).not.toHaveBeenCalled();
   });
 
   it("releases its concurrency slot after a failed clone", async () => {
@@ -256,22 +256,22 @@ describe("GitOperations", () => {
     ).rejects.toThrow("FETCH_FAILED");
 
     expect(gitMocks.fetch).toHaveBeenCalledWith("origin");
-    expect(gitMocks.pull).not.toHaveBeenCalled();
+    expect(gitMocks.merge).not.toHaveBeenCalled();
   });
 
-  it("does not report success when a fast-forward pull fails", async () => {
+  it("does not report success when a fast-forward merge fails", async () => {
     await mkdir(path.join(workspaceRoot, repositoryId));
 
-    gitMocks.pull.mockRejectedValue(new Error("PULL_FAILED"));
+    gitMocks.merge.mockRejectedValue(new Error("MERGE_FAILED"));
 
     const operations = new GitOperations({ workspaceRoot });
 
     await expect(
       operations.synchronizeRepository(repositoryId, remoteUrl),
-    ).rejects.toThrow("PULL_FAILED");
+    ).rejects.toThrow("MERGE_FAILED");
 
     expect(gitMocks.fetch).toHaveBeenCalledWith("origin");
-    expect(gitMocks.pull).toHaveBeenCalledWith("origin", "main", ["--ff-only"]);
+    expect(gitMocks.merge).toHaveBeenCalledWith(["--ff-only", "origin/main"]);
     expect(gitMocks.revparse).not.toHaveBeenCalledWith(["HEAD"]);
   });
 
@@ -294,18 +294,18 @@ describe("GitOperations", () => {
     });
 
     expect(gitMocks.fetch).toHaveBeenCalledTimes(2);
-    expect(gitMocks.pull).toHaveBeenCalledTimes(1);
+    expect(gitMocks.merge).toHaveBeenCalledTimes(1);
   });
 
-  it("recovers on a subsequent synchronization after pull fails", async () => {
+  it("recovers on a subsequent synchronization after merge fails", async () => {
     await mkdir(path.join(workspaceRoot, repositoryId));
-    gitMocks.pull.mockRejectedValueOnce(new Error("PULL_FAILED"));
+    gitMocks.merge.mockRejectedValueOnce(new Error("MERGE_FAILED"));
 
     const operations = new GitOperations({ workspaceRoot });
 
     await expect(
       operations.synchronizeRepository(repositoryId, remoteUrl),
-    ).rejects.toThrow("PULL_FAILED");
+    ).rejects.toThrow("MERGE_FAILED");
 
     await expect(
       operations.synchronizeRepository(repositoryId, remoteUrl),
@@ -316,7 +316,7 @@ describe("GitOperations", () => {
     });
 
     expect(gitMocks.fetch).toHaveBeenCalledTimes(2);
-    expect(gitMocks.pull).toHaveBeenCalledTimes(2);
+    expect(gitMocks.merge).toHaveBeenCalledTimes(2);
   });
 
   it("allows a queued synchronization after an earlier fetch fails", async () => {
@@ -355,25 +355,25 @@ describe("GitOperations", () => {
     expect(results[0]?.status).toBe("rejected");
     expect(results[1]?.status).toBe("fulfilled");
     expect(fetchAttempts).toBe(2);
-    expect(gitMocks.pull).toHaveBeenCalledTimes(1);
+    expect(gitMocks.merge).toHaveBeenCalledTimes(1);
   });
 
   it("allows a queued synchronization after an earlier pull fails", async () => {
     await mkdir(path.join(workspaceRoot, repositoryId));
 
-    let pullAttempts = 0;
-    let releaseFirstPull!: () => void;
+    let mergeAttempts = 0;
+    let releaseFirstMerge!: () => void;
 
-    const firstPullGate = new Promise<void>((resolve) => {
-      releaseFirstPull = resolve;
+    const firstMergeGate = new Promise<void>((resolve) => {
+      releaseFirstMerge = resolve;
     });
 
-    gitMocks.pull.mockImplementation(async () => {
-      pullAttempts += 1;
+    gitMocks.merge.mockImplementation(async () => {
+      mergeAttempts += 1;
 
-      if (pullAttempts === 1) {
-        await firstPullGate;
-        throw new Error("PULL_FAILED");
+      if (mergeAttempts === 1) {
+        await firstMergeGate;
+        throw new Error("MERGE_FAILED");
       }
     });
 
@@ -382,18 +382,18 @@ describe("GitOperations", () => {
     const first = operations.synchronizeRepository(repositoryId, remoteUrl);
 
     await vi.waitFor(() => {
-      expect(pullAttempts).toBe(1);
+      expect(mergeAttempts).toBe(1);
     });
 
     const second = operations.synchronizeRepository(repositoryId, remoteUrl);
 
-    releaseFirstPull();
+    releaseFirstMerge();
 
     const results = await Promise.allSettled([first, second]);
 
     expect(results[0]?.status).toBe("rejected");
     expect(results[1]?.status).toBe("fulfilled");
-    expect(pullAttempts).toBe(2);
+    expect(mergeAttempts).toBe(2);
     expect(gitMocks.fetch).toHaveBeenCalledTimes(2);
   });
 
@@ -424,7 +424,7 @@ describe("GitOperations", () => {
 
     expect(gitMocks.raw).not.toHaveBeenCalled();
     expect(gitMocks.fetch).not.toHaveBeenCalled();
-    expect(gitMocks.pull).not.toHaveBeenCalled();
+    expect(gitMocks.merge).not.toHaveBeenCalled();
   });
 
   it("rejects an invalid repository ID before invoking Git", async () => {

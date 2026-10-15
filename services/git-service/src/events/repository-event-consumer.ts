@@ -1,5 +1,9 @@
-
-import { Kafka, type Consumer, type EachMessagePayload, type Producer } from "kafkajs";
+import {
+  Kafka,
+  type Consumer,
+  type EachMessagePayload,
+  type Producer,
+} from "kafkajs";
 import { logger } from "@forgemind/shared-logger";
 
 export interface RepositoryImportedHandler {
@@ -55,9 +59,7 @@ function eventType(value: unknown): string | null {
   return typeof type === "string" ? type : null;
 }
 
-export class KafkaRepositoryEventConsumer
-  implements RepositoryEventConsumer
-{
+export class KafkaRepositoryEventConsumer implements RepositoryEventConsumer {
   private readonly consumer: Consumer;
   private readonly producer: Producer;
   private readonly deadLetterTopic: string;
@@ -74,8 +76,7 @@ export class KafkaRepositoryEventConsumer
   constructor(
     private readonly handler: RepositoryImportedHandler,
     brokersValue = process.env.KAFKA_BROKERS,
-    groupId =
-      process.env.GIT_SERVICE_CONSUMER_GROUP ?? "forgemind-git-service",
+    groupId = process.env.GIT_SERVICE_CONSUMER_GROUP ?? "forgemind-git-service",
     options: KafkaConsumerOptions = {},
   ) {
     const brokers = brokersValue
@@ -94,8 +95,7 @@ export class KafkaRepositoryEventConsumer
     this.maxProcessingAttempts = options.maxProcessingAttempts ?? 3;
     this.initialRetryDelayMs = options.initialRetryDelayMs ?? 500;
     this.maxRetryDelayMs = options.maxRetryDelayMs ?? 5_000;
-    this.deadLetterTopic =
-      options.deadLetterTopic ?? "repository.events.dlq";
+    this.deadLetterTopic = options.deadLetterTopic ?? "repository.events.dlq";
     this.sleep = options.sleep ?? sleep;
 
     if (
@@ -209,10 +209,17 @@ export class KafkaRepositoryEventConsumer
 
     // Outcome events are published to the same topic. They are not inputs
     // to this consumer's Git workflow.
-    if (
-      type === "RepositorySynchronized" ||
-      type === "RepositorySyncFailed"
-    ) {
+
+    // These events belong to other workflow stages. They share the
+    // repository event stream but are not inputs to Git operations.
+    const unrelatedEventTypes = new Set([
+      "RepositorySynchronized",
+      "RepositorySyncFailed",
+      "RepositoryParseRequested",
+      "RepositoryParseFailed",
+    ]);
+
+    if (type && unrelatedEventTypes.has(type)) {
       await this.commitOffset(topic, partition, message.offset);
       return;
     }
@@ -228,11 +235,7 @@ export class KafkaRepositoryEventConsumer
       return;
     }
 
-    for (
-      let attempt = 1;
-      attempt <= this.maxProcessingAttempts;
-      attempt += 1
-    ) {
+    for (let attempt = 1; attempt <= this.maxProcessingAttempts; attempt += 1) {
       try {
         await this.handler(event);
         await this.commitOffset(topic, partition, message.offset);
@@ -265,52 +268,52 @@ export class KafkaRepositoryEventConsumer
     }
   }
 
-private async deadLetter(
-  topic: string,
-  partition: number,
-  message: EachMessagePayload["message"],
-  failureCode: string,
-): Promise<void> {
-  const deadLetteredAt = new Date().toISOString();
+  private async deadLetter(
+    topic: string,
+    partition: number,
+    message: EachMessagePayload["message"],
+    failureCode: string,
+  ): Promise<void> {
+    const deadLetteredAt = new Date().toISOString();
 
-  // Do not copy the original payload, message key, or arbitrary headers.
-  // They may contain credentials, repository URLs, or untrusted data.
-  const deadLetterRecord = {
-    sourceTopic: topic,
-    sourcePartition: partition,
-    sourceOffset: message.offset,
-    failureCode,
-    deadLetteredAt,
-  };
-
-  // Keep the original message uncommitted if publication fails.
-  // The caller must commit the source offset only after this succeeds.
-  await this.producer.send({
-    topic: this.deadLetterTopic,
-    acks: -1,
-    messages: [
-      {
-        value: JSON.stringify(deadLetterRecord),
-        headers: {
-          failureCode,
-          sourceTopic: topic,
-          sourcePartition: String(partition),
-          sourceOffset: message.offset,
-        },
-      },
-    ],
-  });
-
-  logger.error(
-    {
-      failureCode,
+    // Do not copy the original payload, message key, or arbitrary headers.
+    // They may contain credentials, repository URLs, or untrusted data.
+    const deadLetterRecord = {
       sourceTopic: topic,
       sourcePartition: partition,
       sourceOffset: message.offset,
-    },
-    "Repository event moved to dead-letter topic",
-  );
-}
+      failureCode,
+      deadLetteredAt,
+    };
+
+    // Keep the original message uncommitted if publication fails.
+    // The caller must commit the source offset only after this succeeds.
+    await this.producer.send({
+      topic: this.deadLetterTopic,
+      acks: -1,
+      messages: [
+        {
+          value: JSON.stringify(deadLetterRecord),
+          headers: {
+            failureCode,
+            sourceTopic: topic,
+            sourcePartition: String(partition),
+            sourceOffset: message.offset,
+          },
+        },
+      ],
+    });
+
+    logger.error(
+      {
+        failureCode,
+        sourceTopic: topic,
+        sourcePartition: partition,
+        sourceOffset: message.offset,
+      },
+      "Repository event moved to dead-letter topic",
+    );
+  }
 
   private async commitOffset(
     topic: string,
@@ -352,8 +355,7 @@ private async deadLetter(
     this.started = false;
 
     const failure = results.find(
-      (result): result is PromiseRejectedResult =>
-        result.status === "rejected",
+      (result): result is PromiseRejectedResult => result.status === "rejected",
     );
 
     if (failure) throw failure.reason;

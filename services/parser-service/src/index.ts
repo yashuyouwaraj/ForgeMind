@@ -1,3 +1,5 @@
 export * from "./domain/source-file.js";
 export * from "./languages/language-registry.js";
 export * from "./discovery/source-discovery.js";
+export * from "./parsing/syntax-parse-result.js";
+export * from "./parsing/tree-sitter-parser.js";

@@ -1,4 +1,3 @@
-
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { EachMessagePayload } from "kafkajs";
 import { KafkaRepositoryEventConsumer } from "./repository-event-consumer.js";
@@ -73,8 +72,7 @@ function createMessage(
 
 async function getEachMessage() {
   const runOptions = mocks.consumer.run.mock.calls[0]?.[0] as
-    | { eachMessage: (payload: EachMessagePayload) => Promise<void> }
-    | undefined;
+    { eachMessage: (payload: EachMessagePayload) => Promise<void> } | undefined;
 
   if (!runOptions) {
     throw new Error("Consumer run callback was not registered");
@@ -85,9 +83,7 @@ async function getEachMessage() {
 
 async function createStartedConsumer(
   handler: (event: unknown) => Promise<void>,
-  options: ConstructorParameters<
-    typeof KafkaRepositoryEventConsumer
-  >[3] = {},
+  options: ConstructorParameters<typeof KafkaRepositoryEventConsumer>[3] = {},
 ) {
   const consumer = new KafkaRepositoryEventConsumer(
     handler,
@@ -182,9 +178,9 @@ describe("KafkaRepositoryEventConsumer", () => {
 
     const eachMessage = await getEachMessage();
 
-    await expect(
-      eachMessage(createMessage("{invalid-json")),
-    ).rejects.toThrow("KAFKA_UNAVAILABLE");
+    await expect(eachMessage(createMessage("{invalid-json"))).rejects.toThrow(
+      "KAFKA_UNAVAILABLE",
+    );
 
     expect(mocks.consumer.commitOffsets).not.toHaveBeenCalled();
   });
@@ -228,6 +224,29 @@ describe("KafkaRepositoryEventConsumer", () => {
     expect(handler).not.toHaveBeenCalled();
     expect(mocks.consumer.commitOffsets).toHaveBeenCalledTimes(1);
   });
+
+  it.each(["RepositoryParseRequested", "RepositoryParseFailed"])(
+    "ignores %s events without dead-lettering them",
+    async (type) => {
+      const handler = vi.fn().mockResolvedValue(undefined);
+      await createStartedConsumer(handler);
+
+      const eachMessage = await getEachMessage();
+
+      await eachMessage(
+        createMessage(
+          JSON.stringify({
+            eventId: `event-${type}`,
+            eventType: type,
+          }),
+        ),
+      );
+
+      expect(handler).not.toHaveBeenCalled();
+      expect(mocks.producer.send).not.toHaveBeenCalled();
+      expect(mocks.consumer.commitOffsets).toHaveBeenCalledTimes(1);
+    },
+  );
 
   it("dead-letters unsupported event types", async () => {
     const handler = vi.fn().mockResolvedValue(undefined);
@@ -297,16 +316,13 @@ describe("KafkaRepositoryEventConsumer", () => {
 
     expect(typeof deadLetterValue).toBe("string");
 
-    const deadLetterRecord = JSON.parse(
-      deadLetterValue as string,
-    ) as Record<string, unknown>;
+    const deadLetterRecord = JSON.parse(deadLetterValue as string) as Record<
+      string,
+      unknown
+    >;
 
-    expect(JSON.stringify(deadLetterRecord)).not.toContain(
-      "secret-token",
-    );
-    expect(JSON.stringify(deadLetterRecord)).not.toContain(
-      sensitiveUrl,
-    );
+    expect(JSON.stringify(deadLetterRecord)).not.toContain("secret-token");
+    expect(JSON.stringify(deadLetterRecord)).not.toContain(sensitiveUrl);
 
     expect(deadLetterRecord).not.toHaveProperty("originalValue");
     expect(deadLetterRecord).not.toHaveProperty("originalHeaders");

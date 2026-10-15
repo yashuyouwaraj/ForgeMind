@@ -20,9 +20,7 @@ const handleRepositoryImported = createRepositoryImportedHandler({
   publisher,
 });
 
-const consumer = new KafkaRepositoryEventConsumer(
-  handleRepositoryImported,
-);
+const consumer = new KafkaRepositoryEventConsumer(handleRepositoryImported);
 
 const runtime = createGitServiceRuntime({
   listen: (requestedPort) => app.listen(requestedPort),
@@ -51,7 +49,12 @@ async function shutdown(signal: string): Promise<void> {
 process.once("SIGINT", () => void shutdown("SIGINT"));
 process.once("SIGTERM", () => void shutdown("SIGTERM"));
 
-runtime.start().catch((error: unknown) => {
-  logger.error({ err: error }, "Git Service startup failed");
-  process.exitCode = 1;
-});
+runtime
+  .start()
+  .then(() => {
+    logger.info({ port }, "Git Service HTTP server listening");
+  })
+  .catch((error: unknown) => {
+    logger.error({ err: error }, "Git Service startup failed");
+    process.exitCode = 1;
+  });

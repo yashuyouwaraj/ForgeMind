@@ -6,6 +6,7 @@
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "scripts": {
+        "predev": "pnpm --filter @forgemind/shared-config build",
         "build": "tsc -b",
         "dev": "tsx watch src/index.ts",
         "lint": "tsc --noEmit",

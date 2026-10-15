@@ -15,5 +15,9 @@
     "@types/node": "^24.13.3",
     "typescript": "^5.9.2",
     "vitest": "^5.0.1"
+  },
+  "dependencies": {
+    "tree-sitter-wasm": "^2.0.4",
+    "web-tree-sitter": "^0.27.1"
   }
 }

@@ -58,7 +58,39 @@ export type RepositorySyncFailedEvent = DomainEvent<
   RepositorySyncFailedData
 >;
 
+
+export interface RepositoryParseRequestedData {
+  readonly repositoryId: string;
+  readonly projectId: string;
+  readonly ownerId: string;
+  readonly headCommit: string;
+  readonly requestedAt: string;
+}
+
+export type RepositoryParseRequestedEvent = DomainEvent<
+  "RepositoryParseRequested",
+  RepositoryParseRequestedData
+>;
+
+export interface RepositoryParseFailedData {
+  readonly repositoryId: string;
+  readonly projectId: string;
+  readonly ownerId: string;
+  readonly headCommit: string;
+  readonly failureCode: string;
+  readonly retryable: boolean;
+}
+
+export type RepositoryParseFailedEvent = DomainEvent<
+  "RepositoryParseFailed",
+  RepositoryParseFailedData
+>;
+
+
+
 export type RepositoryEvent =
   | RepositoryImportedEvent
   | RepositorySynchronizedEvent
-  | RepositorySyncFailedEvent;
+  | RepositorySyncFailedEvent
+  | RepositoryParseRequestedEvent
+  | RepositoryParseFailedEvent;

@@ -58,7 +58,12 @@ describe("Git fast-forward integration", () => {
   afterEach(async () => {
     try {
       if (root) {
-        await rm(root, { recursive: true, force: true });
+        await rm(root, {
+          recursive: true,
+          force: true,
+          maxRetries: 5,
+          retryDelay: 200,
+        });
       }
     } finally {
       root = undefined;
@@ -275,4 +280,125 @@ describe("Git fast-forward integration", () => {
     expect(workspaces).toEqual([repositoryId]);
     expect(workspaces.some((name) => name.includes(".staging-"))).toBe(false);
   });
+
+  it("times out synchronization and recovers on retry", async () => {
+    root = await mkdtemp(path.join(tmpdir(), "forgemind-git-sync-timeout-"));
+
+    isolatedGitConfigPath = path.join(root, "empty.gitconfig");
+    process.env.GIT_CONFIG_GLOBAL = isolatedGitConfigPath;
+    process.env.GIT_CONFIG_NOSYSTEM = "1";
+    process.env.GIT_TERMINAL_PROMPT = "0";
+
+    await writeFile(isolatedGitConfigPath, "");
+
+    const remotePath = path.join(root, "remote.git");
+    const seedPath = path.join(root, "seed");
+    const workspaceRoot = path.join(root, "workspaces");
+    const repositoryId = "sync-timeout-repository";
+    const remoteUrl = "https://github.com/example/repository.git";
+
+    await runGit(root, ["init", "--bare", "--initial-branch=main", remotePath]);
+
+    await runGit(root, ["init", "--initial-branch=main", seedPath]);
+
+    await configureGitIdentity(seedPath);
+
+    await writeFile(path.join(seedPath, "base.txt"), "initial\n");
+    await runGit(seedPath, ["add", "base.txt"]);
+    await runGit(seedPath, ["commit", "-m", "Initial commit"]);
+    await runGit(seedPath, ["remote", "add", "origin", remotePath]);
+    await runGit(seedPath, ["push", "-u", "origin", "main"]);
+
+    const slowFilterPath = path.join(root, "slow-filter.cjs");
+
+    await writeFile(
+      slowFilterPath,
+      [
+        "const chunks = [];",
+        'process.stdin.on("data", chunk => chunks.push(chunk));',
+        'process.stdin.on("end", () => {',
+        "  const writeOutput = () => process.stdout.write(Buffer.concat(chunks));",
+        '  if (process.argv[2] === "smudge") {',
+        "    setTimeout(writeOutput, 1500);",
+        "  } else {",
+        "    writeOutput();",
+        "  }",
+        "});",
+        "",
+      ].join("\n"),
+    );
+
+    // Route the approved test URL to the local bare repository. The filter
+    // only applies to the file introduced by the later synchronization pull.
+    await writeFile(
+      isolatedGitConfigPath,
+      [
+        `[url "${pathToFileURL(remotePath).href}"]`,
+        `    insteadOf = ${remoteUrl}`,
+        "",
+        '[filter "slow"]',
+        `    clean = node '${slowFilterPath.replace(/\\/g, "/")}' clean`,
+        `    smudge = node '${slowFilterPath.replace(/\\/g, "/")}' smudge`,
+        "    required = true",
+        "",
+      ].join("\n"),
+    );
+
+    const initialOperations = new GitOperations({
+      workspaceRoot,
+      operationTimeoutMs: 5_000,
+      cloneTimeoutMs: 5_000,
+    });
+
+    await initialOperations.cloneRepository(repositoryId, remoteUrl);
+
+    const workspacePath = path.join(workspaceRoot, repositoryId);
+    const initialHead = await runGit(workspacePath, ["rev-parse", "HEAD"]);
+
+    // Advance the remote so synchronization has new content to fetch.
+    await writeFile(
+      path.join(seedPath, ".gitattributes"),
+      "slow.txt filter=slow\n",
+    );
+    await writeFile(path.join(seedPath, "slow.txt"), "remote update\n");
+    await runGit(seedPath, ["add", ".gitattributes", "slow.txt"]);
+    await runGit(seedPath, ["commit", "-m", "Remote update"]);
+    await runGit(seedPath, ["push", "origin", "main"]);
+
+    const timedOperations = new GitOperations({
+      workspaceRoot,
+      operationTimeoutMs: 300,
+      commandTimeoutMs: 5_000,
+    });
+
+    await expect(
+      timedOperations.synchronizeRepository(repositoryId, remoteUrl),
+    ).rejects.toThrow("GIT_OPERATION_TIMEOUT");
+
+    // The interrupted pull must not change the checked-out commit or
+    // leave tracked working-tree changes.
+    expect(await runGit(workspacePath, ["rev-parse", "HEAD"])).toBe(
+      initialHead,
+    );
+    expect(await runGit(workspacePath, ["status", "--porcelain"])).toBe("");
+
+    const retryOperations = new GitOperations({
+      workspaceRoot,
+      operationTimeoutMs: 5_000,
+      commandTimeoutMs: 5_000,
+    });
+
+    await expect(
+      retryOperations.synchronizeRepository(repositoryId, remoteUrl),
+    ).resolves.toMatchObject({
+      repositoryId,
+      branch: "main",
+    });
+
+    expect(await readFile(path.join(workspacePath, "slow.txt"), "utf8")).toBe(
+      "remote update\n",
+    );
+
+    expect(await runGit(workspacePath, ["status", "--porcelain"])).toBe("");
+  }, 15_000);
 });

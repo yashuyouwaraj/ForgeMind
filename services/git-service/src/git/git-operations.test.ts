@@ -5,7 +5,7 @@ import path from "node:path";
 
 const gitMocks = vi.hoisted(() => ({
   clone: vi.fn(),
-  remote: vi.fn(),
+  raw: vi.fn(),
   status: vi.fn(),
   revparse: vi.fn(),
   fetch: vi.fn(),
@@ -35,7 +35,7 @@ describe("GitOperations", () => {
       },
     );
 
-    gitMocks.remote.mockResolvedValue(remoteUrl);
+    gitMocks.raw.mockResolvedValue(remoteUrl);
     gitMocks.status.mockResolvedValue({
       isClean: () => true,
     });
@@ -88,7 +88,7 @@ describe("GitOperations", () => {
 
   it("rejects a synchronization when the configured remote differs", async () => {
     await mkdir(path.join(workspaceRoot, repositoryId));
-    gitMocks.remote.mockResolvedValue(
+    gitMocks.raw.mockResolvedValue(
       "https://github.com/another-owner/another-repo.git",
     );
 
@@ -422,7 +422,7 @@ describe("GitOperations", () => {
       operations.synchronizeRepository(repositoryId, remoteUrl),
     ).rejects.toThrow("REPOSITORY_WORKSPACE_NOT_FOUND");
 
-    expect(gitMocks.remote).not.toHaveBeenCalled();
+    expect(gitMocks.raw).not.toHaveBeenCalled();
     expect(gitMocks.fetch).not.toHaveBeenCalled();
     expect(gitMocks.pull).not.toHaveBeenCalled();
   });

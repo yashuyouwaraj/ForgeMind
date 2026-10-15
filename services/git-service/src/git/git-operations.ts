@@ -108,9 +108,7 @@ export class GitOperations {
     this.cloneTimeoutMs = options.cloneTimeoutMs ?? 120_000;
     this.commandTimeoutMs = options.commandTimeoutMs ?? 30_000;
     this.operationTimeoutMs = options.operationTimeoutMs ?? 300_000;
-    this.limiter = new ConcurrencyLimiter(
-      options.maxConcurrentOperations ?? 2,
-    );
+    this.limiter = new ConcurrencyLimiter(options.maxConcurrentOperations ?? 2);
     if (
       !Number.isFinite(this.cloneTimeoutMs) ||
       this.cloneTimeoutMs < 1 ||
@@ -240,7 +238,7 @@ export class GitOperations {
           );
 
           const configuredRemote = String(
-            await git.remote(["get-url", "origin"]),
+            await git.raw(["config", "--get", "remote.origin.url"]),
           ).trim();
           assertOperationWithinDeadline(deadlineExceeded);
 

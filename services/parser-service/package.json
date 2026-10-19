@@ -9,14 +9,21 @@
     "build": "tsc -b",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json",
     "test": "vitest run",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "dev:worker": "tsx watch src/worker.ts",
+    "start:worker": "node dist/worker.js"
   },
   "devDependencies": {
     "@types/node": "^24.13.3",
+    "tsx": "^4.23.15",
     "typescript": "^5.9.2",
     "vitest": "^5.0.1"
   },
   "dependencies": {
+    "@forgemind/shared-events": "workspace:*",
+    "@forgemind/shared-logger": "workspace:*",
+    "dotenv": "^17.4.2",
+    "kafkajs": "^2.2.4",
     "tree-sitter-wasm": "^2.0.4",
     "web-tree-sitter": "^0.27.1"
   }

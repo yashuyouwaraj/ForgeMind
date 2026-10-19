@@ -86,11 +86,33 @@ export type RepositoryParseFailedEvent = DomainEvent<
   RepositoryParseFailedData
 >;
 
-
-
 export type RepositoryEvent =
   | RepositoryImportedEvent
   | RepositorySynchronizedEvent
   | RepositorySyncFailedEvent
   | RepositoryParseRequestedEvent
+  | RepositoryParsedEvent
   | RepositoryParseFailedEvent;
+
+
+export interface RepositoryParsedData {
+  readonly repositoryId: string;
+  readonly projectId: string;
+  readonly ownerId: string;
+  readonly headCommit: string;
+  readonly completedAt: string;
+  readonly summary: {
+    readonly discoveredFiles: number;
+    readonly parsedFiles: number;
+    readonly failedFiles: number;
+    readonly skippedFiles: number;
+    readonly filesWithSyntaxErrors: number;
+    readonly sourceBytesParsed: number;
+    readonly truncated: boolean;
+  };
+}
+
+export type RepositoryParsedEvent = DomainEvent<
+  "RepositoryParsed",
+  RepositoryParsedData
+>;

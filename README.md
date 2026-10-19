@@ -1,4 +1,4 @@
-<div align="center">
+ <div align="center">
 
 # ForgeMind
 
@@ -6,228 +6,291 @@
 
 **Understand Software. Not Just Code.**
 
-Transform repositories into a living Software Digital Twin that understands architecture, dependencies, runtime behaviour and engineering knowledge.
+Transform repositories into a living Software Digital Twin that will connect architecture, dependencies, runtime behaviour, and engineering knowledge.
 
----
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue.svg)
+![Node.js](https://img.shields.io/badge/Node.js-Backend-green.svg)
+![pnpm](https://img.shields.io/badge/pnpm-Workspace-F69220.svg)
+![Kafka](https://img.shields.io/badge/Apache_Kafka-Event--Driven-black.svg)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Workflow_Storage-336791.svg)
+![Neo4j](https://img.shields.io/badge/Neo4j-Graph_Architecture-008CC1.svg)
 
-![License](https://img.shields.io/badge/license-MIT-blue)
-![Next.js](https://img.shields.io/badge/Next.js-15-black)
-![Express](https://img.shields.io/badge/Express.js-5-green)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
-![Python](https://img.shields.io/badge/Python-3.12-yellow)
-![Neo4j](https://img.shields.io/badge/Neo4j-5-008CC1)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791)
-![Kafka](https://img.shields.io/badge/Apache-Kafka-black)
-![Docker](https://img.shields.io/badge/Docker-Ready-2496ED)
-![Kubernetes](https://img.shields.io/badge/Kubernetes-Ready-326CE5)
+**Status: Active Development — Foundation and Repository Intelligence**
 
 </div>
 
 ---
 
-# Overview
+## Overview
 
-ForgeMind is a Universal Software Intelligence Platform designed to help developers understand complex software systems.
+ForgeMind is a Universal Software Intelligence Platform designed to help engineering teams understand complex software systems.
 
-Instead of treating a repository as a collection of files, ForgeMind builds a living Software Digital Twin by analysing source code, architecture, dependencies, runtime behaviour and infrastructure.
+Rather than treating a repository as a collection of files, ForgeMind is being built to create a structured, evolving model of software architecture, dependencies, and behaviour.
 
-The platform enables engineering teams to understand software faster, predict the impact of changes before deployment and generate reusable project intelligence for both humans and AI systems.
+Its long-term objective is to help developers understand unfamiliar systems, trace dependencies, assess the impact of changes, and export reusable engineering context for people and AI-assisted workflows.
 
----
+ForgeMind is not an IDE, Git hosting platform, generic chatbot, or wrapper around a commercial LLM API. Its core intelligence is designed around deterministic software analysis, explicit relationships, traceable evidence, and a language-independent software model.
 
-# Why ForgeMind?
+## Why ForgeMind?
 
-Modern software systems contain:
+Modern software systems span multiple languages, frameworks, services, databases, APIs, containers, infrastructure, and deployment pipelines.
 
-- Thousands of source files
-- Multiple programming languages
-- Microservices
-- Databases
-- APIs
-- Containers
-- Kubernetes
-- CI/CD pipelines
-- Cloud infrastructure
+Understanding a large system often requires engineers to piece together information from disconnected tools and repositories.
 
-Understanding these systems often requires navigating many disconnected tools.
+ForgeMind aims to connect that information through a consistent processing pipeline, enabling software knowledge to be built, queried, and updated as repositories evolve.
 
-ForgeMind provides a single platform that connects all of these pieces into one continuously evolving software model.
+## Core Capabilities
 
----
+The platform is designed around these capabilities:
 
-# Core Features
+- **Repository Intelligence** — register repositories and coordinate repository operations.
+- **Multi-language Analysis** — discover source files and parse supported languages through extensible language integrations.
+- **Universal Intermediate Representation (UIR)** — normalize language-specific analysis into a canonical software model.
+- **Software Knowledge Graph** — represent components and their relationships.
+- **Software Digital Twin** — maintain a structured representation of the software system.
+- **Change Impact Analysis** — trace dependencies and identify potentially affected components.
+- **Runtime Intelligence** — correlate runtime evidence with software architecture.
+- **Software Reasoning Engine** — explain conclusions using graph relationships, engineering rules, and evidence.
+- **AI Context Export** — produce reusable, structured software context for engineering workflows.
+- **Plugin System** — extend language, framework, integration, and visualization support.
 
-- Multi-language repository analysis
-- Automatic architecture discovery
-- Software Digital Twin
-- Software Knowledge Graph
-- Universal Intermediate Representation (UIR)
-- Change Impact Analysis
-- Runtime Intelligence
-- AI Context Export
-- Interactive dependency visualization
-- Enterprise-ready REST APIs
-- Real-time repository synchronization
+These are platform capabilities at different stages of implementation; the list describes the product direction, not a claim that every capability is already operational.
 
----
+## Architecture
 
-# Architecture
+ForgeMind preserves a canonical processing pipeline:
 
 ```text
 Repository
-
-↓
-
-Repository Analysis
-
-↓
-
-Universal Intermediate Representation
-
-↓
-
+    |
+    v
+Repository Operations
+    |
+    v
+Parser
+    |
+    v
+Semantic Analysis
+    |
+    v
+Universal Intermediate Representation (UIR)
+    |
+    v
 Software Knowledge Graph
-
-↓
-
+    |
+    v
 Software Digital Twin
-
-↓
-
-Intelligence Engine
-
-↓
-
-Dashboard
-Reports
-Search
-AI Context Export
-Impact Analysis
-Runtime Intelligence
+    |
+    v
+Software Reasoning Engine
+    |
+    v
+Impact Analysis | Search | Reports | AI Context Export
 ```
 
----
+Apache Kafka provides asynchronous communication between services where event-driven processing is appropriate. PostgreSQL supports transactional data and workflow persistence; Neo4j is the planned graph store for software relationships.
 
-# Technology Stack
+The pipeline represents the intended end-to-end architecture. The complete repository-to-Digital-Twin flow is still under development.
 
-## Frontend
+## Current Implementation
+
+### Seven-service monorepo
+
+ForgeMind uses a pnpm workspace organized around independently structured services, shared packages, applications, and infrastructure.
+
+| Service | Responsibility | Current implementation status |
+|---|---|---|
+| `api-gateway` | API entry point and request routing | Initial service infrastructure |
+| `auth-service` | Authentication and identity-related operations | Foundation implemented; broader integration remains |
+| `project-service` | Project management | Foundation implemented; broader integration remains |
+| `repository-service` | Repository registration and repository events | Registration and outbox infrastructure |
+| `git-service` | Repository clone, synchronization, and Git event handling | Core operations and Kafka event handling implemented |
+| `parser-service` | Source discovery, parsing, and parsing events | Parser components and Kafka worker implemented |
+| `workflow-orchestrator` | Workflow lifecycle and persistent execution state | Domain, PostgreSQL persistence, and concurrency tests implemented |
+
+Service maturity varies. Having a service in the workspace does not imply that its complete production feature set is finished.
+
+### Verified engineering milestones
+
+The latest local development checkpoints include:
+
+- `07d6a59` — `feat(parser-service): add Kafka repository parsing worker`
+- `97e8bc3` — `feat(workflow-orchestrator): add persistent workflow state`
+
+The parser-service build and typecheck passed, with **30 automated tests passing** at the latest recorded verification.
+
+The workflow-orchestrator foundation includes a persistent workflow model, Prisma schema and migration, optimistic concurrency protection, and automated tests. Its PostgreSQL integration test has also passed in the recorded development run.
+
+The next major milestone is to verify the complete service-to-service workflow, including event delivery, retry and recovery behaviour, duplicate-event handling, and correct repository revision processing.
+
+## Technology Stack
+
+### Frontend
 
 - Next.js
 - React
 - TypeScript
 - Tailwind CSS
 - shadcn/ui
-- Framer Motion
 - Zustand
+- TanStack Query
 
-## Backend
+### Backend and Services
 
+- Node.js
+- TypeScript
 - Express.js
-- Python (FastAPI)
-- Apache Kafka
+- Prisma
+- Zod-based validation where applicable
 
-## Databases
+### Repository Analysis
 
-- PostgreSQL
-- Neo4j
-- Redis
+- Tree-sitter
+- Extensible language registry
+- Bounded source discovery and parsing
+- Kafka-driven parsing worker
 
-## Infrastructure
+### Data and Messaging
 
-- Docker
-- Kubernetes
-- NGINX
-- GitHub Actions
+- PostgreSQL — transactional and workflow persistence
+- Neo4j — software knowledge graph architecture
+- Redis — caching and coordination architecture
+- Apache Kafka — asynchronous event-driven communication
 
----
+### Infrastructure and Tooling
 
-# Project Structure
+- pnpm workspaces
+- Turborepo
+- TypeScript project builds
+- Vitest
+- Docker-based development infrastructure
+
+Kubernetes, full production deployment, and complete CI/CD are roadmap concerns rather than claims of a finished production deployment.
+
+## Repository Structure
 
 ```text
-apps/
-services/
-packages/
-infrastructure/
-docs/
-tests/
+forgemind/
+├── apps/                    # Frontend applications
+├── services/
+│   ├── api-gateway/
+│   ├── auth-service/
+│   ├── project-service/
+│   ├── repository-service/
+│   ├── git-service/
+│   ├── parser-service/
+│   └── workflow-orchestrator/
+├── packages/                # Shared packages and contracts
+├── infrastructure/          # Infrastructure configuration
+├── docs/                    # Product and architecture documentation
+├── .ai/                     # Machine-readable project context
+├── assets/                  # Design assets
+├── specs/                   # Technical specifications
+├── package.json
+├── pnpm-workspace.yaml
+└── turbo.json
 ```
 
----
+Some directories may be under active development. The repository contents remain the source of truth for what is currently implemented.
 
-# Documentation
+## Development Roadmap
 
-| Document                              | Description                   |
-| ------------------------------------- | ----------------------------- |
-| Project Vision                        | Product vision                |
-| Product Overview                      | Platform overview             |
-| System Architecture                   | High-level architecture       |
-| Software Digital Twin                 | Core intelligence model       |
-| Universal Intermediate Representation | Language-independent model    |
-| Software Knowledge Graph              | Relationship engine           |
-| Intelligence Engine                   | Decision engine               |
-| Runtime Intelligence                  | Production understanding      |
-| Change Impact Analysis                | Dependency prediction         |
-| AI Context Export                     | Portable project intelligence |
+### Phase 1 — Platform Foundation
 
-Complete documentation is available in the **docs/** directory.
+- [x] Establish the pnpm monorepo and shared-package architecture.
+- [x] Define product, architecture, and design specifications.
+- [x] Establish initial API, authentication, project, and repository service foundations.
+- [ ] Complete and verify workspace-wide build, lint, test, and CI workflows.
 
----
+### Phase 2 — Repository Intelligence
 
-# Development Roadmap
+- [x] Implement repository registration and initial event/outbox infrastructure.
+- [x] Implement Git clone and synchronization operations.
+- [x] Implement bounded source discovery and a language registry.
+- [x] Add the Kafka-based parser worker and parsing outcome events.
+- [x] Establish persistent workflow state and concurrency protection.
+- [ ] Verify repository import → synchronization → parsing end to end.
+- [ ] Harden revision consistency, retries, idempotency, and workflow recovery.
+- [ ] Expand language, framework, and build-tool detection.
 
-- Platform Foundation
-- Repository Intelligence
-- Parsing Engine
-- Universal Intermediate Representation
-- Software Knowledge Graph
-- Software Digital Twin
-- Intelligence Engine
-- Runtime Intelligence
-- Enterprise Features
+### Phase 3 — Semantic Analysis and UIR
 
----
+- [ ] Extract semantic entities and relationships from parsed source.
+- [ ] Define and validate the canonical UIR contract.
+- [ ] Preserve source traceability and repository revision metadata.
+- [ ] Add deterministic semantic-analysis tests.
 
-# Current Status
+### Phase 4 — Software Knowledge Graph
 
-ForgeMind is under active development.
+- [ ] Persist validated UIR relationships to Neo4j.
+- [ ] Implement graph updates and consistency checks.
+- [ ] Support dependency traversal and graph queries.
 
-The project is being built as a production-grade Software Intelligence Platform with a strong focus on scalability, maintainability and enterprise architecture.
+### Phase 5 — Software Digital Twin
 
----
+- [ ] Assemble repository, graph, configuration, and runtime evidence.
+- [ ] Track software state by repository revision.
+- [ ] Support incremental updates.
 
-# Goals
+### Phase 6 — Reasoning and Impact Analysis
 
-The long-term goals of ForgeMind are to:
+- [ ] Implement evidence-backed graph traversal and engineering rules.
+- [ ] Generate explainable dependency and change-impact results.
+- [ ] Validate conclusions against known software relationships.
 
-- Support multiple programming languages
-- Understand complete software systems
-- Predict software impact before deployment
-- Improve developer productivity
-- Simplify onboarding for large projects
-- Generate reusable project intelligence
-- Provide explainable software analysis
+### Phase 7 — Runtime Intelligence and Enterprise Readiness
 
----
+- [ ] Integrate runtime telemetry with software entities.
+- [ ] Add operational observability and failure-recovery verification.
+- [ ] Harden authentication, authorization, tenant isolation, and auditability.
+- [ ] Complete CI/CD, deployment automation, and production-readiness checks.
 
-# Contributing
+### Phase 8 — Dashboard and AI Context Export
 
-Contributions are welcome.
+- [ ] Connect the dashboard to implemented service APIs.
+- [ ] Visualize repositories, architecture, dependencies, and analysis progress.
+- [ ] Export versioned, reusable software context.
+- [ ] Expand the plugin and integration ecosystem.
 
-Please read:
+## Engineering Principles
 
-- CONTRIBUTING.md
-- DEVELOPMENT_GUIDE.md
-- CODE_OF_CONDUCT.md
+ForgeMind is being developed with the following principles:
 
-before opening a pull request.
+- **Deterministic analysis:** engineering conclusions should be based on explicit analysis and evidence.
+- **Language independence:** downstream intelligence consumes UIR rather than language-specific syntax.
+- **Evidence-backed reasoning:** never invent software dependencies or relationships.
+- **Event-driven boundaries:** use asynchronous events to reduce unnecessary service coupling.
+- **Reliable workflows:** support persistent state, concurrency control, retry handling, and recovery.
+- **Modularity:** keep service responsibilities clear and reuse shared contracts.
+- **Extensibility:** add languages, frameworks, parsers, and integrations through defined extension points.
+- **AI independence:** commercial LLM APIs are optional interfaces, not platform dependencies.
+- **Production quality:** test behaviour, validate inputs, protect secrets, and verify operational assumptions.
 
----
+## Documentation
 
-# License
+ForgeMind maintains detailed product and engineering documentation, including:
 
-This project is licensed under the MIT License.
+- `ForgeMind_Master_Documentation.md`
+- `ForgeMind_AI_Context.json`
+- `ARCHITECTURE_DECISIONS.md`
+- `TECH_STACK.md`
+- `DESIGN_SYSTEM.md`
+- `COMPONENT_LIBRARY.md`
+- `UI_SCREEN_SPECIFICATIONS.md`
+- `PROJECT_STATUS.md`
 
----
+These documents define the intended product and architecture. Implementation status should be updated separately as features are completed and verified.
+
+## Contributing
+
+Contributions are welcome as the platform evolves.
+
+Before proposing architectural changes, review the existing specifications, service boundaries, shared event contracts, and engineering decisions. Prefer extending existing components over introducing duplicate services or parallel workflows.
+
+## License
+
+ForgeMind is licensed under the MIT License. See [LICENSE](LICENSE) for details.
 
 <div align="center">
 

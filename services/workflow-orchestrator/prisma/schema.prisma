@@ -1,0 +1,66 @@
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["workflow"]
+}
+
+enum WorkflowStatus {
+  PENDING
+  RUNNING
+  RETRY_WAIT
+  COMPLETED
+  FAILED
+  CANCELLED
+
+  @@schema("workflow")
+}
+
+enum WorkflowStage {
+  REPOSITORY_SYNC
+  REPOSITORY_PARSE
+  SEMANTIC_ANALYSIS
+  UIR_GENERATION
+  KNOWLEDGE_GRAPH_UPDATE
+  DIGITAL_TWIN_UPDATE
+  IMPACT_ANALYSIS
+
+  @@schema("workflow")
+}
+
+model WorkflowExecution {
+  id              String         @id @default(uuid()) @db.Uuid
+  repositoryId    String         @db.Uuid
+  projectId       String         @db.Uuid
+  ownerId         String         @db.Uuid
+  headCommit      String
+  correlationId   String
+  traceId         String
+  status          WorkflowStatus @default(PENDING)
+  currentStage    WorkflowStage  @default(REPOSITORY_SYNC)
+  stageAttempt    Int            @default(0)
+
+  createdAt       DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime       @updatedAt @db.Timestamptz(3)
+  startedAt       DateTime?      @db.Timestamptz(3)
+  completedAt     DateTime?      @db.Timestamptz(3)
+  nextAttemptAt   DateTime?      @db.Timestamptz(3)
+
+  lastFailureCode      String?
+  lastFailureMessage   String?
+  lastFailureRetryable Boolean?
+  lastFailureAt        DateTime? @db.Timestamptz(3)
+
+  // Optimistic concurrency: increment on every successful state update.
+  version          Int            @default(0)
+
+  @@index([status, nextAttemptAt])
+  @@index([repositoryId, createdAt])
+  @@index([projectId, createdAt])
+  @@map("workflow_executions")
+  @@schema("workflow")
+}

@@ -19,9 +19,16 @@
     "test": "vitest run",
     "lint": "tsc --noEmit",
     "clean": "node -e \"import('node:fs').then(fs => fs.rmSync('dist', { recursive: true, force: true }))\"",
-    "test:integration": "prisma generate --schema prisma/schema.prisma && vitest run --config vitest.integration.config.ts"
+    "test:integration": "prisma generate --schema prisma/schema.prisma && vitest run --config vitest.integration.config.ts",
+    "dev:worker": "prisma generate --schema prisma/schema.prisma && tsx watch src/worker.ts",
+    "start:worker": "node dist/worker.js"
   },
   "dependencies": {
+    "@forgemind/sdk": "workspace:*",
+    "@forgemind/shared-auth": "workspace:*",
+    "@forgemind/shared-errors": "workspace:*",
+    "@forgemind/shared-events": "workspace:*",
+    "@forgemind/shared-validation": "workspace:*",
     "@prisma/adapter-pg": "^7.10.0",
     "@prisma/client": "^7.10.0",
     "dotenv": "^17.4.2",

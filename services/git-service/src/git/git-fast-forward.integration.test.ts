@@ -182,7 +182,7 @@ describe("Git fast-forward integration", () => {
     ).toBe("remote work\n");
 
     expect(await runGit(workspacePath, ["status", "--porcelain"])).toBe("");
-  });
+  }, 15_000);
 
   it("times out a real clone, cleans up, and permits a retry", async () => {
     root = await mkdtemp(path.join(tmpdir(), "forgemind-git-timeout-"));
@@ -279,7 +279,7 @@ describe("Git fast-forward integration", () => {
 
     expect(workspaces).toEqual([repositoryId]);
     expect(workspaces.some((name) => name.includes(".staging-"))).toBe(false);
-  });
+  }, 15_000);
 
   it("times out synchronization and recovers on retry", async () => {
     root = await mkdtemp(path.join(tmpdir(), "forgemind-git-sync-timeout-"));

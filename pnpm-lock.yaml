@@ -399,6 +399,21 @@ importers:
 
   services/workflow-orchestrator:
     dependencies:
+      '@forgemind/sdk':
+        specifier: workspace:*
+        version: link:../../packages/sdk
+      '@forgemind/shared-auth':
+        specifier: workspace:*
+        version: link:../../packages/shared-auth
+      '@forgemind/shared-errors':
+        specifier: workspace:*
+        version: link:../../packages/shared-errors
+      '@forgemind/shared-events':
+        specifier: workspace:*
+        version: link:../../packages/shared-events
+      '@forgemind/shared-validation':
+        specifier: workspace:*
+        version: link:../../packages/shared-validation
       '@prisma/adapter-pg':
         specifier: ^7.10.0
         version: 7.10.0

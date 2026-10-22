@@ -33,34 +33,66 @@ enum WorkflowStage {
 }
 
 model WorkflowExecution {
-  id              String         @id @default(uuid()) @db.Uuid
-  repositoryId    String         @db.Uuid
-  projectId       String         @db.Uuid
-  ownerId         String         @db.Uuid
-  headCommit      String
-  correlationId   String
-  traceId         String
-  status          WorkflowStatus @default(PENDING)
-  currentStage    WorkflowStage  @default(REPOSITORY_SYNC)
-  stageAttempt    Int            @default(0)
-
-  createdAt       DateTime       @default(now()) @db.Timestamptz(3)
-  updatedAt       DateTime       @updatedAt @db.Timestamptz(3)
-  startedAt       DateTime?      @db.Timestamptz(3)
-  completedAt     DateTime?      @db.Timestamptz(3)
-  nextAttemptAt   DateTime?      @db.Timestamptz(3)
-
-  lastFailureCode      String?
-  lastFailureMessage   String?
-  lastFailureRetryable Boolean?
-  lastFailureAt        DateTime? @db.Timestamptz(3)
-
-  // Optimistic concurrency: increment on every successful state update.
-  version          Int            @default(0)
+  id                     String         @id @default(uuid()) @db.Uuid
+  repositoryId           String         @db.Uuid
+  projectId              String         @db.Uuid
+  ownerId                String         @db.Uuid
+  headCommit             String?
+  correlationId          String
+  traceId                String
+  status                 WorkflowStatus @default(PENDING)
+  currentStage           WorkflowStage  @default(REPOSITORY_SYNC)
+  stageAttempt           Int            @default(0)
+  createdAt              DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt              DateTime       @updatedAt @db.Timestamptz(3)
+  startedAt              DateTime?      @db.Timestamptz(3)
+  completedAt            DateTime?      @db.Timestamptz(3)
+  nextAttemptAt          DateTime?      @db.Timestamptz(3)
+  lastFailureCode        String?
+  lastFailureMessage     String?
+  lastFailureRetryable   Boolean?
+  lastFailureAt          DateTime?      @db.Timestamptz(3)
+  version                Int            @default(0)
 
   @@index([status, nextAttemptAt])
   @@index([repositoryId, createdAt])
   @@index([projectId, createdAt])
+  @@index([repositoryId, correlationId])
   @@map("workflow_executions")
+  @@schema("workflow")
+}
+
+model WorkflowInboxEvent {
+  id          String    @id @default(uuid()) @db.Uuid
+  eventId     String    @unique
+  eventType   String
+  payload     Json
+  receivedAt  DateTime  @default(now()) @db.Timestamptz(3)
+  processedAt DateTime? @db.Timestamptz(3)
+  attempts    Int       @default(0)
+  lastError   String?
+
+  @@index([processedAt, receivedAt])
+  @@map("workflow_inbox_events")
+  @@schema("workflow")
+}
+
+model WorkflowOutboxEvent {
+  id             String    @id @default(uuid()) @db.Uuid
+  eventId        String    @unique
+  eventType      String
+  payload        Json
+  createdAt      DateTime  @default(now()) @db.Timestamptz(3)
+  publishedAt    DateTime? @db.Timestamptz(3)
+  attempts       Int       @default(0)
+  nextAttemptAt  DateTime  @default(now()) @db.Timestamptz(3)
+  leaseToken     String?
+  leasedUntil    DateTime? @db.Timestamptz(3)
+  deadLetteredAt DateTime? @db.Timestamptz(3)
+  lastError      String?
+
+  @@index([publishedAt, nextAttemptAt])
+  @@index([leasedUntil])
+  @@map("workflow_outbox_events")
   @@schema("workflow")
 }

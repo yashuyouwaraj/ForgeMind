@@ -10,7 +10,7 @@ export interface CreateWorkflowInput {
   readonly repositoryId: string;
   readonly projectId: string;
   readonly ownerId: string;
-  readonly headCommit: string;
+  readonly headCommit?: string | null;
   readonly correlationId: string;
   readonly traceId: string;
   readonly createdAt?: Date;
@@ -28,7 +28,7 @@ export interface WorkflowSnapshot {
   readonly repositoryId: string;
   readonly projectId: string;
   readonly ownerId: string;
-  readonly headCommit: string;
+  readonly headCommit: string | null;
   readonly correlationId: string;
   readonly traceId: string;
   readonly status: WorkflowStatus;
@@ -112,7 +112,10 @@ export class Workflow {
       repositoryId: requireNonEmpty(input.repositoryId, "repositoryId"),
       projectId: requireNonEmpty(input.projectId, "projectId"),
       ownerId: requireNonEmpty(input.ownerId, "ownerId"),
-      headCommit: requireNonEmpty(input.headCommit, "headCommit"),
+      headCommit:
+        input.headCommit == null
+          ? null
+          : requireNonEmpty(input.headCommit, "headCommit"),
       correlationId: requireNonEmpty(input.correlationId, "correlationId"),
       traceId: requireNonEmpty(input.traceId, "traceId"),
       status: "PENDING",
@@ -187,6 +190,21 @@ export class Workflow {
       startedAt: timestamp,
       updatedAt: timestamp,
     };
+  }
+
+  synchronize(headCommit: string, at: Date = new Date()): void {
+    this.assertStatus("RUNNING");
+    this.assertCurrentStage("REPOSITORY_SYNC");
+
+    const normalizedCommit = requireNonEmpty(headCommit, "headCommit");
+    const timestamp = requireValidDate(at, "at");
+
+    this.state = {
+      ...this.state,
+      headCommit: normalizedCommit,
+    };
+
+    this.completeStage("REPOSITORY_SYNC", timestamp);
   }
 
   completeStage(stage: WorkflowStage, at: Date = new Date()): void {

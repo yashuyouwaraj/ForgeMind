@@ -32,6 +32,22 @@ describe("Workflow", () => {
     expect(snapshot.startedAt).toBeNull();
   });
 
+  it("allows a workflow to be created without a head commit", () => {
+    const workflow = Workflow.create(
+      {
+        repositoryId: "repository-1",
+        projectId: "project-1",
+        ownerId: "owner-1",
+        correlationId: "correlation-1",
+        traceId: "trace-1",
+        createdAt,
+      },
+      "workflow-1",
+    );
+
+    expect(workflow.getSnapshot().headCommit).toBeNull();
+  });
+
   it("rejects missing required identifiers", () => {
     expect(() =>
       Workflow.create(
@@ -64,6 +80,21 @@ describe("Workflow", () => {
     const snapshot = workflow.getSnapshot();
 
     expect(snapshot.status).toBe("RUNNING");
+    expect(snapshot.currentStage).toBe("REPOSITORY_PARSE");
+  });
+
+  it("records the synchronized head commit and completes repository sync", () => {
+    const workflow = createWorkflow();
+    workflow.start(new Date("2026-10-19T10:01:00.000Z"));
+
+    workflow.synchronize(
+      "verified-commit",
+      new Date("2026-10-19T10:02:00.000Z"),
+    );
+
+    const snapshot = workflow.getSnapshot();
+
+    expect(snapshot.headCommit).toBe("verified-commit");
     expect(snapshot.currentStage).toBe("REPOSITORY_PARSE");
   });
 

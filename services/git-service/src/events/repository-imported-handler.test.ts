@@ -1,5 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { RepositoryImportedEvent } from "@forgemind/shared-events";
+import type {
+  RepositoryImportedEvent,
+  RepositorySyncRequestedEvent,
+} from "@forgemind/shared-events";
 import {
   createRepositoryImportedHandler,
   type RepositoryEventPublisher,
@@ -24,6 +27,22 @@ const importedEvent: RepositoryImportedEvent = {
   },
 };
 
+const syncRequestedEvent: RepositorySyncRequestedEvent = {
+  eventId: "event-sync-requested-001",
+  eventType: "RepositorySyncRequested",
+  eventVersion: 1,
+  occurredAt: "2026-10-12T10:01:00.000Z",
+  correlationId: "correlation-001",
+  traceId: "trace-001",
+  data: {
+    repositoryId: "repository-001",
+    projectId: "project-001",
+    ownerId: "owner-001",
+    defaultBranch: "main",
+    requestedAt: "2026-10-12T10:01:00.000Z",
+  },
+};
+
 const gitResult = {
   repositoryId: "repository-001",
   workspacePath: "/workspace/repository-001",
@@ -37,9 +56,14 @@ function createDependencies() {
   const gitOperations = {
     cloneRepository: vi.fn().mockResolvedValue(gitResult),
     synchronizeRepository: vi.fn().mockResolvedValue(gitResult),
+    synchronizeRepositoryFromConfiguredRemote: vi
+      .fn()
+      .mockResolvedValue(gitResult),
   } as unknown as Pick<
     GitOperations,
-    "cloneRepository" | "synchronizeRepository"
+    | "cloneRepository"
+    | "synchronizeRepository"
+    | "synchronizeRepositoryFromConfiguredRemote"
   >;
 
   const publisher: RepositoryEventPublisher = {
@@ -109,6 +133,35 @@ describe("createRepositoryImportedHandler", () => {
     expect(publisher.publish).toHaveBeenCalledWith(
       expect.objectContaining({
         eventType: "RepositorySynchronized",
+      }),
+    );
+  });
+
+  it("synchronizes a retry request using the configured remote", async () => {
+    const { gitOperations, publisher } = createDependencies();
+
+    const handler = createRepositoryImportedHandler({
+      gitOperations,
+      publisher,
+    });
+
+    await handler(syncRequestedEvent);
+
+    expect(gitOperations.cloneRepository).not.toHaveBeenCalled();
+    expect(gitOperations.synchronizeRepository).not.toHaveBeenCalled();
+    expect(
+      gitOperations.synchronizeRepositoryFromConfiguredRemote,
+    ).toHaveBeenCalledWith("repository-001");
+    expect(publisher.publish).toHaveBeenCalledWith(
+      expect.objectContaining({
+        eventType: "RepositorySynchronized",
+        data: expect.objectContaining({
+          repositoryId: "repository-001",
+          projectId: "project-001",
+          ownerId: "owner-001",
+          defaultBranch: "main",
+          headCommit: "abc123def456",
+        }),
       }),
     );
   });
@@ -263,6 +316,27 @@ describe("createRepositoryImportedHandler", () => {
     ).rejects.toThrow("INVALID_REPOSITORY_IMPORTED_EVENT");
 
     expect(gitOperations.cloneRepository).not.toHaveBeenCalled();
+    expect(publisher.publish).not.toHaveBeenCalled();
+  });
+
+  it("rejects retry requests with an invalid requestedAt timestamp", async () => {
+    const { gitOperations, publisher } = createDependencies();
+
+    const handler = createRepositoryImportedHandler({
+      gitOperations,
+      publisher,
+    });
+
+    await expect(
+      handler({
+        ...syncRequestedEvent,
+        data: { ...syncRequestedEvent.data, requestedAt: "not-a-date" },
+      }),
+    ).rejects.toThrow("INVALID_REPOSITORY_SYNC_REQUESTED_EVENT");
+
+    expect(
+      gitOperations.synchronizeRepositoryFromConfiguredRemote,
+    ).not.toHaveBeenCalled();
     expect(publisher.publish).not.toHaveBeenCalled();
   });
 

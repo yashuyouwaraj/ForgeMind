@@ -1,5 +1,6 @@
 import "dotenv/config";
 import { Kafka } from "kafkajs";
+import { DueRetryDispatcher } from "./application/due-retry-dispatcher.js";
 import { RepositoryEventProcessor } from "./application/repository-event-processor.js";
 import { prisma, disconnectPrisma } from "./infrastructure/database/prisma.js";
 import { RepositoryEventConsumer } from "./infrastructure/messaging/repository-event-consumer.js";
@@ -51,13 +52,14 @@ async function main(): Promise<void> {
     { topic, deadLetterTopic },
   );
 
+  const retryDispatcher = new DueRetryDispatcher(prisma);
   const outboxPublisher = new WorkflowOutboxPublisher(prisma, producer, {
     topic,
     deadLetterTopic,
   });
 
   let stopping = false;
-  let activePublish: Promise<void> | null = null;
+  let activeTick: Promise<void> | null = null;
   let interval: ReturnType<typeof setInterval> | undefined;
 
   const shutdown = async (signal: string): Promise<void> => {
@@ -68,14 +70,14 @@ async function main(): Promise<void> {
 
     if (interval) clearInterval(interval);
 
-    if (activePublish) {
-      console.info("[workflow-worker] Waiting for the active outbox batch.");
+    if (activeTick) {
+      console.info("[workflow-worker] Waiting for the active worker tick.");
 
       try {
-        await activePublish;
+        await activeTick;
       } catch (error) {
         console.error(
-          "[workflow-worker] Active outbox batch failed during shutdown.",
+          "[workflow-worker] Active worker tick failed during shutdown.",
           error,
         );
       }
@@ -109,21 +111,30 @@ async function main(): Promise<void> {
   });
 
   interval = setInterval(() => {
-    if (stopping || activePublish) return;
+    if (stopping || activeTick) return;
 
-    activePublish = outboxPublisher
-      .publishBatch()
-      .then((result) => {
+    activeTick = (async () => {
+      try {
+        const retries = await retryDispatcher.dispatchDueRetries();
+        if (retries.dispatched > 0 || retries.invalid > 0) {
+          console.info("[workflow-worker] Due retries processed.", retries);
+        }
+
+      } catch (error) {
+        console.error("[workflow-worker] Retry dispatch failed.", error);
+      }
+
+      try {
+        const result = await outboxPublisher.publishBatch();
         if (result.claimed > 0) {
           console.info("[workflow-worker] Outbox batch completed.", result);
         }
-      })
-      .catch((error: unknown) => {
+      } catch (error) {
         console.error("[workflow-worker] Outbox batch failed.", error);
-      })
-      .finally(() => {
-        activePublish = null;
-      });
+      }
+    })().finally(() => {
+      activeTick = null;
+    });
   }, 1_000);
 
   console.info("[workflow-worker] Starting.", {

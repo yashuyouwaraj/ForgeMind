@@ -102,6 +102,41 @@ describe("GitOperations", () => {
     expect(gitMocks.merge).not.toHaveBeenCalled();
   });
 
+  it("synchronizes from the validated configured origin for retry requests", async () => {
+    await mkdir(path.join(workspaceRoot, repositoryId));
+
+    const operations = new GitOperations({ workspaceRoot });
+
+    await expect(
+      operations.synchronizeRepositoryFromConfiguredRemote(repositoryId),
+    ).resolves.toMatchObject({
+      repositoryId,
+      remoteUrl,
+      branch: "main",
+      headCommit: "a".repeat(40),
+    });
+
+    expect(gitMocks.raw).toHaveBeenCalledWith([
+      "config",
+      "--get",
+      "remote.origin.url",
+    ]);
+    expect(gitMocks.fetch).toHaveBeenCalledWith("origin");
+  });
+
+  it("rejects an invalid configured origin before fetching", async () => {
+    await mkdir(path.join(workspaceRoot, repositoryId));
+    gitMocks.raw.mockResolvedValue("file:///untrusted/repository");
+
+    const operations = new GitOperations({ workspaceRoot });
+
+    await expect(
+      operations.synchronizeRepositoryFromConfiguredRemote(repositoryId),
+    ).rejects.toThrow("UNSUPPORTED_REPOSITORY_URL");
+
+    expect(gitMocks.fetch).not.toHaveBeenCalled();
+  });
+
   it("rejects a dirty working tree before fetching or pulling", async () => {
     await mkdir(path.join(workspaceRoot, repositoryId));
     gitMocks.status.mockResolvedValue({

@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import type {
   RepositoryImportedEvent,
+  RepositorySyncRequestedEvent,
   RepositorySyncFailedEvent,
   RepositorySynchronizedEvent,
 } from "@forgemind/shared-events";
@@ -18,7 +19,9 @@ export interface RepositoryEventPublisher {
 export interface RepositoryImportedHandlerDependencies {
   gitOperations: Pick<
     GitOperations,
-    "cloneRepository" | "synchronizeRepository"
+    | "cloneRepository"
+    | "synchronizeRepository"
+    | "synchronizeRepositoryFromConfiguredRemote"
   >;
   publisher: RepositoryEventPublisher;
   retry?: {
@@ -82,6 +85,47 @@ function isImportedEvent(value: unknown): value is RepositoryImportedEvent {
     typeof repository.url === "string" &&
     (typeof repository.defaultBranch === "string" ||
       repository.defaultBranch === null)
+  );
+}
+
+function isSyncRequestedEvent(
+  value: unknown,
+): value is RepositorySyncRequestedEvent {
+  if (typeof value !== "object" || value === null) return false;
+
+  const event = value as Record<string, unknown>;
+  const data = event.data;
+
+  if (
+    event.eventType !== "RepositorySyncRequested" ||
+    event.eventVersion !== 1 ||
+    typeof event.eventId !== "string" ||
+    !event.eventId.trim() ||
+    typeof event.correlationId !== "string" ||
+    !event.correlationId.trim() ||
+    typeof event.traceId !== "string" ||
+    !event.traceId.trim() ||
+    typeof event.occurredAt !== "string" ||
+    !Number.isFinite(Date.parse(event.occurredAt)) ||
+    typeof data !== "object" ||
+    data === null
+  ) {
+    return false;
+  }
+
+  const repository = data as Record<string, unknown>;
+
+  return (
+    typeof repository.repositoryId === "string" &&
+    /^[A-Za-z0-9_-]{1,128}$/.test(repository.repositoryId) &&
+    typeof repository.projectId === "string" &&
+    repository.projectId.length > 0 &&
+    typeof repository.ownerId === "string" &&
+    repository.ownerId.length > 0 &&
+    (typeof repository.defaultBranch === "string" ||
+      repository.defaultBranch === null) &&
+    typeof repository.requestedAt === "string" &&
+    Number.isFinite(Date.parse(repository.requestedAt))
   );
 }
 
@@ -151,29 +195,36 @@ export function createRepositoryImportedHandler({
   }
 
   async function execute(
-    event: RepositoryImportedEvent,
+    event: RepositoryImportedEvent | RepositorySyncRequestedEvent,
   ): Promise<OperationResult> {
     for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
       try {
         let result: GitOperationResult;
 
-        try {
-          result = await gitOperations.cloneRepository(
-            event.data.repositoryId,
-            event.data.url,
-          );
-        } catch (error) {
-          if (
-            !(error instanceof Error) ||
-            error.message !== "REPOSITORY_WORKSPACE_ALREADY_EXISTS"
-          ) {
-            throw error;
-          }
+        if (event.eventType === "RepositoryImported") {
+          try {
+            result = await gitOperations.cloneRepository(
+              event.data.repositoryId,
+              event.data.url,
+            );
+          } catch (error) {
+            if (
+              !(error instanceof Error) ||
+              error.message !== "REPOSITORY_WORKSPACE_ALREADY_EXISTS"
+            ) {
+              throw error;
+            }
 
-          result = await gitOperations.synchronizeRepository(
-            event.data.repositoryId,
-            event.data.url,
-          );
+            result = await gitOperations.synchronizeRepository(
+              event.data.repositoryId,
+              event.data.url,
+            );
+          }
+        } else {
+          result =
+            await gitOperations.synchronizeRepositoryFromConfiguredRemote(
+              event.data.repositoryId,
+            );
         }
 
         return { success: true, result };
@@ -203,14 +254,26 @@ export function createRepositoryImportedHandler({
     };
   }
 
-  return async function handleRepositoryImported(
+  return async function handleRepositoryEvent(
     value: unknown,
   ): Promise<void> {
-    if (!isImportedEvent(value)) {
+    const isImported = isImportedEvent(value);
+    const isSyncRequested = isSyncRequestedEvent(value);
+
+    if (!isImported && !isSyncRequested) {
+      const type =
+        typeof value === "object" && value !== null
+          ? (value as Record<string, unknown>).eventType
+          : undefined;
+
+      if (type === "RepositorySyncRequested") {
+        throw new Error("INVALID_REPOSITORY_SYNC_REQUESTED_EVENT");
+      }
+
       throw new Error("INVALID_REPOSITORY_IMPORTED_EVENT");
     }
 
-    const event = value;
+    const event = isImported ? value : (value as RepositorySyncRequestedEvent);
     const repository = event.data;
     const operation = await execute(event);
 

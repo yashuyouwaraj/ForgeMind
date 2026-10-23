@@ -1,5 +1,4 @@
-
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   decodeRepositoryEvent,
   RepositoryEventDecodeError,
@@ -28,6 +27,7 @@ function event(overrides: Record<string, unknown> = {}) {
   };
 }
 
+
 describe("decodeRepositoryEvent", () => {
   it("accepts a valid synchronization event", () => {
     const decoded = decodeRepositoryEvent(JSON.stringify(event()));
@@ -41,7 +41,7 @@ describe("decodeRepositoryEvent", () => {
       JSON.stringify({
         ...event(),
         data: {
-          ...event().data as object,
+          ...(event().data as object),
           headCommit: null,
         },
       }),
@@ -70,7 +70,7 @@ describe("decodeRepositoryEvent", () => {
         JSON.stringify({
           ...event(),
           data: {
-            ...event().data as object,
+            ...(event().data as object),
             headCommit: "not-a-sha",
           },
         }),
@@ -81,9 +81,9 @@ describe("decodeRepositoryEvent", () => {
   it("rejects an event with a missing correlation ID", () => {
     const invalid = event({ correlationId: "" });
 
-    expect(() =>
-      decodeRepositoryEvent(JSON.stringify(invalid)),
-    ).toThrow("INVALID_REPOSITORY_EVENT");
+    expect(() => decodeRepositoryEvent(JSON.stringify(invalid))).toThrow(
+      "INVALID_REPOSITORY_EVENT",
+    );
   });
 
   it("rejects negative parser counters", () => {
@@ -107,8 +107,8 @@ describe("decodeRepositoryEvent", () => {
       },
     };
 
-    expect(() =>
-      decodeRepositoryEvent(JSON.stringify(parsedEvent)),
-    ).toThrow("INVALID_REPOSITORY_EVENT_DATA");
+    expect(() => decodeRepositoryEvent(JSON.stringify(parsedEvent))).toThrow(
+      "INVALID_REPOSITORY_EVENT_DATA",
+    );
   });
 });

@@ -213,7 +213,26 @@ export class GitOperations {
     repositoryId: string,
     remoteUrl: string,
   ): Promise<GitOperationResult> {
-    const validatedUrl = validateRepositoryUrl(remoteUrl);
+    return this.synchronizeRepositoryInternal(
+      repositoryId,
+      validateRepositoryUrl(remoteUrl),
+    );
+  }
+
+  /**
+   * Retry synchronization using the workspace's configured origin.
+   * The configured remote is still validated before Git fetches anything.
+   */
+  async synchronizeRepositoryFromConfiguredRemote(
+    repositoryId: string,
+  ): Promise<GitOperationResult> {
+    return this.synchronizeRepositoryInternal(repositoryId);
+  }
+
+  private async synchronizeRepositoryInternal(
+    repositoryId: string,
+    expectedRemoteUrl?: string,
+  ): Promise<GitOperationResult> {
     const targetPath = this.getWorkspacePath(repositoryId);
 
     return this.repositoryLock.run(repositoryId, () =>
@@ -240,11 +259,16 @@ export class GitOperations {
           const configuredRemote = String(
             await git.raw(["config", "--get", "remote.origin.url"]),
           ).trim();
+
           assertOperationWithinDeadline(deadlineExceeded);
 
+          const validatedConfiguredRemote =
+            validateRepositoryUrl(configuredRemote);
+
           if (
-            normalizeRepositoryUrl(configuredRemote) !==
-            normalizeRepositoryUrl(validatedUrl)
+            expectedRemoteUrl !== undefined &&
+            normalizeRepositoryUrl(validatedConfiguredRemote) !==
+              normalizeRepositoryUrl(expectedRemoteUrl)
           ) {
             throw new Error("REPOSITORY_REMOTE_MISMATCH");
           }
@@ -259,6 +283,7 @@ export class GitOperations {
           const branch = String(
             await git.revparse(["--abbrev-ref", "HEAD"]),
           ).trim();
+
           assertOperationWithinDeadline(deadlineExceeded);
 
           if (!branch || branch === "HEAD") {
@@ -274,13 +299,12 @@ export class GitOperations {
           const result = await this.getResult(
             repositoryId,
             targetPath,
-            validatedUrl,
+            expectedRemoteUrl ?? validatedConfiguredRemote,
             this.commandTimeoutMs,
             controller.signal,
           );
 
           assertOperationWithinDeadline(deadlineExceeded);
-
           return result;
         } catch (error) {
           if (deadlineExceeded) {

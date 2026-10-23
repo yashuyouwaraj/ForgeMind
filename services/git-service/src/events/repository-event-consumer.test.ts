@@ -50,6 +50,22 @@ const importedEvent = {
   },
 };
 
+const syncRequestedEvent = {
+  eventId: "event-sync-requested-001",
+  eventType: "RepositorySyncRequested",
+  eventVersion: 1,
+  occurredAt: "2026-10-12T10:01:00.000Z",
+  correlationId: "correlation-001",
+  traceId: "trace-001",
+  data: {
+    repositoryId: "repo-001",
+    projectId: "project-001",
+    ownerId: "owner-001",
+    defaultBranch: "main",
+    requestedAt: "2026-10-12T10:01:00.000Z",
+  },
+};
+
 function createMessage(
   value: string | null,
   offset = "10",
@@ -128,6 +144,18 @@ describe("KafkaRepositoryEventConsumer", () => {
     expect(mocks.consumer.commitOffsets).toHaveBeenCalledWith([
       { topic: "repository.events", partition: 0, offset: "11" },
     ]);
+    expect(mocks.producer.send).not.toHaveBeenCalled();
+  });
+
+  it("routes sync-requested events to the handler", async () => {
+    const handler = vi.fn().mockResolvedValue(undefined);
+    await createStartedConsumer(handler);
+
+    const eachMessage = await getEachMessage();
+    await eachMessage(createMessage(JSON.stringify(syncRequestedEvent)));
+
+    expect(handler).toHaveBeenCalledWith(syncRequestedEvent);
+    expect(mocks.consumer.commitOffsets).toHaveBeenCalledTimes(1);
     expect(mocks.producer.send).not.toHaveBeenCalled();
   });
 

@@ -88,6 +88,7 @@ export type RepositoryParseFailedEvent = DomainEvent<
 
 export type RepositoryEvent =
   | RepositoryImportedEvent
+  | RepositorySyncRequestedEvent
   | RepositorySynchronizedEvent
   | RepositorySyncFailedEvent
   | RepositoryParseRequestedEvent
@@ -115,4 +116,19 @@ export interface RepositoryParsedData {
 export type RepositoryParsedEvent = DomainEvent<
   "RepositoryParsed",
   RepositoryParsedData
+>;
+
+
+
+export interface RepositorySyncRequestedData {
+  readonly repositoryId: string;
+  readonly projectId: string;
+  readonly ownerId: string;
+  readonly defaultBranch: string | null;
+  readonly requestedAt: string;
+}
+
+export type RepositorySyncRequestedEvent = DomainEvent<
+  "RepositorySyncRequested",
+  RepositorySyncRequestedData
 >;

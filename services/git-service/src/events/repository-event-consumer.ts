@@ -25,6 +25,7 @@ export interface KafkaConsumerOptions {
 
 const PERMANENT_PROCESSING_ERRORS = new Set([
   "INVALID_REPOSITORY_IMPORTED_EVENT",
+  "INVALID_REPOSITORY_SYNC_REQUESTED_EVENT",
   "INVALID_REPOSITORY_EVENT",
   "INVALID_REPOSITORY_EVENT_JSON",
 ]);
@@ -212,10 +213,12 @@ export class KafkaRepositoryEventConsumer implements RepositoryEventConsumer {
 
     // These events belong to other workflow stages. They share the
     // repository event stream but are not inputs to Git operations.
+
     const unrelatedEventTypes = new Set([
       "RepositorySynchronized",
       "RepositorySyncFailed",
       "RepositoryParseRequested",
+      "RepositoryParsed",
       "RepositoryParseFailed",
     ]);
 
@@ -224,7 +227,7 @@ export class KafkaRepositoryEventConsumer implements RepositoryEventConsumer {
       return;
     }
 
-    if (type !== "RepositoryImported") {
+    if (type !== "RepositoryImported" && type !== "RepositorySyncRequested") {
       await this.deadLetter(
         topic,
         partition,

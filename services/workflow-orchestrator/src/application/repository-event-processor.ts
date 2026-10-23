@@ -1,4 +1,3 @@
-
 import type { RepositoryEvent } from "@forgemind/shared-events";
 import { randomUUID } from "node:crypto";
 import { Prisma, PrismaClient } from "../generated/prisma/index.js";
@@ -6,9 +5,14 @@ import { Workflow } from "../domain/workflow.js";
 import { PrismaWorkflowRepository } from "../infrastructure/persistence/prisma-workflow-repository.js";
 import { prisma } from "../infrastructure/database/prisma.js";
 
-const RETRY_DELAY_MS = 30_000;
-
 type TransactionClient = Prisma.TransactionClient;
+
+interface RepositoryEventProcessorOptions {
+  readonly retryDelayMs?: number;
+  readonly now?: () => Date;
+}
+
+const DEFAULT_RETRY_DELAY_MS = 30_000;
 
 export interface ProcessRepositoryEventResult {
   readonly outcome: "processed" | "duplicate";
@@ -36,8 +40,10 @@ function dateFrom(value: string): Date {
   return date;
 }
 
-function retryAt(occurredAt: string): Date {
-  return new Date(dateFrom(occurredAt).getTime() + RETRY_DELAY_MS);
+function retryAt(occurredAt: Date, now: Date, retryDelayMs: number): Date {
+  const baseTime = Math.max(now.getTime(), occurredAt.getTime());
+
+  return new Date(baseTime + retryDelayMs);
 }
 
 function isCommitSha(value: string): boolean {
@@ -45,11 +51,22 @@ function isCommitSha(value: string): boolean {
 }
 
 export class RepositoryEventProcessor {
-  constructor(private readonly client: PrismaClient = prisma) {}
+  private readonly retryDelayMs: number;
+  private readonly now: () => Date;
 
-  async process(
-    event: RepositoryEvent,
-  ): Promise<ProcessRepositoryEventResult> {
+  constructor(
+    private readonly client: PrismaClient = prisma,
+    options: RepositoryEventProcessorOptions = {},
+  ) {
+    this.retryDelayMs = options.retryDelayMs ?? DEFAULT_RETRY_DELAY_MS;
+    this.now = options.now ?? (() => new Date());
+
+    if (!Number.isFinite(this.retryDelayMs) || this.retryDelayMs <= 0) {
+      throw new Error("retryDelayMs must be a positive finite number.");
+    }
+  }
+
+  async process(event: RepositoryEvent): Promise<ProcessRepositoryEventResult> {
     return this.client.$transaction(async (tx) => {
       const inserted = await tx.workflowInboxEvent.createMany({
         data: {
@@ -110,6 +127,10 @@ export class RepositoryEventProcessor {
         // This event belongs to the parser service. Never consume it
         // as a workflow completion or republish it from this processor.
         return;
+
+      case "RepositorySyncRequested":
+        // This event belongs to the Git service; it is not a workflow result.
+        return;
     }
   }
 
@@ -162,13 +183,11 @@ export class RepositoryEventProcessor {
     const synchronizedAt = dateFrom(event.data.synchronizedAt);
     const workflow = persisted.workflow;
 
-    if (
-      event.data.headCommit === null ||
-      !isCommitSha(event.data.headCommit)
-    ) {
+    if (event.data.headCommit === null || !isCommitSha(event.data.headCommit)) {
       workflow.recordFailure({
         code: "REPOSITORY_HEAD_COMMIT_UNAVAILABLE",
-        message: "Repository synchronization did not provide a valid commit SHA.",
+        message:
+          "Repository synchronization did not provide a valid commit SHA.",
         retryable: false,
         occurredAt: synchronizedAt,
       });
@@ -259,6 +278,10 @@ export class RepositoryEventProcessor {
 
     const occurredAt = dateFrom(event.occurredAt);
 
+    const nextAttemptAt = event.data.retryable
+      ? retryAt(occurredAt, this.now(), this.retryDelayMs)
+      : undefined;
+
     persisted.workflow.recordFailure(
       {
         code: event.data.failureCode,
@@ -266,7 +289,7 @@ export class RepositoryEventProcessor {
         retryable: event.data.retryable,
         occurredAt,
       },
-      event.data.retryable ? retryAt(event.occurredAt) : undefined,
+      nextAttemptAt,
     );
 
     await repository.save(persisted.workflow, persisted.version);

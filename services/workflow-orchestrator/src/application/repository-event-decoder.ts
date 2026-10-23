@@ -73,6 +73,13 @@ function isValidEventData(
         typeof data.retryable === "boolean"
       );
 
+    case "RepositorySyncRequested":
+      return (
+        (data.defaultBranch === null ||
+          isNonEmptyString(data.defaultBranch)) &&
+        isTimestamp(data.requestedAt)
+      );
+
     case "RepositoryParseRequested":
       return (
         typeof data.headCommit === "string" &&
